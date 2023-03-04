@@ -1,36 +1,56 @@
--- Angered Earth
-UPDATE `creature_template` SET `DamageModifier`= 8 WHERE `entry`= 50376;
--- Chains of Woe
-UPDATE `creature_template` SET `ScriptName`= '' WHERE `entry`= 40447;
-UPDATE `creature_template` SET `ScriptName`= 'npc_romogg_chains_of_woe' WHERE `entry`= 40447;
-UPDATE `creature_template` SET `InhabitType`= 12, `mechanic_immune_mask`= 1 | 2 | 16 | 32 | 256 | 512 | 2048 | 8192 | 65536 | 131072 | 8388608 | 33554432, `flags_extra`= 0x40000000 WHERE `entry` IN (40447, 50379);
-
--- Template Addons
-DELETE FROM `creature_template_addon` WHERE `entry` IN (40401);
-INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES
-(40401, '75379');
--- Spells
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN
-('spell_romogg_quake',
-'spell_chains_of_woe_1',
-'spell_chains_of_woe_4',
-'spell_romogg_chains_of_woe_teleport',
-'spell_romogg_chains_of_woe_root',
-'spell_romogg_chains_of_woe',
-'spell_romogg_chains_of_woe_teleport_dest',
-'spell_romogg_call_for_help');
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(75272, 'spell_romogg_quake'),
-(75437, 'spell_romogg_chains_of_woe_teleport'),
-(82189, 'spell_romogg_chains_of_woe_root'),
-(75539, 'spell_romogg_chains_of_woe'),
-(75464, 'spell_romogg_chains_of_woe_teleport_dest'),
-(82137, 'spell_romogg_call_for_help');
--- Achievement
-DELETE FROM `achievement_criteria_data` WHERE `criteria_id`= 15943;
-INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
-(15943, 11, 0, 0, 'achievement_crushing_bones_and_cracking_skulls');
-DELETE FROM `conditions` WHERE `SourceEntry`= 93454 AND `SourceTypeOrReferenceId`= 13;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ScriptName`, `Comment`) VALUES
-(13, 2, 93454, 0, 0, 31, 0, 3, 50376, 0, 0, 0, '', 'The Skullcracker - Target Enraged Earth'),
-(13, 2, 93454, 0, 1, 31, 0, 3, 40447, 0, 0, 0, '', 'The Skullcracker - Target Chains of Woe');
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN (55085,54853,55500,55419,55510)
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(55085, 0, 0, 0, 2, 0, 100, 30, 0, 2, 95000, 96000, 11, 98535, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Peroth\'arn'),
+(55085, 0, 1, 0, 0, 0, 100, 30, 5000, 6000, 40000, 41000, 11, 98535, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Peroth\'arn'),
+(55085, 0, 3, 0, 0, 0, 100, 30, 7000, 7000, 32000, 32000, 11, 108141, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Peroth\'arn'),
+(55085, 0, 4, 0, 0, 0, 100, 30, 5000, 6000, 40000, 41000, 11, 98535, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Peroth\'arn'),
+(55085, 0, 5, 0, 0, 0, 100, 30, 7000, 7000, 32000, 34000, 11, 108141, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Peroth\'arn'),
+(55085, 0, 6, 0, 0, 0, 100, 8, 600000, 600000, 600000, 600000, 11, 108141, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Berserk in 25 HC = 10 min'),
+(54853, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Set Phase 1 on Aggro'),
+(54853, 0, 1, 0, 4, 1, 100, 1, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Stop Moving on Aggro'),
+(54853, 0, 2, 0, 4, 1, 100, 1, 0, 0, 0, 0, 11, 103241, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Cast Bolt on Aggro'),
+(54853, 0, 3, 0, 9, 1, 100, 0, 0, 40, 3400, 4700, 11, 103241, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Cast Bolt'),
+(54853, 0, 4, 0, 9, 1, 100, 0, 40, 100, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Start Moving when not in Bolt Range'),
+(54853, 0, 5, 0, 9, 1, 100, 0, 10, 15, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Stop Moving at 15 Yards'),
+(54853, 0, 6, 0, 9, 1, 100, 0, 0, 40, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Stop Moving when in Bolt Range'),
+(54853, 0, 7, 0, 3, 1, 100, 0, 0, 15, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Set Phase 2 at 15% Mana'),
+(54853, 0, 8, 0, 3, 2, 100, 0, 0, 15, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Start Moving at 15% Mana'),
+(54853, 0, 9, 0, 3, 2, 100, 0, 30, 100, 100, 100, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Set Phase 1 When Mana is above 30%'),
+(54853, 0, 10, 0, 2, 2, 100, 1, 0, 15, 0, 0, 22, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Set Phase 3 at 15% HP'),
+(54853, 0, 11, 0, 2, 3, 100, 1, 0, 15, 0, 0, 25, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Flee at 15% HP'),
+(54853, 0, 12, 0, 7, 3, 100, 1, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Reset on Evade'),
+(54853, 0, 13, 0, 2, 3, 100, 1, 0, 15, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Say Text at 15% HP'),
+(54853, 0, 14, 0, 4, 1, 100, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Say Text on Aggro'),
+(54853, 0, 15, 0, 1, 0, 100, 0, 500, 1000, 600000, 600000, 11, 103241, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Cast Frost Armor on Spawn'),
+(55500, 0, 0, 0, 2, 0, 100, 30, 0, 2, 95000, 96000, 11, 104738, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage'),
+(55500, 0, 1, 0, 0, 0, 100, 30, 5000, 6000, 40000, 41000, 11, 105543, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage'),
+(55500, 0, 3, 0, 0, 0, 100, 30, 7000, 7000, 32000, 33000, 11, 105547, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage'),
+(55500, 0, 4, 0, 0, 0, 100, 30, 5000, 6000, 40000, 41000, 11, 105635, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage'),
+(55500, 0, 5, 0, 0, 0, 100, 30, 7000, 7000, 32000, 33000, 11, 105915, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage'),
+(55500, 0, 6, 0, 0, 0, 100, 8, 600000, 600000, 600000, 600000, 11, 104400, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Berserk in 25 HC = 10 min'),
+(55419, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Set Phase 1 on Aggro'),
+(55419, 0, 1, 0, 4, 1, 100, 1, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Stop Moving on Aggro'),
+(55419, 0, 2, 0, 4, 1, 100, 1, 0, 0, 0, 0, 11, 102478, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Cast Bolt on Aggro'),
+(55419, 0, 3, 0, 9, 1, 100, 0, 0, 40, 3400, 4700, 11, 102478, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Cast Bolt'),
+(55419, 0, 4, 0, 9, 1, 100, 0, 40, 100, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Start Moving when not in Bolt Range'),
+(55419, 0, 5, 0, 4, 0, 100, 1, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Set Phase 2 on Aggro'),
+(55419, 0, 6, 0, 4, 1, 100, 1, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Stop Moving on Aggro'),
+(55419, 0, 7, 0, 4, 1, 100, 1, 0, 0, 0, 0, 11, 102466, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Cast Bolt on Aggro'),
+(55419, 0, 8, 0, 9, 1, 100, 0, 0, 40, 3400, 4700, 11, 102466, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Cast Bolt'),
+(55419, 0, 9, 0, 9, 1, 100, 0, 40, 100, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Start Moving when not in Bolt Range'),
+(55419, 0, 10, 0, 4, 0, 100, 1, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Set Phase 3 on Aggro'),
+(55419, 0, 11, 0, 4, 1, 100, 1, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Stop Moving on Aggro'),
+(55419, 0, 12, 0, 4, 1, 100, 1, 0, 0, 0, 0, 11, 102467, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Cast Bolt on Aggro'),
+(55419, 0, 13, 0, 9, 1, 100, 0, 0, 40, 3400, 4700, 11, 102467, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Cast Bolt'),
+(55419, 0, 14, 0, 9, 1, 100, 0, 40, 100, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Start Moving when not in Bolt Range'),
+(55419, 0, 15, 0, 7, 3, 100, 1, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Reset on Evade'),
+(55419, 0, 16, 0, 2, 3, 100, 1, 0, 15, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Say Text at 15% HP'),
+(55419, 0, 17, 0, 4, 1, 100, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Say Text on Aggro'),
+(55419, 0, 18, 0, 1, 0, 100, 0, 500, 1000, 600000, 600000, 11, 82631, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Cast Frost Armor on Spawn'),
+(55510, 0, 0, 0, 0, 0, 100, 6, 5000, 7000, 18000, 26000, 11, 103992, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Cast Abyssal Flames'),
+(54969, 0, 0, 0, 2, 0, 100, 30, 0, 2, 95000, 96000, 11, 104961, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Mannoroth <The Destructor>'),
+(54969, 0, 1, 0, 0, 0, 100, 30, 5000, 6000, 40000, 41000, 11, 103888, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Mannoroth <The Destructor>'),
+(54969, 0, 3, 0, 0, 0, 100, 30, 7000, 7000, 32000, 33000, 11, 103966, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Mannoroth <The Destructor>'),
+(54969, 0, 4, 0, 0, 0, 100, 30, 5000, 6000, 40000, 41000, 11, 105141, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Mannoroth <The Destructor>'),
+(54969, 0, 5, 0, 0, 0, 100, 30, 7000, 7000, 32000, 33000, 11, 104625, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Mannoroth <The Destructor>'),
+(54969, 0, 6, 0, 0, 0, 100, 8, 600000, 600000, 600000, 600000, 11, 105041, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Berserk in 25 HC = 10 min'),
