@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -408,7 +408,7 @@ class spell_husam_mystic_trap : public SpellScript
         if (targets.size() < 3)
             return;
 
-        Firelands::Containers::RandomResize(targets, 3);
+        Trinity::Containers::RandomResize(targets, 3);
     }
 
     void Register() override

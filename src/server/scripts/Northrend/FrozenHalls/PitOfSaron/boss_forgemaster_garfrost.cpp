@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -171,11 +171,11 @@ class boss_garfrost : public CreatureScript
                 events.ScheduleEvent(EVENT_RESUME_ATTACK, 5000);
             }
 
-            void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+            void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
             {
-                if (spell->Id == SPELL_PERMAFROST_HELPER)
+                if (spell->Id == SPELL_PERMAFROST_HELPER && target->IsUnit())
                 {
-                    if (Aura* aura = target->GetAura(SPELL_PERMAFROST_HELPER))
+                    if (Aura* aura = target->ToUnit()->GetAura(SPELL_PERMAFROST_HELPER))
                         _permafrostStack = std::max<uint32>(_permafrostStack, aura->GetStackAmount());
                 }
             }

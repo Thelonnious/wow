@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -103,9 +103,10 @@ public:
 
         void DamageTaken(Unit* done_by, uint32 &damage) override
         {
-            Player* player = done_by->ToPlayer();
+            if (!done_by || !me->HealthBelowPctDamaged(30, damage))
+                return;
 
-            if (player && me->HealthBelowPctDamaged(30, damage))
+            if (Player* player = done_by->ToPlayer())
             {
                 if (Group* group = player->GetGroup())
                 {

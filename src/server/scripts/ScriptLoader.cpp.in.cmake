@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,47 +18,47 @@
 // This file was created automatically from your script configuration!
 // Use CMake to reconfigure this file, never change it on your own!
 
-#cmakedefine FIRELANDS_IS_DYNAMIC_SCRIPTLOADER
+#cmakedefine TRINITY_IS_DYNAMIC_SCRIPTLOADER
 
 #include "Define.h"
 #include <vector>
 #include <string>
 
-@FIRELANDS_SCRIPTS_FORWARD_DECL@
-#ifdef FIRELANDS_IS_DYNAMIC_SCRIPTLOADER
+@TRINITY_SCRIPTS_FORWARD_DECL@
+#ifdef TRINITY_IS_DYNAMIC_SCRIPTLOADER
 #  include "revision_data.h"
-#  define FC_SCRIPT_API FC_API_EXPORT
+#  define TC_SCRIPT_API TC_API_EXPORT
 extern "C" {
 
 /// Exposed in script modules to return the script module revision hash.
-FC_SCRIPT_API char const* GetScriptModuleRevisionHash()
+TC_SCRIPT_API char const* GetScriptModuleRevisionHash()
 {
     return _HASH;
 }
 
 /// Exposed in script module to return the name of the script module
 /// contained in this shared library.
-FC_SCRIPT_API char const* GetScriptModule()
+TC_SCRIPT_API char const* GetScriptModule()
 {
-    return "@FIRELANDS_CURRENT_SCRIPT_PROJECT@";
+    return "@TRINITY_CURRENT_SCRIPT_PROJECT@";
 }
 
 #else
 #  include "ScriptLoader.h"
-#  define FC_SCRIPT_API
+#  define TC_SCRIPT_API
 #endif
 
 /// Exposed in script modules to register all scripts to the ScriptMgr.
-FC_SCRIPT_API void AddScripts()
+TC_SCRIPT_API void AddScripts()
 {
-@FIRELANDS_SCRIPTS_INVOKE@}
+@TRINITY_SCRIPTS_INVOKE@}
 
 /// Exposed in script modules to get the build directive of the module.
-FC_SCRIPT_API char const* GetBuildDirective()
+TC_SCRIPT_API char const* GetBuildDirective()
 {
     return _BUILD_DIRECTIVE;
 }
 
-#ifdef FIRELANDS_IS_DYNAMIC_SCRIPTLOADER
+#ifdef TRINITY_IS_DYNAMIC_SCRIPTLOADER
 } // extern "C"
 #endif

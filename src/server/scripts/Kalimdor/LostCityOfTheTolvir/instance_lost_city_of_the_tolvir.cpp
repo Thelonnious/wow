@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -141,6 +141,7 @@ class instance_lost_city_of_the_tolvir : public InstanceMapScript
                     default:
                         break;
                 }
+                    
             }
 
             void OnGameObjectCreate(GameObject* go) override
@@ -218,12 +219,12 @@ class instance_lost_city_of_the_tolvir : public InstanceMapScript
                         switch (value)
                         {
                             case ASSISTANCE_SUMMON_AUGH_DART:
-                                if (Unit* stalker = instance->GetCreature(Firelands::Containers::SelectRandomContainerElement(addStalkerGUIDs)))
+                                if (Unit* stalker = instance->GetCreature(Trinity::Containers::SelectRandomContainerElement(addStalkerGUIDs)))
                                     stalker->CastSpell(stalker, SPELL_SUMMON_AUGH_DART);
                                 SetData(DATA_LOCKMAW_COMBAT_ASSISTANCE, ASSISTANCE_NONE);
                                 break;
                             case ASSISTANCE_SUMMON_AUGH_WHIRLWIND:
-                                if (Unit* stalker = instance->GetCreature(Firelands::Containers::SelectRandomContainerElement(addStalkerGUIDs)))
+                                if (Unit* stalker = instance->GetCreature(Trinity::Containers::SelectRandomContainerElement(addStalkerGUIDs)))
                                     stalker->CastSpell(stalker, SPELL_SUMMON_AUGH_WHIRLWIND);
                                 SetData(DATA_LOCKMAW_COMBAT_ASSISTANCE, ASSISTANCE_NONE);
                                 break;
@@ -232,7 +233,7 @@ class instance_lost_city_of_the_tolvir : public InstanceMapScript
                                 GuidVector tempList = addStalkerGUIDs;
                                 if (!tempList.empty())
                                 {
-                                    Firelands::Containers::RandomResize(tempList, 4);
+                                    Trinity::Containers::RandomResize(tempList, 4);
                                     for (auto itr = tempList.begin(); itr != tempList.end(); itr++)
                                         if (Unit* stalker = instance->GetCreature(*itr))
                                             stalker->CastSpell(stalker, SPELL_SUMMON_CROCOLISK);

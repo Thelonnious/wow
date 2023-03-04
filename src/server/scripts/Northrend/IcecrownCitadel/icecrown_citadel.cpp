@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -745,7 +745,7 @@ class boss_sister_svalna : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell) override
+            void SpellHit(WorldObject* caster, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_HURL_SPEAR && me->HasAura(SPELL_AETHER_SHIELD))
                 {
@@ -766,12 +766,13 @@ class boss_sister_svalna : public CreatureScript
                 me->SetHover(false);
             }
 
-            void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+            void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
             {
                 switch (spell->Id)
                 {
                     case SPELL_IMPALING_SPEAR_KILL:
-                        me->Kill(target);
+                        if (target->IsUnit())
+                            Unit::Kill(me, target->ToUnit());
                         break;
                     case SPELL_IMPALING_SPEAR:
                         if (TempSummon* summon = target->SummonCreature(NPC_IMPALING_SPEAR, *target))
@@ -990,7 +991,7 @@ class npc_crok_scourgebane : public CreatureScript
                         // get all nearby vrykul
                         std::list<Creature*> temp;
                         FrostwingVrykulSearcher check(me, 80.0f);
-                        Firelands::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
+                        Trinity::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
                         Cell::VisitGridObjects(me, searcher, 80.0f);
 
                         _aliveTrash.clear();
@@ -1016,8 +1017,8 @@ class npc_crok_scourgebane : public CreatureScript
                 {
                     _wipeCheckTimer = 1000;
                     Player* player = nullptr;
-                    Firelands::AnyPlayerInObjectRangeCheck check(me, 60.0f);
-                    Firelands::PlayerSearcher<Firelands::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
+                    Trinity::AnyPlayerInObjectRangeCheck check(me, 60.0f);
+                    Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
                     Cell::VisitWorldObjects(me, searcher, 60.0f);
                     // wipe
                     if (!player)
@@ -1026,7 +1027,7 @@ class npc_crok_scourgebane : public CreatureScript
                         if (damage >= me->GetHealth())
                         {
                             FrostwingGauntletRespawner respawner;
-                            Firelands::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
+                            Trinity::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
                             Cell::VisitGridObjects(me, worker, 333.0f);
                             Talk(SAY_CROK_DEATH);
                         }
@@ -1218,7 +1219,7 @@ struct npc_argent_captainAI : public ScriptedAI
             Reset();
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_REVIVE_CHAMPION && !IsUndead)
             {
@@ -1303,7 +1304,7 @@ class npc_captain_arnath : public CreatureScript
                         case EVENT_ARNATH_PW_SHIELD:
                         {
                             std::list<Creature*> targets = DoFindFriendlyMissingBuff(40.0f, SPELL_POWER_WORD_SHIELD);
-                            DoCast(Firelands::Containers::SelectRandomContainerElement(targets), SPELL_POWER_WORD_SHIELD);
+                            DoCast(Trinity::Containers::SelectRandomContainerElement(targets), SPELL_POWER_WORD_SHIELD);
                             Events.ScheduleEvent(EVENT_ARNATH_PW_SHIELD, urand(15000, 20000));
                             break;
                         }
@@ -1331,8 +1332,8 @@ class npc_captain_arnath : public CreatureScript
             Creature* FindFriendlyCreature() const
             {
                 Creature* target = nullptr;
-                Firelands::FriendlyMostHPMissingInRange u_check(me, 60.0f, 0);
-                Firelands::CreatureLastSearcher<Firelands::FriendlyMostHPMissingInRange> searcher(me, target, u_check);
+                Trinity::FriendlyMostHPMissingInRange u_check(me, 60.0f, 0);
+                Trinity::CreatureLastSearcher<Trinity::FriendlyMostHPMissingInRange> searcher(me, target, u_check);
                 Cell::VisitGridObjects(me, searcher, 60.0f);
                 return target;
             }
@@ -1736,12 +1737,12 @@ class spell_icc_sprit_alarm : public SpellScriptLoader
                         return;
                 }
 
-                if (GameObject* trap = GetCaster()->FindNearestGameObject(trapId, 5.0f))
+                if (GameObject* trap = GetGObjCaster()->FindNearestGameObject(trapId, 5.0f))
                     trap->SetRespawnTime(trap->GetGOInfo()->GetAutoCloseTime() / IN_MILLISECONDS);
 
                 std::list<Creature*> wards;
-                GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
-                wards.sort(Firelands::ObjectDistanceOrderPred(GetCaster()));
+                GetGObjCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
+                wards.sort(Trinity::ObjectDistanceOrderPred(GetGObjCaster()));
                 for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
                 {
                     if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
@@ -1788,7 +1789,7 @@ class spell_svalna_revive_champion : public SpellScriptLoader
             void RemoveAliveTarget(std::list<WorldObject*>& targets)
             {
                 targets.remove_if(AliveCheck());
-                Firelands::Containers::RandomResize(targets, 2);
+                Trinity::Containers::RandomResize(targets, 2);
             }
 
             void Land(SpellEffIndex /*effIndex*/)
@@ -1935,7 +1936,7 @@ class at_icc_saurfang_portal : public AreaTriggerScript
                 instance->SetData(DATA_COLDFLAME_JETS, IN_PROGRESS);
                 std::list<Creature*> traps;
                 GetCreatureListWithEntryInGrid(traps, player, NPC_FROST_FREEZE_TRAP, 120.0f);
-                traps.sort(Firelands::ObjectDistanceOrderPred(player));
+                traps.sort(Trinity::ObjectDistanceOrderPred(player));
                 bool instant = false;
                 for (std::list<Creature*>::iterator itr = traps.begin(); itr != traps.end(); ++itr)
                 {

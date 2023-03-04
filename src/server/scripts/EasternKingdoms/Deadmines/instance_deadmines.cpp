@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -675,7 +675,7 @@ class instance_deadmines : public InstanceMapScript
                                     std::list<Player*> playerList;
                                     purposeBunny->GetPlayerListInGrid(playerList, 100.0f);
                                     if (!playerList.empty())
-                                        if (Player* target = Firelands::Containers::SelectRandomContainerElement(playerList))
+                                        if (Player* target = Trinity::Containers::SelectRandomContainerElement(playerList))
                                             purposeBunny->CastSpell(target, SPELL_SUMMON_ICICLE, true);
                                 }
                             }

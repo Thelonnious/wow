@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -277,15 +277,15 @@ struct boss_theralion final : public BossAI
         _DespawnAtEvade();
     }
 
-    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
     {
-        if (!caster)
+        if (!caster || !caster->IsUnit())
             return;
 
         switch (spell->Id)
         {
             case SPELL_SHARE_HEALTH_2:
-                if (!caster->HasAura(SPELL_SHARE_HEALTH_1))
+                if (!caster->ToUnit()->HasAura(SPELL_SHARE_HEALTH_1))
                     DoCastAOE(SPELL_SHARE_HEALTH_1, true);
                 break;
             case SPELL_TRIGGER_ACTION_THERALION:
@@ -517,15 +517,15 @@ struct boss_valiona final : public BossAI
         _DespawnAtEvade();
     }
 
-    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
     {
-        if (!caster)
+        if (!caster || !caster->IsUnit())
             return;
 
         switch (spell->Id)
         {
             case SPELL_SHARE_HEALTH_1:
-                if (!caster->HasAura(SPELL_SHARE_HEALTH_2))
+                if (!caster->ToUnit()->HasAura(SPELL_SHARE_HEALTH_2))
                     DoCastAOE(SPELL_SHARE_HEALTH_2, true);
                 break;
             case SPELL_TRIGGER_ACTION_VALIONA:
@@ -693,7 +693,7 @@ struct boss_valiona final : public BossAI
                     break;
                 case EVENT_FACE_TO_DIRECTION:
                     _currentDeepBreathWaypoint.clear();
-                    _currentDeepBreathWaypoint = Firelands::Containers::SelectRandomContainerElement(_deepBreathWaypoints);
+                    _currentDeepBreathWaypoint = Trinity::Containers::SelectRandomContainerElement(_deepBreathWaypoints);
 
                     if (_currentRoomSide == SIDE_THERALION)
                         me->SetFacingTo(me->GetAngle(_currentDeepBreathWaypoint.back()));
@@ -771,7 +771,7 @@ struct npc_theralion_and_valiona_unstable_twilight final : public ScriptedAI
         _events.ScheduleEvent(EVENT_MOVE_RANDOM, 1ms, 1s);
     }
 
-    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {
@@ -992,7 +992,7 @@ class spell_theralion_fabulous_flames_targeting final : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleHit(SpellEffIndex effIndex)
@@ -1040,9 +1040,9 @@ class spell_theralion_engulfing_magic_targeting final : public SpellScript
         if (Unit* caster = GetCaster())
         {
             if (caster->GetMap()->Is25ManRaid() && targets.size() > 3)
-                Firelands::Containers::RandomResize(targets, 3);
+                Trinity::Containers::RandomResize(targets, 3);
             else if (!caster->GetMap()->Is25ManRaid())
-                Firelands::Containers::RandomResize(targets, 1);
+                Trinity::Containers::RandomResize(targets, 1);
         }
     }
 
@@ -1083,7 +1083,7 @@ class spell_valiona_blackout_dummy final : public SpellScript
 {
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleHit(SpellEffIndex effIndex)
@@ -1173,7 +1173,7 @@ class spell_valiona_devouring_flames_targeting final : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void Register() override
@@ -1226,7 +1226,7 @@ class spell_valiona_twilight_meteorite_targeting final : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleEffect(SpellEffIndex effIndex)
@@ -1308,7 +1308,7 @@ class spell_valiona_strafe final : public SpellScript
         std::list<Creature*> dummyList;
         caster->GetCreatureListWithEntryInGrid(dummyList, NPC_VALIONA_DUMMY, 20.0f);
         dummyList.remove(caster->ToCreature());
-        dummyList.sort(Firelands::ObjectDistanceOrderPred(GetCaster(), true));
+        dummyList.sort(Trinity::ObjectDistanceOrderPred(GetCaster(), true));
 
         if (!dummyList.empty())
             dummyList.remove_if(StrafeLaneCheck(caster));

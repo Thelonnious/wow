@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -158,7 +158,7 @@ public:
         if (!*args)
             return false;
 
-        sWorld->SendServerMessage(SERVER_MSG_STRING, Firelands::StringFormat(handler->GetFirelandsString(LANG_SYSTEMMESSAGE), args).c_str());
+        sWorld->SendServerMessage(SERVER_MSG_STRING, Trinity::StringFormat(handler->GetTrinityString(LANG_SYSTEMMESSAGE), args).c_str());
         return true;
     }
     // announce to logged in GMs
@@ -176,7 +176,7 @@ public:
         if (!*args)
             return false;
 
-        std::string str = handler->GetFirelandsString(LANG_GLOBAL_NOTIFY);
+        std::string str = handler->GetTrinityString(LANG_GLOBAL_NOTIFY);
         str += args;
 
         WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
@@ -191,7 +191,7 @@ public:
         if (!*args)
             return false;
 
-        std::string str = handler->GetFirelandsString(LANG_GM_NOTIFY);
+        std::string str = handler->GetTrinityString(LANG_GM_NOTIFY);
         str += args;
 
         WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
@@ -205,7 +205,7 @@ public:
     {
         if (!*args)
         {
-            handler->PSendSysMessage(LANG_COMMAND_WHISPERACCEPTING, handler->GetSession()->GetPlayer()->isAcceptWhispers() ?  handler->GetFirelandsString(LANG_ON) : handler->GetFirelandsString(LANG_OFF));
+            handler->PSendSysMessage(LANG_COMMAND_WHISPERACCEPTING, handler->GetSession()->GetPlayer()->isAcceptWhispers() ?  handler->GetTrinityString(LANG_ON) : handler->GetTrinityString(LANG_OFF));
             return true;
         }
 

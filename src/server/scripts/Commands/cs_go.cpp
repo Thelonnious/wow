@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -33,12 +33,13 @@ EndScriptData */
 #include "PhasingHandler.h"
 #include "Player.h"
 #include "RBAC.h"
+#include "TerrainMgr.h"
 #include "TicketMgr.h"
 #include "Transport.h"
 #include "Util.h"
 #include "WorldSession.h"
 
-using namespace Firelands::ChatCommands;
+using namespace Trinity::ChatCommands;
 class go_commandscript : public CommandScript
 {
 public:
@@ -245,8 +246,8 @@ public:
         else
             player->SaveRecallPosition();
 
-        Map* map = sMapMgr->CreateBaseMap(mapId);
-        float z = std::max(map->GetHeight(PhasingHandler::GetEmptyPhaseShift(), x, y, MAX_HEIGHT), map->GetWaterLevel(PhasingHandler::GetEmptyPhaseShift(), x, y));
+        std::shared_ptr<TerrainInfo> terrain = sTerrainMgr.LoadTerrain(mapId);
+        float z = std::max(terrain->GetStaticHeight(PhasingHandler::GetEmptyPhaseShift(), mapId, x, y, MAX_HEIGHT), terrain->GetWaterLevel(PhasingHandler::GetEmptyPhaseShift(), mapId, x, y));
 
         player->TeleportTo(mapId, x, y, z, player->GetOrientation());
         return true;
@@ -317,16 +318,13 @@ public:
         AreaTableEntry const* zoneEntry = areaEntry->ParentAreaID ? sAreaTableStore.LookupEntry(areaEntry->ParentAreaID) : areaEntry;
         ASSERT(zoneEntry);
 
-        Map* map = sMapMgr->CreateBaseMap(zoneEntry->ContinentID);
-
-        if (map->Instanceable())
+        std::shared_ptr<TerrainInfo> terrain = sTerrainMgr.LoadTerrain(zoneEntry->ContinentID);
+        if (!sDBCManager.Zone2MapCoordinates(x, y, zoneEntry->ID))
         {
-            handler->PSendSysMessage(LANG_INVALID_ZONE_MAP, areaEntry->ID, areaEntry->AreaName, map->GetId(), map->GetMapName());
+            handler->PSendSysMessage(LANG_INVALID_ZONE_MAP, areaEntry->ID, areaEntry->AreaName, terrain->GetId(), terrain->GetMapName());
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        sDBCManager.Zone2MapCoordinates(x, y, zoneEntry->ID);
 
         if (!MapManager::IsValidMapCoord(zoneEntry->ContinentID, x, y))
         {
@@ -345,7 +343,7 @@ public:
         else
             player->SaveRecallPosition();
 
-        float z = std::max(map->GetHeight(PhasingHandler::GetEmptyPhaseShift(), x, y, MAX_HEIGHT), map->GetWaterLevel(PhasingHandler::GetEmptyPhaseShift(), x, y));
+        float z = std::max(terrain->GetStaticHeight(PhasingHandler::GetEmptyPhaseShift(), zoneEntry->ContinentID, x, y, MAX_HEIGHT), terrain->GetWaterLevel(PhasingHandler::GetEmptyPhaseShift(), zoneEntry->ContinentID, x, y));
 
         player->TeleportTo(zoneEntry->ContinentID, x, y, z, player->GetOrientation());
         return true;
@@ -374,8 +372,8 @@ public:
                 handler->SetSentErrorMessage(true);
                 return false;
             }
-            Map* map = sMapMgr->CreateBaseMap(mapId);
-            z = std::max(map->GetHeight(PhasingHandler::GetEmptyPhaseShift(), x, y, MAX_HEIGHT), map->GetWaterLevel(PhasingHandler::GetEmptyPhaseShift(), x, y));
+            std::shared_ptr<TerrainInfo> terrain = sTerrainMgr.LoadTerrain(mapId);
+            z = std::max(terrain->GetStaticHeight(PhasingHandler::GetEmptyPhaseShift(), mapId, x, y, MAX_HEIGHT), terrain->GetWaterLevel(PhasingHandler::GetEmptyPhaseShift(), mapId, x, y));
         }
 
         return DoTeleport(handler, { x, y, *z, o.value_or(0.0f) }, mapId);

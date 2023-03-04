@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -109,7 +109,6 @@ enum TotTCreatureIds
 
 enum TotTGameObjectIds
 {
-    GO_TEMP_FALLING_ROCKS                   = 202742,
     GO_DOODAD_ABYSSAL_MAW_DOOR_1            = 204338,
     GO_DOODAD_ABYSSAL_MAW_DOOR_2            = 204339,
     GO_DOODAD_ABYSSAL_MAW_DOOR_4            = 204341,

@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -128,7 +128,7 @@ public:
 
         void DamageTaken(Unit* done_by, uint32 &damage) override
         {
-            if (done_by->GetGUID() != victimGUID && done_by->GetGUID() != me->GetGUID())
+            if (!done_by || (done_by->GetGUID() != victimGUID && done_by->GetGUID() != me->GetGUID()))
             {
                 damage = 0;
                 ModifyThreatByPercent(done_by, -100);
@@ -157,7 +157,7 @@ public:
                     AttackStart(owner);
                 } else if (owner && owner->isDead())
                 {
-                    me->DealDamage(me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                    me->KillSelf();
                     return;
                 }
             }

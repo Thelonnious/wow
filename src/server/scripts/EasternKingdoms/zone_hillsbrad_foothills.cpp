@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -244,12 +244,9 @@ Position const FreezyaSeedJumpPos   = { -116.2847f, 216.7865f, 53.2755f };
 struct npc_brazie_the_bonatist_vehicle : public VehicleAI
 {
     npc_brazie_the_bonatist_vehicle(Creature* creature) : VehicleAI(creature), _summons(me), _currentLevel(LEVEL_TUTORIAL),
-        _deadZombieCount(0), _damagedZombieCount(0), _damagedGhoulCount(0), _currentStage(0)
-    {
-        Inizialize();
-    }
+        _deadZombieCount(0), _damagedZombieCount(0), _damagedGhoulCount(0), _currentStage(0), _timeUntilNextSolarPower(0s) { }
 
-    void Inizialize()
+    void InizializeAI()
     {
         // Figure out at what level we currently are
         InitializeLevel();
@@ -306,7 +303,7 @@ struct npc_brazie_the_bonatist_vehicle : public VehicleAI
         }
     }
 
-    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {
@@ -467,7 +464,8 @@ struct npc_brazie_the_bonatist_vehicle : public VehicleAI
                     float x = pos.GetPositionX() + cos(angle) * 3;
                     float y = pos.GetPositionY() + sin(angle) * 3;
 
-                    GetPlayer()->CastSpell({ x, y, pos.GetPositionZ() + 50.0f }, SPELL_CREATE_RANDOM_SUN_POWER, true);
+                    if (Player* player = GetPlayer())
+                        player->CastSpell({ x, y, pos.GetPositionZ() + 50.0f }, SPELL_CREATE_RANDOM_SUN_POWER, true);
 
                     switch (_currentLevel)
                     {
@@ -581,7 +579,13 @@ public:
     }
 
 private:
-    Player* GetPlayer() { return me->GetCharmerOrOwner()->ToPlayer(); }
+    Player* GetPlayer()
+    {
+        if (Unit* creator = ObjectAccessor::GetUnit(*me, me->GetCreatorGUID()))
+            return creator->ToPlayer();
+
+        return nullptr;
+    }
 
     void SetupSpawns()
     {
@@ -670,7 +674,8 @@ private:
                 break;
         }
 
-        GetPlayer()->ModifyPower(POWER_ALTERNATE_POWER, 1);
+        if (Player* player = GetPlayer())
+            player->ModifyPower(POWER_ALTERNATE_POWER, 1);
     }
 
     void StartMassiveWave()
@@ -872,7 +877,7 @@ struct npc_brazie_spot : public ScriptedAI
         return 0;
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {
@@ -1137,15 +1142,15 @@ struct npc_brazie_vehicle_notifier : public ScriptedAI
                 vehicle->AI()->JustSummoned(me);
     }
 
-    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
     {
-        if (!caster)
+        if (!caster || !caster->IsUnit())
             return;
 
         switch (spell->Id)
         {
         case SPELL_GAIN_SOLAR_POWER_SPELLCLICK:
-            if (Unit* vehicle = caster->GetVehicleCreatureBase())
+            if (Unit* vehicle = caster->ToUnit()->GetVehicleCreatureBase())
                 DoCast(vehicle, SPELL_GAIN_SOLAR_POWER_ENERGIZE, true);
             me->GetMotionMaster()->MoveJump(SolarPowerJumpPos, 45.0f, 20.0f);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
@@ -1264,22 +1269,22 @@ class spell_brazie_spit : public SpellScript
 
         if (GetSpellInfo()->Id == SPELL_VENOM_SPIT)
         {
-            targets.sort(Firelands::ObjectDistanceOrderPred(GetCaster(), true));
+            targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster(), true));
             targets.resize(1);
         }
         else
         {
             std::list<WorldObject*> targetsBackup = targets;
-            targetsBackup.remove_if(Firelands::UnitAuraCheck(true, SPELL_FREEZYA_BLAST));
+            targetsBackup.remove_if(Trinity::UnitAuraCheck(true, SPELL_FREEZYA_BLAST));
             if (targetsBackup.empty())
             {
-                targets.sort(Firelands::ObjectDistanceOrderPred(GetCaster(), true));
+                targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster(), true));
                 targets.resize(1);
             }
             else
             {
                 targets = targetsBackup;
-                targets.sort(Firelands::ObjectDistanceOrderPred(GetCaster(), true));
+                targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster(), true));
                 targets.resize(1);
             }
         }

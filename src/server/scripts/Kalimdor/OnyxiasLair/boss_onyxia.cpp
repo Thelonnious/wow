@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -173,7 +173,7 @@ public:
 
         void JustSummoned(Creature* summoned) override
         {
-            summoned->SetInCombatWithZone();
+            DoZoneInCombat(summoned);
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                 summoned->AI()->AttackStart(target);
 
@@ -196,7 +196,7 @@ public:
             Talk(SAY_KILL);
         }
 
-        void SpellHit(Unit* /*pCaster*/, SpellInfo const* Spell) override
+        void SpellHit(WorldObject* /*pCaster*/, SpellInfo const* Spell) override
         {
             if (Spell->Id == SPELL_BREATH_EAST_TO_WEST ||
                 Spell->Id == SPELL_BREATH_WEST_TO_EAST ||
@@ -231,7 +231,7 @@ public:
                         me->SetCanFly(false);
                         me->SetDisableGravity(false);
                         if (Creature* trigger = ObjectAccessor::GetCreature(*me, triggerGUID))
-                            me->Kill(trigger);
+                            Unit::Kill(me, trigger);
                         me->SetReactState(REACT_AGGRESSIVE);
                         // tank selection based on phase one. If tank is not there i take nearest one
                         if (Unit* tank = ObjectAccessor::GetUnit(*me, tankGUID))
@@ -272,7 +272,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* Spell) override
+        void SpellHitTarget(WorldObject* target, SpellInfo const* Spell) override
         {
             //Workaround - Couldn't find a way to group this spells (All Eruption)
             if (((Spell->Id >= 17086 && Spell->Id <= 17095) ||
@@ -355,8 +355,8 @@ public:
                             DoCastVictim(SPELL_BELLOWING_ROAR);
                             // Eruption
                             GameObject* Floor = nullptr;
-                            Firelands::GameObjectInRangeCheck check(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 15);
-                            Firelands::GameObjectLastSearcher<Firelands::GameObjectInRangeCheck> searcher(me, Floor, check);
+                            Trinity::GameObjectInRangeCheck check(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 15);
+                            Trinity::GameObjectLastSearcher<Trinity::GameObjectInRangeCheck> searcher(me, Floor, check);
                             Cell::VisitGridObjects(me, searcher, 30.0f);
                             if (Floor)
                                 instance->SetGuidData(DATA_FLOOR_ERUPTION_GUID, Floor->GetGUID());

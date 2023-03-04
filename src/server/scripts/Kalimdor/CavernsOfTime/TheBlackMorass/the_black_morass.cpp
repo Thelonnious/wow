@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -137,7 +137,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
         {
             if (SpellCorrupt_Timer)
                 return;
@@ -151,7 +151,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (killer->GetEntry() == me->GetEntry())
+            if (killer && killer->GetEntry() == me->GetEntry())
                 return;
 
             Talk(SAY_DEATH);
@@ -316,7 +316,7 @@ public:
             uint32 entry = 0;
 
             entry = PortalWaves[mWaveId].PortalMob[mRiftWaveCount];
-            LOG_DEBUG("scripts", "npc_time_rift: summoning wave Creature (Wave %u, Entry %u).", mRiftWaveCount, entry);
+            TC_LOG_DEBUG("scripts", "npc_time_rift: summoning wave Creature (Wave %u, Entry %u).", mRiftWaveCount, entry);
 
             ++mRiftWaveCount;
 
@@ -338,7 +338,7 @@ public:
             if (me->IsNonMeleeSpellCast(false))
                 return;
 
-            LOG_DEBUG("scripts", "npc_time_rift: not casting anylonger, i need to die.");
+            TC_LOG_DEBUG("scripts", "npc_time_rift: not casting anylonger, i need to die.");
             me->setDeathState(JUST_DIED);
 
             if (instance->GetData(TYPE_RIFT) == IN_PROGRESS)

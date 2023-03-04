@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -85,7 +85,7 @@ public:
     }
 
     template<typename... Args>
-    static void NotifyModification(ChatHandler* handler, Unit* target, FirelandsStrings resourceMessage, FirelandsStrings resourceReportMessage, Args&&... args)
+    static void NotifyModification(ChatHandler* handler, Unit* target, TrinityStrings resourceMessage, TrinityStrings resourceReportMessage, Args&&... args)
     {
         if (Player* player = target->ToPlayer())
         {
@@ -165,7 +165,7 @@ public:
             NotifyModification(handler, target, LANG_YOU_CHANGE_ENERGY, LANG_YOURS_ENERGY_CHANGED, energy / energyMultiplier, energymax / energyMultiplier);
             target->SetMaxPower(POWER_ENERGY, energymax);
             target->SetPower(POWER_ENERGY, energy);
-            LOG_DEBUG("misc", handler->GetFirelandsString(LANG_CURRENT_ENERGY), target->GetMaxPower(POWER_ENERGY));
+            TC_LOG_DEBUG("misc", handler->GetTrinityString(LANG_CURRENT_ENERGY), target->GetMaxPower(POWER_ENERGY));
             return true;
         }
         return false;
@@ -570,7 +570,7 @@ public:
         {
             int64 newmoney = int64(targetMoney) + moneyToAdd;
 
-            LOG_DEBUG("misc", handler->GetFirelandsString(LANG_CURRENT_MONEY), targetMoney, moneyToAdd, newmoney);
+            TC_LOG_DEBUG("misc", handler->GetTrinityString(LANG_CURRENT_MONEY), targetMoney, moneyToAdd, newmoney);
             if (newmoney <= 0)
             {
                 NotifyModification(handler, target, LANG_YOU_TAKE_ALL_MONEY, LANG_YOURS_ALL_MONEY_GONE);
@@ -603,7 +603,7 @@ public:
             target->ModifyMoney(moneyToAdd);
         }
 
-        LOG_DEBUG("misc", handler->GetFirelandsString(LANG_NEW_MONEY), targetMoney, moneyToAdd, target->GetMoney());
+        TC_LOG_DEBUG("misc", handler->GetTrinityString(LANG_NEW_MONEY), targetMoney, moneyToAdd, target->GetMoney());
 
         return true;
     }
@@ -682,7 +682,7 @@ public:
 
         int32 amount = (uint32)atoi(args);
 
-        target->ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, amount, true, true);
+        target->ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, amount, false, true);
 
         handler->PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, handler->GetNameLink(target).c_str(), target->GetCurrency(CURRENCY_TYPE_HONOR_POINTS, false));
 
@@ -745,7 +745,7 @@ public:
             amount = -42000;
             for (; r < MAX_REPUTATION_RANK; ++r)
             {
-                std::string rank = handler->GetFirelandsString(ReputationRankStrIndex[r]);
+                std::string rank = handler->GetTrinityString(ReputationRankStrIndex[r]);
                 if (rank.empty())
                     continue;
 
@@ -986,7 +986,7 @@ public:
         if (!amount)
             return false;
 
-        target->ModifyCurrency(currencyId, amount, true, true);
+        target->ModifyCurrency(currencyId, amount, false, true);
 
         return true;
     }

@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -226,7 +226,7 @@ class boss_foe_reaper_5000 : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+            void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
             {
                 switch (spell->Id)
                 {
@@ -334,8 +334,8 @@ class boss_foe_reaper_5000 : public CreatureScript
                             const float distanceY = range * std::sin(angle);
                             destX = respX + distanceX;
                             destY = respY + distanceY;
-                            Firelands::NormalizeMapCoord(destX);
-                            Firelands::NormalizeMapCoord(destY);
+                            Trinity::NormalizeMapCoord(destX);
+                            Trinity::NormalizeMapCoord(destY);
                             travelDistZ = 10.0f;
                             destZ = map->GetHeight(me->GetPhaseShift(), destX, destY, respZ + travelDistZ - 2.0f, false);
                             if (std::fabs(destZ - respZ) > travelDistZ)
@@ -432,7 +432,7 @@ class npc_foe_reaper_5000_molten_slag : public CreatureScript
                         case EVENT_MOLTEN_SHIELD:
                             DoCastSelf(SPELL_MOLTEN_SHIELD, true);
                             me->SetReactState(REACT_AGGRESSIVE);
-                            me->SetInCombatWithZone();
+                            DoZoneInCombat();
                             break;
                         case EVENT_FIXATE_PLAYER:
                             DoCastAOE(SPELL_FIXATE_TARGETING, true);
@@ -466,7 +466,7 @@ class spell_foe_reaper_5000_acquire_target : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                Firelands::Containers::RandomResize(targets, 1);
+                Trinity::Containers::RandomResize(targets, 1);
             }
 
             void HandleHit(SpellEffIndex effIndex)
@@ -520,7 +520,7 @@ class spell_foe_reaper_5000_fixate_targeting : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                Firelands::Containers::RandomResize(targets, 1);
+                Trinity::Containers::RandomResize(targets, 1);
             }
 
             void HandleHit(SpellEffIndex effIndex)

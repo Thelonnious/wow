@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -367,7 +367,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* Spell) override
+        void SpellHit(WorldObject* /*caster*/, SpellInfo const* Spell) override
         {
             if ((Spell->SchoolMask == SPELL_SCHOOL_MASK_FIRE) && (!(rand32() % 10)))
             {
@@ -1132,7 +1132,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* Spell) override
+        void SpellHit(WorldObject* /*caster*/, SpellInfo const* Spell) override
         {
             if (Spell->Id == SPELL_DRINK_POISON)
             {
@@ -1269,7 +1269,7 @@ public:
                 }
             }
 
-            LOG_ERROR("scripts", "boss_romuloAI: DamageTaken reach end of code, that should not happen.");
+            TC_LOG_ERROR("scripts", "boss_romuloAI: DamageTaken reach end of code, that should not happen.");
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -1511,7 +1511,7 @@ void boss_julianne::boss_julianneAI::DamageTaken(Unit* /*done_by*/, uint32 &dama
 
     if (Phase == PHASE_ROMULO)
     {
-        LOG_ERROR("scripts", "boss_julianneAI: cannot take damage in PHASE_ROMULO, why was i here?");
+        TC_LOG_ERROR("scripts", "boss_julianneAI: cannot take damage in PHASE_ROMULO, why was i here?");
         damage = 0;
         return;
     }
@@ -1544,7 +1544,7 @@ void boss_julianne::boss_julianneAI::DamageTaken(Unit* /*done_by*/, uint32 &dama
             return;
         }
     }
-    LOG_ERROR("scripts", "boss_julianneAI: DamageTaken reach end of code, that should not happen.");
+    TC_LOG_ERROR("scripts", "boss_julianneAI: DamageTaken reach end of code, that should not happen.");
 }
 
 void AddSC_bosses_opera()

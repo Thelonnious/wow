@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -273,7 +273,7 @@ public:
 
         LocaleConstant loc = handler->GetSessionDbcLocale();
         char const* targetName = target->GetName().c_str();
-        char const* knownStr = handler->GetFirelandsString(LANG_KNOWN);
+        char const* knownStr = handler->GetTrinityString(LANG_KNOWN);
 
         // Search in CharTitles.dbc
         for (CharTitlesEntry const* titleInfo : sCharTitlesStore)
@@ -285,7 +285,7 @@ public:
                     continue;
 
                 char const* activeStr = target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->Mask_ID
-                ? handler->GetFirelandsString(LANG_ACTIVE)
+                ? handler->GetTrinityString(LANG_ACTIVE)
                 : "";
 
                 char titleNameStr[80];
@@ -625,14 +625,14 @@ public:
 
         handler->PSendSysMessage(LANG_CHANGEACCOUNT_SUCCESS, targetName.c_str(), accountName.c_str());
 
-        std::string logString = Firelands::StringFormat("changed ownership of player %s (%s) from account %u to account %u", targetName.c_str(), targetGuid.ToString().c_str(), oldAccountId, newAccountId);
+        std::string logString = Trinity::StringFormat("changed ownership of player %s (%s) from account %u to account %u", targetName.c_str(), targetGuid.ToString().c_str(), oldAccountId, newAccountId);
         if (WorldSession* session = handler->GetSession())
         {
             if (Player* player = session->GetPlayer())
                 sLog->outCommand(session->GetAccountId(), "GM %s (Account: %u) %s", player->GetName().c_str(), session->GetAccountId(), logString.c_str());
         }
         else
-            sLog->outCommand(0, "%s %s", handler->GetFirelandsString(LANG_CONSOLE), logString.c_str());
+            sLog->outCommand(0, "%s %s", handler->GetTrinityString(LANG_CONSOLE), logString.c_str());
         return true;
     }
 
@@ -651,7 +651,7 @@ public:
             FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction.ID);
             char const* factionName = factionEntry ? factionEntry->Name : "#Not found#";
             ReputationRank rank = target->GetReputationMgr().GetRank(factionEntry);
-            std::string rankName = handler->GetFirelandsString(ReputationRankStrIndex[rank]);
+            std::string rankName = handler->GetTrinityString(ReputationRankStrIndex[rank]);
             std::ostringstream ss;
             if (handler->GetSession())
                 ss << faction.ID << " - |cffffffff|Hfaction:" << faction.ID << "|h[" << factionName << ' ' << localeNames[loc] << "]|h|r";
@@ -661,17 +661,17 @@ public:
             ss << ' ' << rankName << " (" << target->GetReputationMgr().GetReputation(factionEntry) << ')';
 
             if (faction.Flags & FACTION_FLAG_VISIBLE)
-                ss << handler->GetFirelandsString(LANG_FACTION_VISIBLE);
+                ss << handler->GetTrinityString(LANG_FACTION_VISIBLE);
             if (faction.Flags & FACTION_FLAG_AT_WAR)
-                ss << handler->GetFirelandsString(LANG_FACTION_ATWAR);
+                ss << handler->GetTrinityString(LANG_FACTION_ATWAR);
             if (faction.Flags & FACTION_FLAG_PEACE_FORCED)
-                ss << handler->GetFirelandsString(LANG_FACTION_PEACE_FORCED);
+                ss << handler->GetTrinityString(LANG_FACTION_PEACE_FORCED);
             if (faction.Flags & FACTION_FLAG_HIDDEN)
-                ss << handler->GetFirelandsString(LANG_FACTION_HIDDEN);
+                ss << handler->GetTrinityString(LANG_FACTION_HIDDEN);
             if (faction.Flags & FACTION_FLAG_INVISIBLE_FORCED)
-                ss << handler->GetFirelandsString(LANG_FACTION_INVISIBLE_FORCED);
+                ss << handler->GetTrinityString(LANG_FACTION_INVISIBLE_FORCED);
             if (faction.Flags & FACTION_FLAG_INACTIVE)
-                ss << handler->GetFirelandsString(LANG_FACTION_INACTIVE);
+                ss << handler->GetTrinityString(LANG_FACTION_INACTIVE);
 
             handler->SendSysMessage(ss.str().c_str());
         }

@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -104,7 +104,7 @@ struct boss_pit_lord_argaloth : public BossAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_FEL_FIRESTORM)
         {
@@ -221,7 +221,7 @@ class spell_argaloth_consuming_darkness : public SpellScript
 {
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        Firelands::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 8 : 3);
+        Trinity::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 8 : 3);
     }
 
     void Register() override
@@ -284,7 +284,7 @@ class spell_argaloth_fel_firestorm : public SpellScript
 {
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        Firelands::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 8 : 3);
+        Trinity::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 8 : 3);
     }
 
     void Register() override

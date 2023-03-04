@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -396,14 +396,14 @@ public:
         void CastLavaStrikeOnTarget(Unit* target)
         {
             std::list<Creature*> fireCyclonesList;
-            Firelands::AllCreaturesOfEntryInRange checker(me, NPC_FIRE_CYCLONE, 200.0f);
-            Firelands::CreatureListSearcher<Firelands::AllCreaturesOfEntryInRange> searcher(me, fireCyclonesList, checker);
+            Trinity::AllCreaturesOfEntryInRange checker(me, NPC_FIRE_CYCLONE, 200.0f);
+            Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(me, fireCyclonesList, checker);
             Cell::VisitAllObjects(me, searcher, 200.0f);
 
             if (fireCyclonesList.empty())
                 return;
 
-            Firelands::Containers::SelectRandomContainerElement(fireCyclonesList)->CastSpell(target, SPELL_LAVA_STRIKE, true);
+            Trinity::Containers::SelectRandomContainerElement(fireCyclonesList)->CastSpell(target, SPELL_LAVA_STRIKE, true);
         }
 
         void UpdateAI(uint32 diff) override

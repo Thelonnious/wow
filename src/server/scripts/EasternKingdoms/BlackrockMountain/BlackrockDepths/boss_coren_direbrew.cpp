@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -167,7 +167,7 @@ public:
                 events.SetPhase(PHASE_ONE);
                 me->SetImmuneToPC(false);
                 me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
-                me->SetInCombatWithZone();
+                DoZoneInCombat();
 
                 EntryCheckPredicate pred(NPC_ANTAGONIST);
                 summons.DoAction(ACTION_ANTAGONIST_HOSTILE, pred);
@@ -215,7 +215,7 @@ public:
         void SummonSister(uint32 entry)
         {
             if (Creature* sister = me->SummonCreature(entry, me->GetPosition(), TEMPSUMMON_DEAD_DESPAWN))
-                sister->SetInCombatWithZone();
+                DoZoneInCombat(sister);
         }
 
         void UpdateAI(uint32 diff) override
@@ -359,7 +359,7 @@ public:
         {
             me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
             DoCastAOE(SPELL_MOLE_MACHINE_EMERGE, true);
-            me->SetInCombatWithZone();
+            DoZoneInCombat();
         }
 
         void IsSummonedBy(Unit* /*summoner*/) override
@@ -400,7 +400,7 @@ public:
                 case ACTION_ANTAGONIST_HOSTILE:
                     me->SetImmuneToPC(false);
                     me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
-                    me->SetInCombatWithZone();
+                    DoZoneInCombat();
                     break;
                 default:
                     break;
@@ -546,7 +546,7 @@ class spell_send_mug_target_picker : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
 
-                targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_HAS_DARK_BREWMAIDENS_BREW));
+                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_HAS_DARK_BREWMAIDENS_BREW));
 
                 if (targets.size() > 1)
                     targets.remove_if([caster](WorldObject* obj)
@@ -559,7 +559,7 @@ class spell_send_mug_target_picker : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }

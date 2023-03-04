@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -54,8 +54,8 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
 
                 // Find victim of Summon Gargoyle spell
                 std::list<Unit*> targets;
-                Firelands::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
-                Firelands::UnitListSearcher<Firelands::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+                Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
+                Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
                 Cell::VisitAllObjects(me, searcher, 30.0f);
                 for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                     if ((*iter)->HasAura(SPELL_DK_SUMMON_GARGOYLE_1, ownerGuid))
@@ -73,7 +73,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
             }
 
             // Fly away when dismissed
-            void SpellHit(Unit* source, SpellInfo const* spell) override
+            void SpellHit(WorldObject* source, SpellInfo const* spell) override
             {
                 if (spell->Id != SPELL_DK_DISMISS_GARGOYLE || !me->IsAlive())
                     return;

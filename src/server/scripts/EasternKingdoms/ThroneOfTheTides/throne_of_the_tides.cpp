@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -193,7 +193,7 @@ struct npc_tott_lady_nazjar : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
     {
         bool useLeftGUIDs = false;
         if (spell->Id == SPELL_TRIGGER_MURLOC)
@@ -324,7 +324,7 @@ class spell_tott_trigger_murloc : public SpellScript
             return;
 
         if (GetSpellInfo()->Id != SPELL_TRIGGER_MURLOC_END)
-            Firelands::Containers::RandomResize(targets, GetSpellInfo()->Effects[EFFECT_0].BasePoints);
+            Trinity::Containers::RandomResize(targets, GetSpellInfo()->Effects[EFFECT_0].BasePoints);
     }
 
     void Register() override
@@ -365,6 +365,18 @@ struct go_tott_defense_system : public GameObjectAI
 private:
     InstanceScript * _instance;
 };
+
+struct go_tott_temp_falling_rocks : public GameObjectAI
+{
+    go_tott_temp_falling_rocks(GameObject* go) : GameObjectAI(go) { }
+
+    void JustAppeared() override
+    {
+        me->SetGoState(GO_STATE_ACTIVE);
+        me->SendCustomAnim(0);
+    }
+};
+
 
 class spell_tott_camera: public SpellScript
 {
@@ -511,6 +523,7 @@ void AddSC_throne_of_the_tides()
     RegisterThroneOfTheTidesCreatureAI(npc_tott_lady_nazjar);
     RegisterSpellScript(spell_tott_trigger_murloc);
     RegisterGameObjectAI(go_tott_defense_system);
+    RegisterGameObjectAI(go_tott_temp_falling_rocks);
     RegisterSpellScript(spell_tott_camera);
     RegisterSpellScript(spell_tott_shock_defense_script);
     RegisterSpellScript(spell_tott_ulthok_intro_visual_impact);

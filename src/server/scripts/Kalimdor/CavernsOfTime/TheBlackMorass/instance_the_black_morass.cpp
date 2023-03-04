@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -104,27 +104,12 @@ public:
             _currentRiftId      = 0;
         }
 
-        void InitWorldState(bool Enable = true)
-        {
-            DoUpdateWorldState(WORLD_STATE_BM, Enable ? 1 : 0);
-            DoUpdateWorldState(WORLD_STATE_BM_SHIELD, 100);
-            DoUpdateWorldState(WORLD_STATE_BM_RIFT, 0);
-        }
-
         bool IsEncounterInProgress() const override
         {
             if (GetData(TYPE_MEDIVH) == IN_PROGRESS)
                 return true;
 
             return false;
-        }
-
-        void OnPlayerEnter(Player* player) override
-        {
-            if (GetData(TYPE_MEDIVH) == IN_PROGRESS)
-                return;
-
-            player->SendUpdateWorldState(WORLD_STATE_BM, 0);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -176,7 +161,7 @@ public:
                         {
                             if (medivh->IsAlive())
                             {
-                                medivh->DealDamage(medivh, medivh->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                                medivh->KillSelf();
                                 m_auiEncounter[0] = FAIL;
                                 m_auiEncounter[1] = NOT_STARTED;
                             }
@@ -187,8 +172,8 @@ public:
                 {
                     if (data == IN_PROGRESS)
                     {
-                        LOG_DEBUG("scripts", "Instance The Black Morass: Starting event.");
-                        InitWorldState();
+                        TC_LOG_DEBUG("scripts", "Instance The Black Morass: Starting event.");
+                        DoUpdateWorldState(WORLD_STATE_BM, 1);
                         m_auiEncounter[1] = IN_PROGRESS;
                         ScheduleEventNextPortal(15000);
                     }
@@ -196,7 +181,7 @@ public:
                     if (data == DONE)
                     {
                         //this may be completed further out in the post-event
-                        LOG_DEBUG("scripts", "Instance The Black Morass: Event completed.");
+                        TC_LOG_DEBUG("scripts", "Instance The Black Morass: Event completed.");
                         Map::PlayerList const& players = instance->GetPlayers();
 
                         if (!players.isEmpty())
@@ -261,7 +246,7 @@ public:
             if (entry == RIFT_BOSS)
                 entry = RandRiftBoss();
 
-            LOG_DEBUG("scripts", "Instance The Black Morass: Summoning rift boss entry %u.", entry);
+            TC_LOG_DEBUG("scripts", "Instance The Black Morass: Summoning rift boss entry %u.", entry);
 
             Position pos = me->GetRandomNearPosition(10.0f);
 
@@ -271,7 +256,7 @@ public:
             if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                 return summon;
 
-            LOG_DEBUG("scripts", "Instance The Black Morass: What just happened there? No boss, no loot, no fun...");
+            TC_LOG_DEBUG("scripts", "Instance The Black Morass: What just happened there? No boss, no loot, no fun...");
             return nullptr;
         }
 
@@ -284,7 +269,7 @@ public:
                 if (tmp >= _currentRiftId)
                     ++tmp;
 
-                LOG_DEBUG("scripts", "Instance The Black Morass: Creating Time Rift at locationId %i (old locationId was %u).", tmp, _currentRiftId);
+                TC_LOG_DEBUG("scripts", "Instance The Black Morass: Creating Time Rift at locationId %i (old locationId was %u).", tmp, _currentRiftId);
 
                 _currentRiftId = tmp;
 

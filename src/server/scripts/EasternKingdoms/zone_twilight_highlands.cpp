@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -294,7 +294,7 @@ class spell_th_grab_targeting : public SpellScript
         });
 
         if (targets.size() > 1)
-            Firelands::Containers::RandomResize(targets, 1);
+            Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleDummyEffect(SpellEffIndex /*effIndex*/)
@@ -325,7 +325,7 @@ class spell_th_charge : public SpellScript
     void SetDest(SpellDestination& dest)
     {
         // While the target type indicates a nearby entry target, there is no sniffable unit target at given coordinates.
-        dest.Relocate(Firelands::Containers::SelectRandomContainerElement(ChargeDestinations));
+        dest.Relocate(Trinity::Containers::SelectRandomContainerElement(ChargeDestinations));
     }
 
     void Register() override

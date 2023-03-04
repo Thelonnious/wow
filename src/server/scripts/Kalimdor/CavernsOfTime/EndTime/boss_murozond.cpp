@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -356,6 +356,7 @@ struct boss_murozond : public BossAI
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.f, true))
                                 me->CastSpell(target, SPELL_DISTORTION_BOMB_1, true);
 
+                            
                             task.Repeat(6s);
                         })
                         .Schedule(7s, [this](TaskContext task)

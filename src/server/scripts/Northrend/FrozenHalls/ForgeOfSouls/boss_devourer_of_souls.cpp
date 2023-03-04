@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -222,7 +222,7 @@ class boss_devourer_of_souls : public CreatureScript
                 }
             }
 
-            void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+            void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
             {
                 if (spell->Id == H_SPELL_PHANTOM_BLAST)
                     threeFaced = false;
@@ -442,7 +442,7 @@ class spell_devourer_of_souls_mirrored_soul_target_selector : public SpellScript
                 if (targets.empty())
                     return;
 
-                WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }

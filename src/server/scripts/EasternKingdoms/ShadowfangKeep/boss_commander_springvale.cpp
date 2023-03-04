@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -467,6 +467,7 @@ public:
 
         void Register() override
         {
+            
             AfterHit.Register(&spell_sfk_unholy_power_SpellScript::HandleStacks);
         }
     };
@@ -509,7 +510,7 @@ public:
 
                 if (InstanceScript* instance = target->GetInstanceScript())
                     if (!instance->instance->GetWorldStateValue(WORLD_STATE_ID_TO_THE_GROUND))
-                        instance->instance->SetWorldState(WORLD_STATE_ID_TO_THE_GROUND, 1);
+                        instance->DoUpdateWorldState(WORLD_STATE_ID_TO_THE_GROUND, 1);
             }
         }
 

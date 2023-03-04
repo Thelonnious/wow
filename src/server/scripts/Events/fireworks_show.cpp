@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -854,7 +854,7 @@ public:
                     auto it = pos.find(me->GetZoneId());
                     if (it != pos.end())
                     {
-                        Position const& rndpos = Firelands::Containers::SelectRandomContainerElement(it->second);
+                        Position const& rndpos = Trinity::Containers::SelectRandomContainerElement(it->second);
                         float rndrot = frand(-1.0000000f, 1.0000000f);
                         float rndrot2 = frand(-1.0000000f, 1.0000000f);
 

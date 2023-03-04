@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -33,7 +33,6 @@
 enum HunterSpells
 {
     SPELL_HUNTER_AIMED_SHOT                         = 19434,
-    SPELL_HUNTER_AIMED_SHOT_INSTANT                 = 82928,
     SPELL_HUNTER_BESTIAL_WRATH                      = 19574,
     SPELL_HUNTER_CALL_PET_1                         = 883,
     SPELL_HUNTER_CALL_PET_2                         = 83242,
@@ -117,10 +116,10 @@ class spell_hun_ancient_hysteria : public SpellScript
 
     void RemoveInvalidTargets(std::list<WorldObject*>& targets)
     {
-        targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_HUNTER_INSANITY));
-        targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_MAGE_TEMPORAL_DISPLACEMENT));
-        targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_SHAMAN_EXHAUSTION));
-        targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_SHAMAN_SATED));
+        targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_HUNTER_INSANITY));
+        targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_MAGE_TEMPORAL_DISPLACEMENT));
+        targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_SHAMAN_EXHAUSTION));
+        targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_SHAMAN_SATED));
     }
 
     void ApplyDebuff()
@@ -239,34 +238,6 @@ class spell_hun_disengage : public SpellScript
     void Register() override
     {
         OnCheckCast.Register(&spell_hun_disengage::CheckCast);
-    }
-};
-
-// 82926 - Fire!
-class spell_hun_fire : public AuraScript
-{
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_HUNTER_AIMED_SHOT_INSTANT });
-    }
-
-    void HandleEffectCalcSpellMod(AuraEffect const* aurEff, SpellModifier*& spellMod)
-    {
-        if (!spellMod)
-        {
-            spellMod = new SpellModifier(GetAura());
-            spellMod->op = SPELLMOD_CASTING_TIME;
-            spellMod->type = SPELLMOD_PCT;
-            spellMod->spellId = GetId();
-            spellMod->mask = GetSpellInfo()->Effects[aurEff->GetEffIndex()].SpellClassMask;
-        }
-
-        spellMod->value = -aurEff->GetAmount();
-    }
-
-    void Register() override
-    {
-        DoEffectCalcSpellMod.Register(&spell_hun_fire::HandleEffectCalcSpellMod, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -461,8 +432,8 @@ class spell_hun_pet_carrion_feeder : public SpellScript
         float max_range = GetSpellInfo()->GetMaxRange(false);
         WorldObject* result = nullptr;
         // search for nearby enemy corpse in range
-        Firelands::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_ENEMY);
-        Firelands::WorldObjectSearcher<Firelands::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
+        Trinity::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_ENEMY);
+        Trinity::WorldObjectSearcher<Trinity::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
         Cell::VisitWorldObjects(caster, searcher, max_range);
         if (!result)
             Cell::VisitGridObjects(caster, searcher, max_range);
@@ -1477,7 +1448,6 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_crouching_tiger_hidden_chimera);
     RegisterSpellScript(spell_hun_disengage);
     RegisterSpellScript(spell_hun_fervor);
-    RegisterSpellScript(spell_hun_fire);
     RegisterSpellAndAuraScriptPair(spell_hun_focus_fire, spell_hun_focus_fire_AuraScript);
     RegisterSpellScript(spell_hun_frenzy_effect);
     RegisterSpellScript(spell_hun_glyph_of_kill_shot);

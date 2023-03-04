@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -164,7 +164,7 @@ public:
             else
             {
                 // Madrigosa not found, end intro
-                LOG_ERROR("scripts", "Madrigosa was not found");
+                TC_LOG_ERROR("scripts", "Madrigosa was not found");
                 EndIntro();
             }
         }
@@ -235,7 +235,7 @@ public:
                     ++IntroPhase;
                     break;
                 case 7:
-                    me->Kill(Madrigosa);
+                    Unit::Kill(me, Madrigosa);
                     Madrigosa->AI()->Talk(YELL_MADR_DEATH);
                     me->SetFullHealth();
                     me->AttackStop();

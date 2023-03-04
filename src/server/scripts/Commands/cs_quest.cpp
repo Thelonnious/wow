@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -129,8 +129,6 @@ public:
             return false;
         }
 
-        QuestStatus oldStatus = player->GetQuestStatus(entry);
-
         if (player->GetQuestStatus(entry) != QUEST_STATUS_NONE)
         {
             // remove all quest entries for 'entry' from quest log
@@ -155,7 +153,6 @@ public:
             player->RemoveRewardedQuest(entry);
 
             sScriptMgr->OnQuestStatusChange(player, entry);
-            sScriptMgr->OnQuestStatusChange(player, quest, oldStatus, QUEST_STATUS_NONE);
 
             handler->SendSysMessage(LANG_COMMAND_QUEST_REMOVED);
             return true;

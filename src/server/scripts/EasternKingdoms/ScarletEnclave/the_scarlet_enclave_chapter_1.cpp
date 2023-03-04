@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -190,7 +190,7 @@ public:
                         anchorGUID = anchor->GetGUID();
                     }
                     else
-                        LOG_ERROR("scripts", "npc_unworthy_initiateAI: unable to find anchor!");
+                        TC_LOG_ERROR("scripts", "npc_unworthy_initiateAI: unable to find anchor!");
 
                     float dist = 99.0f;
                     GameObject* prison = nullptr;
@@ -210,7 +210,7 @@ public:
                     if (prison)
                         prison->ResetDoorOrButton();
                     else
-                        LOG_ERROR("scripts", "npc_unworthy_initiateAI: unable to find prison!");
+                        TC_LOG_ERROR("scripts", "npc_unworthy_initiateAI: unable to find prison!");
                 }
                 break;
             case PHASE_TO_EQUIP:
@@ -221,7 +221,7 @@ public:
                     else
                     {
                         me->GetMotionMaster()->MovePoint(1, anchorX, anchorY, me->GetPositionZ());
-                        //LOG_DEBUG("scripts", "npc_unworthy_initiateAI: move to %f %f %f", anchorX, anchorY, me->GetPositionZ());
+                        //TC_LOG_DEBUG("scripts", "npc_unworthy_initiateAI: move to %f %f %f", anchorX, anchorY, me->GetPositionZ());
                         phase = PHASE_EQUIPING;
                         wait_timer = 0;
                     }
@@ -537,7 +537,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
         }
 
-        void SpellHit(Unit* pCaster, SpellInfo const* pSpell) override
+        void SpellHit(WorldObject* pCaster, SpellInfo const* pSpell) override
         {
             if (!m_bIsDuelInProgress && pSpell->Id == SPELL_DUEL)
             {
@@ -549,7 +549,7 @@ public:
 
        void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
         {
-            if (m_bIsDuelInProgress && pDoneBy->IsControlledByPlayer())
+            if (m_bIsDuelInProgress && pDoneBy && pDoneBy->IsControlledByPlayer())
             {
                 if (pDoneBy->GetGUID() != m_uiDuelerGUID && pDoneBy->GetOwnerOrCreatorGUID() != m_uiDuelerGUID) // other players cannot help
                     uiDamage = 0;
@@ -795,22 +795,24 @@ public:
             return false;
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        void SpellHit(WorldObject* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_DELIVER_STOLEN_HORSE)
             {
-                if (caster->GetTypeId() == TYPEID_UNIT && caster->IsVehicle())
+                if (caster->GetTypeId() == TYPEID_UNIT && caster->ToCreature()->IsVehicle())
                 {
-                    if (Unit* charmer = caster->GetCharmer())
+                    Creature* creatureCaster = caster->ToCreature();
+
+                    if (Unit* charmer = creatureCaster->GetCharmer())
                     {
                         if (charmer->HasAura(SPELL_EFFECT_STOLEN_HORSE))
                         {
                             charmer->RemoveAurasDueToSpell(SPELL_EFFECT_STOLEN_HORSE);
-                            caster->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-                            caster->SetFaction(FACTION_FRIENDLY);
-                            DoCast(caster, SPELL_CALL_DARK_RIDER, true);
+                            creatureCaster->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                            creatureCaster->SetFaction(FACTION_FRIENDLY);
+                            DoCast(creatureCaster, SPELL_CALL_DARK_RIDER, true);
                             if (Creature* Dark_Rider = me->FindNearestCreature(NPC_DARK_RIDER_OF_ACHERUS, 15))
-                                ENSURE_AI(npc_dark_rider_of_acherus::npc_dark_rider_of_acherusAI, Dark_Rider->AI())->InitDespawnHorse(caster);
+                                ENSURE_AI(npc_dark_rider_of_acherus::npc_dark_rider_of_acherusAI, Dark_Rider->AI())->InitDespawnHorse(creatureCaster);
                         }
                     }
                 }

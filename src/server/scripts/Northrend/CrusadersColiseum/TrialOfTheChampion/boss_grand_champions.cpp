@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -112,7 +112,7 @@ void AggroAllPlayers(Creature* temp)
                 temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 temp->SetImmuneToPC(true);
                 temp->SetReactState(REACT_AGGRESSIVE);
-                temp->EngageWithTarget(player);
+                temp->EngageWithTarget(player);                
             }
         }
     }

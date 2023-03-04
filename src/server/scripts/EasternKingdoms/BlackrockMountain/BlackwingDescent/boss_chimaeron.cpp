@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -150,7 +150,7 @@ struct boss_chimaeron : public BossAI
     {
         BossAI::JustEngagedWith(who);
         instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-        instance->instance->SetWorldState(WORLD_STATE_ID_FULL_OF_SOUND_AND_FURY, 0);
+        instance->DoUpdateWorldState(WORLD_STATE_ID_FULL_OF_SOUND_AND_FURY, 0);
         me->SetReactState(REACT_AGGRESSIVE);
         events.SetPhase(PHASE_1);
         events.ScheduleEvent(EVENT_CAUSTIC_SLIME, 5s, 0, PHASE_1);
@@ -203,6 +203,7 @@ struct boss_chimaeron : public BossAI
             if (Creature* nefarius = instance->GetCreature(DATA_LORD_VICTOR_NEFARIUS_GENERIC))
                 if (nefarius->IsAIEnabled())
                     nefarius->AI()->DoAction(ACTION_CHIMAERON_DEFEATED);
+                
     }
 
     void KilledUnit(Unit* victim) override
@@ -211,7 +212,7 @@ struct boss_chimaeron : public BossAI
         {
             _killedPlayerCount++;
             if (_killedPlayerCount == 3)
-                instance->instance->SetWorldState(WORLD_STATE_ID_FULL_OF_SOUND_AND_FURY, 1);
+                instance->DoUpdateWorldState(WORLD_STATE_ID_FULL_OF_SOUND_AND_FURY, 1);
         }
     }
 
@@ -243,7 +244,7 @@ struct boss_chimaeron : public BossAI
         {
             case SPELL_MASSACRE:
             {
-                // Hotfix (2011-01-05): "Chimaeron now resets his melee attack cycle after each Massacre and removes the Double Attack buff."
+                // Hotfix (2011-01-05): "Chimaeron now resets his melee attack cycle after each Massacre and removes the Double Attack buff." 
                 me->RemoveAurasDueToSpell(SPELL_DOUBLE_ATTACK);
                 me->resetAttackTimer();
 
@@ -519,11 +520,11 @@ class spell_chimaeron_caustic_slime_targeting : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Firelands::Predicates::IsVictimOf(GetCaster()));
+        targets.remove_if(Trinity::Predicates::IsVictimOf(GetCaster()));
 
         uint8 size = GetCaster()->GetMap()->Is25ManRaid() ? 4 : 2;
         if (targets.size() > size)
-            Firelands::Containers::RandomResize(targets, size);
+            Trinity::Containers::RandomResize(targets, size);
     }
 
     void HandleDummyEffect(SpellEffIndex effIndex)

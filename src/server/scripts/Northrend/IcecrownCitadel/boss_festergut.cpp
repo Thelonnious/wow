@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -162,10 +162,10 @@ class boss_festergut : public CreatureScript
                     Talk(SAY_KILL);
             }
 
-            void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+            void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
             {
-                if (spell->Id == PUNGENT_BLIGHT_HELPER)
-                    target->RemoveAurasDueToSpell(INOCULATED_HELPER);
+                if (spell->Id == PUNGENT_BLIGHT_HELPER && target->IsUnit())
+                    target->ToUnit()->RemoveAurasDueToSpell(INOCULATED_HELPER);
             }
 
             void UpdateAI(uint32 diff) override
@@ -218,14 +218,14 @@ class boss_festergut : public CreatureScript
                                 if (melee.empty())
                                     break;
 
-                                Unit* target = Firelands::Containers::SelectRandomContainerElement(melee);
+                                Unit* target = Trinity::Containers::SelectRandomContainerElement(melee);
                                 ranged.push_back(target);
                                 melee.remove(target);
                             }
 
                             if (!ranged.empty())
                             {
-                                Firelands::Containers::RandomResize(ranged, RAID_MODE<uint32>(1, 3, 1, 3));
+                                Trinity::Containers::RandomResize(ranged, RAID_MODE<uint32>(1, 3, 1, 3));
                                 for (std::list<Unit*>::iterator itr = ranged.begin(); itr != ranged.end(); ++itr)
                                     DoCast(*itr, SPELL_VILE_GAS);
                             }

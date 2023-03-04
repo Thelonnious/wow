@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,16 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "World.h"
-#include "AnticheatMgr.h"
-
 // This is where scripts' loading functions should be declared:
 void AddSC_account_commandscript();
 void AddSC_achievement_commandscript();
 void AddSC_ahbot_commandscript();
-void AddSC_anticheat_commandscript();
 void AddSC_arena_commandscript();
 void AddSC_ban_commandscript();
+void AddSC_battlenet_account_commandscript();
 void AddSC_bf_commandscript();
 void AddSC_cast_commandscript();
 void AddSC_character_commandscript();
@@ -68,9 +65,9 @@ void AddCommandsScripts()
     AddSC_account_commandscript();
     AddSC_achievement_commandscript();
     AddSC_ahbot_commandscript();
-    AddSC_anticheat_commandscript();
     AddSC_arena_commandscript();
     AddSC_ban_commandscript();
+    AddSC_battlenet_account_commandscript();
     AddSC_bf_commandscript();
     AddSC_cast_commandscript();
     AddSC_character_commandscript();
@@ -106,5 +103,4 @@ void AddCommandsScripts()
     AddSC_ticket_commandscript();
     AddSC_titles_commandscript();
     AddSC_wp_commandscript();
-    sAnticheatMgr->StartScripts();
 }

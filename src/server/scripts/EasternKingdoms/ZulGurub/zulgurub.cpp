@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -135,13 +135,16 @@ struct npc_zulgurub_berserking_boulder_roller : public ScriptedAI
         me->GetMotionMaster()->MoveTargetedHome();
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
     {
+        if (!target->IsUnit())
+            return;
+
         if (spell->Id == SPELL_ROLLING_BOULDERS_SEARCH_EFFECT)
         {
             me->SetReactState(REACT_AGGRESSIVE);
             me->RemoveAurasDueToSpell(SPELL_ROLLING_BOULDERS_PERIODIC_AURA);
-            AttackStart(target);
+            AttackStart(target->ToUnit());
         }
     }
 
@@ -490,7 +493,7 @@ class spell_zulgurub_sigil_shatter : public SpellScript
 
         uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_SIGIL_OF_FLAME, GetCaster());
 
-        targets.remove_if(Firelands::UnitAuraCheck(true, spellId));
+        targets.remove_if(Trinity::UnitAuraCheck(true, spellId));
     }
 
     void FilterSigilOfFrostTargets(std::list<WorldObject*>& targets)
@@ -500,7 +503,7 @@ class spell_zulgurub_sigil_shatter : public SpellScript
 
         uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_SIGIL_OF_FROST, GetCaster());
 
-        targets.remove_if(Firelands::UnitAuraCheck(true, spellId));
+        targets.remove_if(Trinity::UnitAuraCheck(true, spellId));
     }
 
     void FilterSigilOfDeathTargets(std::list<WorldObject*>& targets)
@@ -510,7 +513,7 @@ class spell_zulgurub_sigil_shatter : public SpellScript
 
         uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_SIGIL_OF_DEATH, GetCaster());
 
-        targets.remove_if(Firelands::UnitAuraCheck(true, spellId));
+        targets.remove_if(Trinity::UnitAuraCheck(true, spellId));
     }
 
     void Register() override
@@ -586,15 +589,15 @@ struct npc_zulgurub_gurubashi_berserker: public ScriptedAI
         me->GetMotionMaster()->MoveTargetedHome();
     }
 
-    void SpellHitTarget(Unit* victim, const SpellInfo* spellInfo) override
+    void SpellHitTarget(WorldObject* victim, const SpellInfo* spellInfo) override
     {
-        if (!victim)
+        if (!victim->IsUnit())
             return;
 
         if (spellInfo->Id == SPELL_PURSUIT)
         {
             me->GetThreatManager().ResetAllThreat();
-            AddThreat(victim, spellInfo->Effects[EFFECT_1].BasePoints);
+            AddThreat(victim->ToUnit(), spellInfo->Effects[EFFECT_1].CalcValue());
             Talk(SAY_WHISPER_PURSUIT_PLAYER, victim);
             Talk(SAY_ANNOUNCE_PURSUIT_PLAYER, victim);
         }

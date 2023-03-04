@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -245,7 +245,7 @@ class spell_walden_conjure_poisonous_mixture : public SpellScript
 {
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void Register() override

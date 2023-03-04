@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -63,7 +63,7 @@ enum Events
     EVENT_CONTINUE_FIGHT,
     EVENT_CHAOS_BLAST,
     EVENT_SEED_OF_CHAOS,
-    EVENT_REIGN_OF_CHAOS,
+    EVENT_REIGN_OF_CHAOS,    
 
     // Chaos Portal
     EVENT_CAST_VISUAL,
@@ -129,7 +129,7 @@ class boss_setesh : public CreatureScript
                 BossAI::JustEngagedWith(who);
                 Talk(SAY_AGGRO);
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-
+                
                 events.ScheduleEvent(EVENT_CHAOS_PORTAL, Seconds(5));
                 events.ScheduleEvent(EVENT_CHAOS_BLAST, Seconds(15));
                 events.ScheduleEvent(EVENT_SEED_OF_CHAOS, Seconds(20));
@@ -185,6 +185,8 @@ class boss_setesh : public CreatureScript
                     default:
                         break;
                 }
+
+                
             }
 
             void DoAction(int32 action) override
@@ -301,7 +303,7 @@ public:
                     setesh->CastSpell(me, SPELL_CHAOS_BLAST_MISSLE, true);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(WorldObject* /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id != SPELL_CHAOS_BLAST_MISSLE)
                 return;
@@ -390,12 +392,12 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(WorldObject* caster, const SpellInfo* spellInfo) override
         {
-            if (spellInfo->Id != SPELL_CHANNEL_CHAOS_PORTAL)
+            if (!caster || !caster->IsUnit() || spellInfo->Id != SPELL_CHANNEL_CHAOS_PORTAL)
                 return;
 
-            caster->InterruptNonMeleeSpells(true, SPELL_CHANNEL_CHAOS_PORTAL);
+            caster->ToUnit()->InterruptNonMeleeSpells(true, SPELL_CHANNEL_CHAOS_PORTAL);
             me->RemoveAurasDueToSpell(SPELL_DUMMY_AURA);
             events.ScheduleEvent(EVENT_CAST_VISUAL, Seconds(1));
         }
@@ -504,7 +506,7 @@ public:
 
             Unit* caster = GetCaster();
             unitList.remove_if([caster](WorldObject* player) { return caster->IsWithinDist(player, 15.0f); });
-            Firelands::Containers::RandomResize(unitList, 1);
+            Trinity::Containers::RandomResize(unitList, 1);
         }
 
         void Register() override

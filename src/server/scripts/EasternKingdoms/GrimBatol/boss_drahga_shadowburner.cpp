@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -448,7 +448,6 @@ struct npc_drahga_invoked_flaming_spirit : public ScriptedAI
 {
     npc_drahga_invoked_flaming_spirit(Creature* creature) : ScriptedAI(creature)
     {
-        me->SetCorpseDelay(3);
         me->SetReactState(REACT_PASSIVE);
         me->SetWalk(true);
     }
@@ -463,6 +462,11 @@ struct npc_drahga_invoked_flaming_spirit : public ScriptedAI
     {
         if (damagetype == SPELL_DIRECT_DAMAGE)
             DoCastSelf(SPELL_QUIETE_SUICIDE);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        me->DespawnOrUnsummon(3s);
     }
 
     void UpdateAI(uint32 diff) override

@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -121,7 +121,7 @@ class boss_xevozz : public CreatureScript
                     _JustDied();
             }
 
-            void SpellHit(Unit* /*who*/, SpellInfo const* spell) override
+            void SpellHit(WorldObject* /*who*/, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_ARCANE_POWER || spell->Id == H_SPELL_ARCANE_POWER)
                     Talk(SAY_SUMMON_ENERGY);
@@ -157,13 +157,13 @@ class boss_xevozz : public CreatureScript
 
                     std::list<uint8> summonSpells = { 0, 1, 2 };
 
-                    uint8 spell = Firelands::Containers::SelectRandomContainerElement(summonSpells);
+                    uint8 spell = Trinity::Containers::SelectRandomContainerElement(summonSpells);
                     DoCast(me, EtherealSphereSummonSpells[spell]);
                     summonSpells.remove(spell);
 
                     if (IsHeroic())
                     {
-                        spell = Firelands::Containers::SelectRandomContainerElement(summonSpells);
+                        spell = Trinity::Containers::SelectRandomContainerElement(summonSpells);
                         task.Schedule(Milliseconds(2500), [this, spell](TaskContext /*task*/)
                         {
                             DoCast(me, EtherealSphereHeroicSummonSpells[spell]);

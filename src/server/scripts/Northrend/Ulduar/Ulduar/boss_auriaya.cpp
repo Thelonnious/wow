@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -258,7 +258,7 @@ class boss_auriaya : public CreatureScript
                                 Defender->Respawn();
                                 if (defenderLives)
                                     Defender->SetAuraStack(SPELL_FERAL_ESSENCE, Defender, defenderLives);
-                                Defender->SetInCombatWithZone();
+                                DoZoneInCombat(Defender);
                                 if (!Defender->IsInCombat())
                                     Defender->AI()->AttackStart(me->GetVictim());
                                 events.CancelEvent(EVENT_RESPAWN_DEFENDER);

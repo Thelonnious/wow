@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -239,7 +239,7 @@ namespace CorruptionHandler
         if (power > CORRUPTION_ACHIEVEMENT_CAP)
             if (InstanceScript* instance = target->GetInstanceScript())
                 if (!instance->instance->GetWorldStateValue(WORLD_STATE_ID_THE_ABYSS_WILL_GAZE_BACK_INTO_YOU))
-                    instance->instance->SetWorldState(WORLD_STATE_ID_THE_ABYSS_WILL_GAZE_BACK_INTO_YOU, 1);
+                    instance->DoUpdateWorldState(WORLD_STATE_ID_THE_ABYSS_WILL_GAZE_BACK_INTO_YOU, 1);
     }
 }
 
@@ -299,7 +299,7 @@ struct boss_chogall final : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-        instance->instance->SetWorldState(WORLD_STATE_ID_THE_ABYSS_WILL_GAZE_BACK_INTO_YOU, 0);
+        instance->DoUpdateWorldState(WORLD_STATE_ID_THE_ABYSS_WILL_GAZE_BACK_INTO_YOU, 0);
         DoCastSelf(SPELL_CORRUPTED_BLOOD);
         events.SetPhase(PHASE_1);
         events.ScheduleEvent(EVENT_FURY_OF_CHOGALL, 33s);
@@ -350,7 +350,7 @@ struct boss_chogall final : public BossAI
             Talk(SAY_DEATH_NORMAL);
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {
@@ -592,7 +592,7 @@ struct npc_chogall_corrupting_adherent final : public ScriptedAI
     }
 
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_CONSUME_BLOOD_OF_THE_OLD_GODS)
         {
@@ -1169,7 +1169,7 @@ class spell_chogall_conversion final : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 4 : 2);
+        Trinity::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 4 : 2);
     }
 
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
@@ -1359,7 +1359,7 @@ class spell_chogall_shadow_bolt final : public SpellScript
 
         targets.remove_if(VehicleCheck(GetCaster()));
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void Register() override

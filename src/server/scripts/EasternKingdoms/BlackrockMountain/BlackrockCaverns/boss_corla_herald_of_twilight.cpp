@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -344,6 +344,8 @@ class spell_corla_nether_dragon_essence : public AuraScript
 
     void HandleTriggerSpell(AuraEffect const* /*aurEff*/)
     {
+        PreventDefaultAction();
+
         if (Unit* caster = GetCaster())
             caster->CastSpell(caster, RAND(SPELL_NETHER_DRAGON_ESSENCE_VISUAL_1, SPELL_NETHER_DRAGON_ESSENCE_VISUAL_2, SPELL_NETHER_DRAGON_ESSENCE_VISUAL_3), true);
     }
@@ -426,7 +428,7 @@ class spell_corla_nether_beam : public SpellScript
         {
             if (Unit* caster = GetCaster())
             {
-                targets.sort(Firelands::ObjectDistanceOrderPred(caster, true));
+                targets.sort(Trinity::ObjectDistanceOrderPred(caster, true));
                 targets.resize(1);
             }
         }

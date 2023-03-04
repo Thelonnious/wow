@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -74,7 +74,7 @@ enum Spells
 
     SPELL_SUMMON_SPIRIT_OF_RAZORCLAW_THE_BUTCHER_DUMMY  = 93921, // Dummy Summon
     SPELL_SUMMON_SPIRIT_OF_RAZORCLAW_THE_BUTCHER_SUMMON = 93924,
-
+    
     SPELL_SUMMON_SPIRIT_OF_RETHILGORE_DUMMY             = 93925, // Dummy Summon
     SPELL_SUMMON_SPIRIT_OF_RETHILGORE_SUMMON            = 93927,
 
@@ -108,7 +108,7 @@ struct boss_baron_silverlaine : public BossAI
             SPELL_SUMMON_SPIRIT_OF_RETHILGORE_DUMMY
         };
 
-        Firelands::Containers::RandomResize(_worgenSummonSpells, IsHeroic() ? 3 : 2);
+        Trinity::Containers::RandomResize(_worgenSummonSpells, IsHeroic() ? 3 : 2);
     }
 
     void JustEngagedWith(Unit* who) override

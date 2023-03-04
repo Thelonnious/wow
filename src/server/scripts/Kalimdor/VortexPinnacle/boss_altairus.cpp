@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -237,8 +237,8 @@ class spell_altairus_call_the_wind : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_CALL_THE_WIND_AURA));
-        Firelands::Containers::RandomResize(targets, 1);
+        targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_CALL_THE_WIND_AURA));
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)

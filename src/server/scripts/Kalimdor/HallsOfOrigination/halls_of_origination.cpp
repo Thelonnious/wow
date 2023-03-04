@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -732,61 +732,21 @@ struct npc_hoo_aqua_bubble : public NullCreatureAI
     }
 };
 
-// The Maker's Lift
-enum ElevatorMisc
-{
-    GOSSIP_MENU_HOO_LIFT                    = 12646,
-    GOSSIP_NPC_TEXT_CHOOSE_A_DESTINATION    = 17791,
-    GOSSIP_OPTION_FIRST_FLOOR               = 0,
-    GOSSIP_OPTION_HOO_LIFT_SECOND_FLOOR     = 1,
-    GOSSIP_OPTION_HOO_LIFT_THIRD_FLOOR      = 2
-};
-
 // 207669 - The Maker's Lift Controller
 struct go_hoo_the_makers_lift_controller : public GameObjectAI
 {
     go_hoo_the_makers_lift_controller(GameObject* go) : GameObjectAI(go) { }
-
-    bool GossipHello(Player* player) override
-    {
-        InstanceScript* instance = player->GetInstanceScript();
-        if (!instance)
-            return false;
-
-        // Build menu.
-        // First floor: Option available from start.
-        AddGossipItemFor(player, GOSSIP_MENU_HOO_LIFT, GOSSIP_OPTION_FIRST_FLOOR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 0);
-
-        // Second floor: Anraphet must be defeated first.
-        if (instance->GetBossState(DATA_ANRAPHET) == DONE || instance->GetBossState(DATA_EARTHRAGER_PTAH) == DONE)
-            AddGossipItemFor(player, GOSSIP_MENU_HOO_LIFT, GOSSIP_OPTION_HOO_LIFT_SECOND_FLOOR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        // Third floor: Constructs of The Four Seats must be defeated first.
-        if (instance->GetBossState(DATA_ISISET) == DONE && instance->GetBossState(DATA_AMMUNAE) == DONE &&
-            instance->GetBossState(DATA_SETESH) == DONE && instance->GetBossState(DATA_RAJH) == DONE)
-            AddGossipItemFor(player, GOSSIP_MENU_HOO_LIFT, GOSSIP_OPTION_HOO_LIFT_THIRD_FLOOR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-
-        SendGossipMenuFor(player, GOSSIP_NPC_TEXT_CHOOSE_A_DESTINATION, me->GetGUID());
-        return true;
-    }
 
     bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
         player->PlayerTalkClass->SendCloseGossip();
 
-        InstanceScript* instance = player->GetInstanceScript();
-        if (!instance)
-            return true;
+        if (InstanceScript* instance = player->GetInstanceScript())
+            if (GameObject* elevator = instance->GetGameObject(DATA_LIFT_OF_THE_MAKERS))
+                elevator->SetGoState(GOState(GO_STATE_TRANSPORT_ACTIVE + action));
 
-        // Handle elevator: gossip item index => stopFrame (floor index).
-        GameObject* elevator = instance->GetGameObject(DATA_LIFT_OF_THE_MAKERS);
-        if (!elevator)
-            return true;
-
-        elevator->SetGoState(GOState(GO_STATE_TRANSPORT_ACTIVE + action));
-
-        return true;
+        return false;
     }
 };
 
@@ -806,7 +766,7 @@ class spell_hoo_flame_ring_visual : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleScriptEffect(SpellEffIndex effIndex)

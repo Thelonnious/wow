@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -267,20 +267,19 @@ class spell_bronjahm_magic_bane : public SpellScriptLoader
 
         class spell_bronjahm_magic_bane_SpellScript : public SpellScript
         {
-            void RecalculateDamage()
+            void RecalculateDamage(SpellEffIndex /*effIndex*/)
             {
                 if (GetHitUnit()->GetPowerType() != POWER_MANA)
                     return;
 
                 int32 const maxDamage = GetCaster()->GetMap()->IsHeroic() ? 15000 : 10000;
-                int32 newDamage = GetHitDamage() + (GetHitUnit()->GetMaxPower(POWER_MANA) / 2);
-
-                SetHitDamage(std::min<int32>(maxDamage, newDamage));
+                int32 newDamage = GetEffectValue() + (GetHitUnit()->GetMaxPower(POWER_MANA) / 2);
+                SetEffectValue(std::min<int32>(maxDamage, newDamage));
             }
 
             void Register() override
             {
-                OnHit.Register(&spell_bronjahm_magic_bane_SpellScript::RecalculateDamage);
+                OnEffectLaunchTarget.Register(&spell_bronjahm_magic_bane_SpellScript::RecalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
             }
         };
 

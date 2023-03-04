@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -458,7 +458,7 @@ class spell_ammunae_consume_life_energy : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
@@ -512,7 +512,7 @@ class spell_ammunae_summon_bloodpetal_blossom : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleDespawn(SpellEffIndex /*effIndex*/)

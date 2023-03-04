@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -68,7 +68,8 @@ extern Position const AnubarakLoc[];
 enum TCRWorldStateIds
 {
     UPDATE_STATE_UI_SHOW            = 4390,
-    UPDATE_STATE_UI_COUNT           = 4389
+    UPDATE_STATE_UI_COUNT           = 4389,
+    WORLD_STATE_PLAYER_DEATHS       = 4408
 };
 
 enum NorthrendBeasts

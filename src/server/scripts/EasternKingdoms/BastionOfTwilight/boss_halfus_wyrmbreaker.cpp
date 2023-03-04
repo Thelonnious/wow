@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -170,7 +170,7 @@ struct boss_halfus_wyrmbreaker final : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, 1);
-        instance->instance->SetWorldState(WORLD_STATE_ID_THE_ONLY_ESCAPE, 0);
+        instance->DoUpdateWorldState(WORLD_STATE_ID_THE_ONLY_ESCAPE, 0);
         events.ScheduleEvent(EVENT_BERSERK, 10min);
 
         if (Creature* protoBehemoth = instance->GetCreature(DATA_PROTO_BEHEMOTH))
@@ -217,7 +217,7 @@ struct boss_halfus_wyrmbreaker final : public BossAI
         _DespawnAtEvade();
     }
 
-    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
     {
         if (!caster)
             return;
@@ -237,13 +237,13 @@ struct boss_halfus_wyrmbreaker final : public BossAI
                 if (_theOnlyEscapeAchievementState == NOT_STARTED)
                 {
                     _theOnlyEscapeAchievementState = IN_PROGRESS;
-                    instance->instance->SetWorldState(WORLD_STATE_ID_THE_ONLY_ESCAPE, 1);
+                    instance->DoUpdateWorldState(WORLD_STATE_ID_THE_ONLY_ESCAPE, 1);
                     events.ScheduleEvent(EVENT_RESET_ACHIEVEMT, Seconds(10));
                 }
                 else if (_theOnlyEscapeAchievementState == IN_PROGRESS)
                 {
                     _theOnlyEscapeAchievementState = DONE;
-                    instance->instance->SetWorldState(WORLD_STATE_ID_THE_ONLY_ESCAPE, 2);
+                    instance->DoUpdateWorldState(WORLD_STATE_ID_THE_ONLY_ESCAPE, 2);
                     events.CancelEvent(EVENT_RESET_ACHIEVEMT);
                 }
                 break;
@@ -439,7 +439,7 @@ struct npc_halfus_enslaved_dragon final : public ScriptedAI
                 protoBehemoth->AI()->DoAction(ACTION_CAST_DRAGONS_VENGEANCE);
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->HasEffect(SPELL_EFFECT_SEND_EVENT))
         {
@@ -593,7 +593,7 @@ class spell_halfus_fireball final : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleHit(SpellEffIndex /*effIndex*/)
@@ -681,7 +681,7 @@ class spell_halfus_dancing_flames final : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void Register() override

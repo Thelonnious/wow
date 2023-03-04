@@ -1,5 +1,5 @@
  /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -111,7 +111,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* Caster, SpellInfo const* Spell) override
+        void SpellHit(WorldObject* caster, SpellInfo const* Spell) override
         {
             if (Spell->SpellFamilyFlags[2] & 0x080000000)
             {
@@ -120,7 +120,7 @@ public:
 
                 DoCast(me, SPELL_STUNNED, true);
 
-                pCaster = Caster->GetGUID();
+                pCaster = caster->GetGUID();
 
                 SayThanksTimer = 5000;
             }
@@ -573,8 +573,8 @@ public:
         {
             float radius = 50.0f;
             std::list<Player*> players;
-            Firelands::AnyPlayerInObjectRangeCheck checker(me, radius);
-            Firelands::PlayerListSearcher<Firelands::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Trinity::AnyPlayerInObjectRangeCheck checker(me, radius);
+            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
             Cell::VisitWorldObjects(me, searcher, radius);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -598,7 +598,7 @@ public:
                 }
             }
             else
-                LOG_ERROR("scripts", "SD2 ERROR: FlagList is empty!");
+                TC_LOG_ERROR("scripts", "SD2 ERROR: FlagList is empty!");
         }
 
         void UpdateAI(uint32 diff) override
@@ -726,5 +726,4 @@ void AddSC_azuremyst_isle()
     new npc_magwin();
     new npc_death_ravager();
     new go_ravager_cage();
-    new npc_geezle();
 }

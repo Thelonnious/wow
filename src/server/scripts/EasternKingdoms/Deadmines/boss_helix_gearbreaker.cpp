@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -258,10 +258,10 @@ struct boss_helix_gearbreaker : public BossAI
             damage = me->GetHealth() - 1;
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
     {
-        if (spell->Id == SPELL_RIDE_VEHICLE)
-            AttackStart(target);
+        if (spell->Id == SPELL_RIDE_VEHICLE && target->IsUnit())
+            AttackStart(target->ToUnit());
     }
 
     void UpdateAI(uint32 diff) override
@@ -580,7 +580,7 @@ class spell_helix_throw_bomb_targeting : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleHit(SpellEffIndex effIndex)
@@ -632,7 +632,7 @@ class spell_helix_oaf_grab_targeting : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleHit(SpellEffIndex effIndex)
@@ -740,7 +740,7 @@ class spell_helix_ride_face_targeting : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleHit(SpellEffIndex effIndex)

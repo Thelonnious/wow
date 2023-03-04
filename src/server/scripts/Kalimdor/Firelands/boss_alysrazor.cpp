@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -164,7 +164,7 @@ class TrashRespawnWorker
 static void AlysrazorTrashEvaded(Creature* creature)
 {
     TrashRespawnWorker check;
-    Firelands::CreatureWorker<TrashRespawnWorker> worker(creature, check);
+    Trinity::CreatureWorker<TrashRespawnWorker> worker(creature, check);
     Cell::VisitGridObjects(creature, worker, SIZE_OF_GRIDS);
 }
 
@@ -459,12 +459,12 @@ class npc_egg_pile : public CreatureScript
                         {
                             std::list<Creature*> eggs;
                             MoltenEggCheck check(me);
-                            Firelands::CreatureListSearcher<MoltenEggCheck> searcher(me, eggs, check);
+                            Trinity::CreatureListSearcher<MoltenEggCheck> searcher(me, eggs, check);
                             Cell::VisitGridObjects(me, searcher, 20.0f);
 
                             if (!eggs.empty())
                             {
-                                Creature* egg = Firelands::Containers::SelectRandomContainerElement(eggs);
+                                Creature* egg = Trinity::Containers::SelectRandomContainerElement(eggs);
                                 egg->CastSpell(egg, SPELL_SUMMON_SMOULDERING_HATCHLING, TRIGGERED_FULL_MASK);
                                 egg->SetDisplayId(MODEL_INVISIBLE_STALKER);
                                 egg->m_Events.AddEvent(new RespawnEggEvent(egg), egg->m_Events.CalculateTime(5000));

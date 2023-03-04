@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,7 +37,6 @@ EndScriptData */
 #include "RBAC.h"
 #include "Realm.h"
 #include "UpdateTime.h"
-#include "ServerMotd.h"
 #include "Util.h"
 #include "VMapFactory.h"
 #include "VMapManager2.h"
@@ -131,9 +130,9 @@ public:
                 dbPort = (*res)[0].GetUInt16();
 
             if (dbPort)
-                dbPortOutput = Firelands::StringFormat("Realmlist (Realm Id: %u) configured in port %" PRIu16, realm.Id.Realm, dbPort);
+                dbPortOutput = Trinity::StringFormat("Realmlist (Realm Id: %u) configured in port %" PRIu16, realm.Id.Realm, dbPort);
             else
-                dbPortOutput = Firelands::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
+                dbPortOutput = Trinity::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
         }
 
         handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
@@ -275,7 +274,10 @@ public:
     // Display the 'Message of the day' for the realm
     static bool HandleServerMotdCommand(ChatHandler* handler, char const* /*args*/)
     {
-        handler->PSendSysMessage(LANG_MOTD_CURRENT, Motd::GetMotd());
+        std::string motd;
+        for (std::string const& line : sWorld->GetMotd())
+            motd += line;
+        handler->PSendSysMessage(LANG_MOTD_CURRENT, motd.c_str());
         return true;
     }
 
@@ -395,10 +397,10 @@ public:
     }
 
     // Define the 'Message of the day' for the realm
-    static bool HandleServerSetMotdCommand(ChatHandler* handler, char const* motd)
+    static bool HandleServerSetMotdCommand(ChatHandler* handler, char const* args)
     {
-        Motd::SetMotd(motd);
-        handler->PSendSysMessage(LANG_MOTD_NEW, motd);
+        sWorld->SetMotd(args);
+        handler->PSendSysMessage(LANG_MOTD_NEW, args);
         return true;
     }
 

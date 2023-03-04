@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -77,7 +77,7 @@ public:
                 }
             }
 
-            LOG_DEBUG("scripts", "Instance Old Hillsbrad: GetPlayerInMap, but PlayerList is empty!");
+            TC_LOG_DEBUG("scripts", "Instance Old Hillsbrad: GetPlayerInMap, but PlayerList is empty!");
             return nullptr;
         }
 
@@ -116,7 +116,7 @@ public:
 
             if (!player)
             {
-                LOG_DEBUG("scripts", "Instance Old Hillsbrad: SetData (Type: %u Data %u) cannot find any player.", type, data);
+                TC_LOG_DEBUG("scripts", "Instance Old Hillsbrad: SetData (Type: %u Data %u) cannot find any player.", type, data);
                 return;
             }
 
@@ -132,7 +132,7 @@ public:
                         ++mBarrelCount;
                         DoUpdateWorldState(WORLD_STATE_OH, mBarrelCount);
 
-                        LOG_DEBUG("scripts", "Instance Old Hillsbrad: go_barrel_old_hillsbrad count %u", mBarrelCount);
+                        TC_LOG_DEBUG("scripts", "Instance Old Hillsbrad: go_barrel_old_hillsbrad count %u", mBarrelCount);
 
                         m_auiEncounter[0] = IN_PROGRESS;
 
@@ -153,7 +153,7 @@ public:
                         {
                             ++mThrallEventCount;
                             m_auiEncounter[1] = NOT_STARTED;
-                            LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event failed %u times. Resetting all sub-events.", mThrallEventCount);
+                            TC_LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event failed %u times. Resetting all sub-events.", mThrallEventCount);
                             m_auiEncounter[2] = NOT_STARTED;
                             m_auiEncounter[3] = NOT_STARTED;
                             m_auiEncounter[4] = NOT_STARTED;
@@ -166,29 +166,29 @@ public:
                             m_auiEncounter[3] = data;
                             m_auiEncounter[4] = data;
                             m_auiEncounter[5] = data;
-                            LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event failed %u times. Resetting all sub-events.", mThrallEventCount);
+                            TC_LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event failed %u times. Resetting all sub-events.", mThrallEventCount);
                         }
                     }
                     else
                         m_auiEncounter[1] = data;
-                    LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall escort event adjusted to data %u.", data);
+                    TC_LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall escort event adjusted to data %u.", data);
                     break;
                 }
                 case TYPE_THRALL_PART1:
                     m_auiEncounter[2] = data;
-                    LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event part I adjusted to data %u.", data);
+                    TC_LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event part I adjusted to data %u.", data);
                     break;
                 case TYPE_THRALL_PART2:
                     m_auiEncounter[3] = data;
-                    LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event part II adjusted to data %u.", data);
+                    TC_LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event part II adjusted to data %u.", data);
                     break;
                 case TYPE_THRALL_PART3:
                     m_auiEncounter[4] = data;
-                    LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event part III adjusted to data %u.", data);
+                    TC_LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event part III adjusted to data %u.", data);
                     break;
                 case TYPE_THRALL_PART4:
                     m_auiEncounter[5] = data;
-                     LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event part IV adjusted to data %u.", data);
+                     TC_LOG_DEBUG("scripts", "Instance Old Hillsbrad: Thrall event part IV adjusted to data %u.", data);
                     break;
             }
         }

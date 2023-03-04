@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -166,7 +166,7 @@ class boss_rotface : public CreatureScript
                     professor->AI()->EnterEvadeMode();
             }
 
-            void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+            void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_SLIME_SPRAY)
                     Talk(SAY_SLIME_SPRAY);
@@ -471,14 +471,14 @@ class spell_rotface_ooze_flood : public SpellScriptLoader
                 if (triggers.empty())
                     return;
 
-                triggers.sort(Firelands::ObjectDistanceOrderPred(GetHitUnit()));
+                triggers.sort(Trinity::ObjectDistanceOrderPred(GetHitUnit()));
                 GetHitUnit()->CastSpell(triggers.back(), uint32(GetEffectValue()), GetOriginalCaster() ? GetOriginalCaster()->GetGUID() : ObjectGuid::Empty);
             }
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 // get 2 targets except 2 nearest
-                targets.sort(Firelands::ObjectDistanceOrderPred(GetCaster()));
+                targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
 
                 // .resize() runs pop_back();
                 if (targets.size() > 5)
@@ -512,11 +512,11 @@ class spell_rotface_mutated_infection : public SpellScriptLoader
             {
                 // remove targets with this aura already
                 // tank is not on this list
-                targets.remove_if(Firelands::UnitAuraCheck(true, GetSpellInfo()->Id));
+                targets.remove_if(Trinity::UnitAuraCheck(true, GetSpellInfo()->Id));
                 if (targets.empty())
                     return;
 
-                WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -799,7 +799,7 @@ class spell_rotface_vile_gas_trigger : public SpellScriptLoader
         {
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.sort(Firelands::ObjectDistanceOrderPred(GetCaster()));
+                targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
                 if (targets.empty())
                     return;
 
@@ -823,13 +823,13 @@ class spell_rotface_vile_gas_trigger : public SpellScriptLoader
                     if (melee.empty())
                         break;
 
-                    WorldObject* target = Firelands::Containers::SelectRandomContainerElement(melee);
+                    WorldObject* target = Trinity::Containers::SelectRandomContainerElement(melee);
                     ranged.push_back(target);
                     melee.remove(target);
                 }
 
                 if (!ranged.empty())
-                    Firelands::Containers::RandomResize(ranged, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
+                    Trinity::Containers::RandomResize(ranged, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
 
                 targets.swap(ranged);
             }

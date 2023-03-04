@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -74,7 +74,7 @@ enum Phases
 enum Points
 {
     POINT_ANRAPHET_ACTIVATE,
-    POINT_BRANN_SAY_TROGGS,
+    POINT_BRANN_SAY_TROGGS, 
     POINT_BRANN_SAY_MOMENT,
     POINT_BRANN_TURN_BACK
 };
@@ -319,7 +319,7 @@ class spell_anraphet_alpha_beams : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void Register() override

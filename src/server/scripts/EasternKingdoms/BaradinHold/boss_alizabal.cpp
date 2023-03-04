@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -121,7 +121,7 @@ struct boss_alizabal : public BossAI
         }
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_SEETHING_HATE_TARGETING)
             Talk(SAY_SEETHING_HATE, target);
@@ -220,7 +220,7 @@ class spell_alizabal_seething_hate : public SpellScript
         }
 
         if (targets.size() > 1)
-            Firelands::Containers::RandomResize(targets, 1);
+            Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleDummyEffect(SpellEffIndex /*effIndex*/)

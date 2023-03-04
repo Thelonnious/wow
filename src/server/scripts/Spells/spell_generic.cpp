@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -805,8 +805,8 @@ class spell_gen_cannibalize : public SpellScriptLoader
                 float max_range = GetSpellInfo()->GetMaxRange(false);
                 WorldObject* result = nullptr;
                 // search for nearby enemy corpse in range
-                Firelands::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_ENEMY);
-                Firelands::WorldObjectSearcher<Firelands::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
+                Trinity::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_ENEMY);
+                Trinity::WorldObjectSearcher<Trinity::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
                 Cell::VisitWorldObjects(caster, searcher, max_range);
                 if (!result)
                     Cell::VisitGridObjects(caster, searcher, max_range);
@@ -1123,46 +1123,40 @@ enum CreateLanceSpells
     SPELL_CREATE_LANCE_HORDE    = 63919
 };
 
-class spell_gen_create_lance : public SpellScriptLoader
+class spell_gen_create_lance : public SpellScript
 {
-    public:
-        spell_gen_create_lance() : SpellScriptLoader("spell_gen_create_lance") { }
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_CREATE_LANCE_ALLIANCE,
+                SPELL_CREATE_LANCE_HORDE
+            });
+    }
 
-        class spell_gen_create_lance_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        GameObject* caster = GetGObjCaster();
+        if (!caster)
+            return;
+
+        if (Player* target = GetHitPlayer())
         {
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                return ValidateSpellInfo(
-                {
-                    SPELL_CREATE_LANCE_ALLIANCE,
-                    SPELL_CREATE_LANCE_HORDE
-                });
-            }
-
-            void HandleScript(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-
-                if (Player* target = GetHitPlayer())
-                {
-                    if (target->GetTeam() == ALLIANCE)
-                        GetCaster()->CastSpell(target, SPELL_CREATE_LANCE_ALLIANCE, true);
-                    else
-                        GetCaster()->CastSpell(target, SPELL_CREATE_LANCE_HORDE, true);
-                }
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget.Register(&spell_gen_create_lance_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_gen_create_lance_SpellScript();
+            if (target->GetTeam() == ALLIANCE)
+                caster->CastSpell(target, SPELL_CREATE_LANCE_ALLIANCE, true);
+            else
+                caster->CastSpell(target, SPELL_CREATE_LANCE_HORDE, true);
         }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget.Register(&spell_gen_create_lance::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
 };
+
 
 class spell_gen_creature_permanent_feign_death : public SpellScriptLoader
 {
@@ -2729,7 +2723,7 @@ class spell_gen_profession_research : public SpellScriptLoader
                 if (uint32 discoveredSpellId = GetExplicitDiscoverySpell(spellId, caster))
                     caster->LearnSpell(discoveredSpellId, false);
 
-                caster->UpdateCraftSkill(spellId);
+                caster->UpdateCraftSkill(GetSpellInfo());
             }
 
             void Register() override
@@ -2817,7 +2811,7 @@ class spell_gen_replenishment : public SpellScriptLoader
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Firelands::PowerPctOrderPred(POWER_MANA));
+                    targets.sort(Trinity::PowerPctOrderPred(POWER_MANA));
                     targets.resize(maxTargets);
                 }
             }
@@ -3052,17 +3046,15 @@ class spell_gen_seaforium_blast : public SpellScriptLoader
 
             bool Load() override
             {
-                // OriginalCaster is always available in Spell::prepare
-                return GetOriginalCaster()->GetTypeId() == TYPEID_PLAYER;
+                return GetGObjCaster()->GetOwnerGUID().IsPlayer();
             }
 
             void AchievementCredit(SpellEffIndex /*effIndex*/)
             {
-                // but in effect handling OriginalCaster can become nullptr
-                if (Unit* originalCaster = GetOriginalCaster())
+                if (Unit* owner = GetGObjCaster()->GetOwner())
                     if (GameObject* go = GetHitGObj())
                         if (go->GetGOInfo()->type == GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING)
-                            originalCaster->CastSpell(originalCaster, SPELL_PLANT_CHARGES_CREDIT_ACHIEVEMENT, true);
+                            owner->CastSpell(nullptr, SPELL_PLANT_CHARGES_CREDIT_ACHIEVEMENT, true);
             }
 
             void Register() override
@@ -4130,7 +4122,7 @@ public:
                         SetBonusValueForEffect(EFFECT_0, 5, aurEff);
                         break;
                     default:
-                        LOG_ERROR("spells", "SpellId %u couldn't be processed in spell_gen_mixology_bonus", GetId());
+                        TC_LOG_ERROR("spells", "SpellId %u couldn't be processed in spell_gen_mixology_bonus", GetId());
                         break;
                 }
                 amount += bonus;
@@ -4517,7 +4509,7 @@ class spell_gen_blink : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                Firelands::Containers::RandomResize(targets, 1);
+                Trinity::Containers::RandomResize(targets, 1);
             }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -4563,7 +4555,7 @@ public:
             if (targets.empty())
                 return;
 
-            Firelands::Containers::RandomResize(targets, 1);
+            Trinity::Containers::RandomResize(targets, 1);
         }
 
         void Register() override
@@ -4709,7 +4701,7 @@ class spell_gen_vengeance_triggered : public AuraScript
 
     void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
-        Unit* target = GetTarget();
+        Unit* target = GetTarget();    
         // Get the total damage of the last two seconds and clean older damage data
         int32 damageLastTwoSeconds = 0;
         for (DamageInfoContainer::const_iterator itr = _damageInfo.begin(); itr != _damageInfo.end();)
@@ -5289,7 +5281,7 @@ class spell_gen_flask_of_battle : public SpellScript
                 int32 durationBonus = sSpellMgr->AssertSpellInfo(chugALugSpellId)->Effects[EFFECT_0].CalcValue();
                 int32 duration = sSpellMgr->AssertSpellInfo(spellId)->GetMaxDuration();
                 AddPct(duration, durationBonus);
-                player->CastSpell(player, spellId, { SPELLVALUE_AURA_DURATION, duration });
+                player->CastSpell(player, spellId, { SPELLVALUE_DURATION, duration });
             }
             else
                 player->CastSpell(player, spellId);
@@ -5459,7 +5451,7 @@ class spell_gen_shadowmeld : public AuraScript
     {
         return ValidateSpellInfo({ SPELL_RACIAL_ELUSIVENESS });
     }
-
+    
     void HandleStealthLevel(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (AuraEffect const* aurEff = GetUnitOwner()->GetAuraEffect(SPELL_RACIAL_ELUSIVENESS, EFFECT_0))
@@ -5470,6 +5462,74 @@ class spell_gen_shadowmeld : public AuraScript
     {
         DoEffectCalcAmount.Register(&spell_gen_shadowmeld::HandleStealthLevel, EFFECT_2, SPELL_AURA_MOD_STEALTH);
     }
+};
+
+enum SiegeTankControl
+{
+    SPELL_SIEGE_TANK_CONTROL = 47963
+};
+
+class spell_gen_vehicle_control_link : public AuraScript
+{
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_SIEGE_TANK_CONTROL); //aurEff->GetAmount()
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove.Register(&spell_gen_vehicle_control_link::OnRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+enum PolymorphCastVisual
+{
+    // Spells
+    SPELL_MAGE_SQUIRREL_FORM    = 32813,
+    SPELL_MAGE_GIRAFFE_FORM     = 32816,
+    SPELL_MAGE_SERPENT_FORM     = 32817,
+    SPELL_MAGE_DRAGONHAWK_FORM  = 32818,
+    SPELL_MAGE_WORGEN_FORM      = 32819,
+    SPELL_MAGE_SHEEP_FORM       = 32820,
+
+    NPC_AUROSALIA               = 18744
+
+};
+
+/// @todo move out of here and rename - not a mage spell
+// 32826 - Polymorph (Visual)
+class spell_gen_polymorph_cast_visual : public SpellScript
+{
+    static const uint32 PolymorhForms[6];
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        // check if spell ids exist in dbc
+        return ValidateSpellInfo(PolymorhForms);
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetCaster()->FindNearestCreature(NPC_AUROSALIA, 30.0f))
+            if (target->GetTypeId() == TYPEID_UNIT)
+                target->CastSpell(target, PolymorhForms[urand(0, 5)], true);
+    }
+
+    void Register() override
+    {
+        // add dummy effect spell handler to Polymorph visual
+        OnEffectHitTarget.Register(&spell_gen_polymorph_cast_visual::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+uint32 const spell_gen_polymorph_cast_visual::PolymorhForms[6] =
+{
+    SPELL_MAGE_SQUIRREL_FORM,
+    SPELL_MAGE_GIRAFFE_FORM,
+    SPELL_MAGE_SERPENT_FORM,
+    SPELL_MAGE_DRAGONHAWK_FORM,
+    SPELL_MAGE_WORGEN_FORM,
+    SPELL_MAGE_SHEEP_FORM
 };
 
 void AddSC_generic_spell_scripts()
@@ -5498,7 +5558,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_clone_weapon_aura();
     new spell_gen_count_pct_from_max_hp("spell_gen_default_count_pct_from_max_hp");
     new spell_gen_count_pct_from_max_hp("spell_gen_50pct_count_pct_from_max_hp", 50);
-    new spell_gen_create_lance();
+    RegisterSpellScript(spell_gen_create_lance);
     new spell_gen_creature_permanent_feign_death();
     new spell_gen_dalaran_disguise("spell_gen_sunreaver_disguise");
     new spell_gen_dalaran_disguise("spell_gen_silver_covenant_disguise");
@@ -5609,4 +5669,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_rocket_barrage);
     RegisterSpellScript(spell_gen_face_rage);
     RegisterSpellScript(spell_gen_shadowmeld);
+    RegisterSpellScript(spell_gen_vehicle_control_link);
+    RegisterSpellScript(spell_gen_polymorph_cast_visual);
 }

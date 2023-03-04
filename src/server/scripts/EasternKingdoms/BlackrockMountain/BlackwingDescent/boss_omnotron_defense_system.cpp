@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -302,10 +302,10 @@ struct boss_omnotron_defense_system : public BossAI
                 break;
             case ACTION_START_ENCOUNTER:
                 instance->SetBossState(DATA_OMNOTRON_DEFENSE_SYSTEM, IN_PROGRESS);
-                instance->instance->SetWorldState(WORLD_STATE_ID_STATIC_SHOCK, 0);
-                instance->instance->SetWorldState(WORLD_STATE_ID_POISON_BOMB, 0);
-                instance->instance->SetWorldState(WORLD_STATE_ID_ARCANE_ANNIHILATOR, 0);
-                instance->instance->SetWorldState(WORLD_STATE_ID_FLAMETHROWER, 0);
+                instance->DoUpdateWorldState(WORLD_STATE_ID_STATIC_SHOCK, 0);
+                instance->DoUpdateWorldState(WORLD_STATE_ID_POISON_BOMB, 0);
+                instance->DoUpdateWorldState(WORLD_STATE_ID_ARCANE_ANNIHILATOR, 0);
+                instance->DoUpdateWorldState(WORLD_STATE_ID_FLAMETHROWER, 0);
 
                 if (IsHeroic())
                     DoSummon(NPC_LORD_VICTOR_NEFARIUS_OMNOTRON, LordVictorNefariusSummonPosition, 0, TEMPSUMMON_MANUAL_DESPAWN);
@@ -326,7 +326,7 @@ struct boss_omnotron_defense_system : public BossAI
                         golem->DespawnOrUnsummon();
                     }
                 }
-
+  
                 instance->SetBossState(DATA_OMNOTRON_DEFENSE_SYSTEM, FAIL);
                 RemoveDebuffsFromRaid();
                 summons.DespawnAll();
@@ -367,7 +367,7 @@ struct boss_omnotron_defense_system : public BossAI
                     break;
                 case EVENT_POWER_UP_FIRST_GOLEM:
                     // Randomize our golem order for each encounter
-                    Firelands::Containers::RandomShuffle(_golemGuidVector);
+                    Trinity::Containers::RandomShuffle(_golemGuidVector);
                     SelectNextGolemGUID();
                     DoCastSelf(SPELL_CONTROLLER_RECHARGE);
                     break;
@@ -481,7 +481,7 @@ struct npc_omnotron_electron : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_ACTIVATED)
         {
@@ -491,7 +491,7 @@ struct npc_omnotron_electron : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_LIGHTNING_CONDUCTOR)
             if (IsHeroic())
@@ -624,7 +624,7 @@ struct npc_omnotron_magmatron : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_ACTIVATED)
         {
@@ -634,7 +634,7 @@ struct npc_omnotron_magmatron : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_ACQUIRING_TARGET && target)
         {
@@ -767,7 +767,7 @@ struct npc_omnotron_toxitron : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_ACTIVATED)
         {
@@ -901,7 +901,7 @@ struct npc_omnotron_arcanotron : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_ACTIVATED)
         {
@@ -917,11 +917,11 @@ struct npc_omnotron_arcanotron : public ScriptedAI
             me->MakeInterruptable(false);
     }
 
-    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_ARCANE_ANNIHILATION)
             if (!_instance->instance->GetWorldStateValue(WORLD_STATE_ID_ARCANE_ANNIHILATOR))
-                _instance->instance->SetWorldState(WORLD_STATE_ID_ARCANE_ANNIHILATOR, 1);
+                _instance->DoUpdateWorldState(WORLD_STATE_ID_ARCANE_ANNIHILATOR, 1);
     }
 
     void UpdateAI(uint32 diff) override
@@ -1129,7 +1129,7 @@ struct npc_omnotron_poison_bomb : public ScriptedAI
         if (targets.empty())
             targets = targetsCopy;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
 
         if (Unit* target = targets.front())
         {
@@ -1145,13 +1145,13 @@ struct npc_omnotron_poison_bomb : public ScriptedAI
         me->DespawnOrUnsummon(2s + 500ms);
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_QUIETE_SUICIDE)
         {
             if (InstanceScript* instance = me->GetInstanceScript())
                 if (!instance->instance->GetWorldStateValue(WORLD_STATE_ID_POISON_BOMB))
-                    instance->instance->SetWorldState(WORLD_STATE_ID_POISON_BOMB, 1);
+                    instance->DoUpdateWorldState(WORLD_STATE_ID_POISON_BOMB, 1);
 
             DoCastSelf(SPELL_POISON_BOMB_DAMAGE, true);
             DoCastSelf(SPELL_POISON_BOMB_SUMMON_PUDDLE, true);
@@ -1309,7 +1309,7 @@ class spell_omnotron_electrical_discharge_trigger : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleDummyEffect(SpellEffIndex effIndex)
@@ -1372,7 +1372,7 @@ class spell_omnotron_unstable_shield : public AuraScript
 
         if (InstanceScript* instance = caster->GetInstanceScript())
             if (!instance->instance->GetWorldStateValue(WORLD_STATE_ID_STATIC_SHOCK))
-                instance->instance->SetWorldState(WORLD_STATE_ID_STATIC_SHOCK, 1);
+                instance->DoUpdateWorldState(WORLD_STATE_ID_STATIC_SHOCK, 1);
     }
 
     void Register() override
@@ -1389,7 +1389,7 @@ class spell_omnotron_aquiring_target : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleDummyEffect(SpellEffIndex effIndex)
@@ -1549,7 +1549,7 @@ class spell_omnotron_flamethrower : public SpellScript
         if (targets.size() >= 2)
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
                 if (!instance->instance->GetWorldStateValue(WORLD_STATE_ID_FLAMETHROWER))
-                    instance->instance->SetWorldState(WORLD_STATE_ID_FLAMETHROWER, 1);
+                    instance->DoUpdateWorldState(WORLD_STATE_ID_FLAMETHROWER, 1);
     }
 
     void Register() override

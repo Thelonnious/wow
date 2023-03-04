@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -198,8 +198,13 @@ public:
             instance->SetBossState(DATA_FELMYST, DONE);
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        void SpellHit(WorldObject* caster, SpellInfo const* spell) override
         {
+            if (!caster || !caster->IsUnit())
+                return;
+
+            Unit* unitCaster = caster->ToUnit();
+
             // workaround for linked aura
             /*if (spell->Id == SPELL_VAPOR_FORCE)
             {
@@ -209,15 +214,15 @@ public:
             if (spell->Id == SPELL_FOG_INFORM)
             {
                 float x, y, z;
-                caster->GetPosition(x, y, z);
+                unitCaster->GetPosition(x, y, z);
                 if (Unit* summon = me->SummonCreature(NPC_DEAD, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                 {
-                    summon->SetMaxHealth(caster->GetMaxHealth());
-                    summon->SetHealth(caster->GetMaxHealth());
+                    summon->SetMaxHealth(unitCaster->GetMaxHealth());
+                    summon->SetHealth(unitCaster->GetMaxHealth());
                     summon->CastSpell(summon, SPELL_FOG_CHARM, true);
                     summon->CastSpell(summon, SPELL_FOG_CHARM2, true);
                 }
-                me->DealDamage(caster, caster->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                Unit::DealDamage(me, unitCaster, unitCaster->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
         }
 
@@ -487,8 +492,8 @@ public:
             float x, y, z;
             me->GetPosition(x, y, z);
 
-            Firelands::AllCreaturesOfEntryInRange check(me, entry, 100);
-            Firelands::CreatureListSearcher<Firelands::AllCreaturesOfEntryInRange> searcher(me, templist, check);
+            Trinity::AllCreaturesOfEntryInRange check(me, entry, 100);
+            Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(me, templist, check);
             Cell::VisitGridObjects(me, searcher, me->GetGridActivationRange());
 
             for (std::list<Creature*>::const_iterator i = templist.begin(); i != templist.end(); ++i)

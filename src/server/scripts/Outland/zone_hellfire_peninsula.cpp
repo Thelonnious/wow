@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -158,7 +158,7 @@ public:
             if (creature->GetOwner() && creature->GetOwner()->GetTypeId() == TYPEID_PLAYER)
                 Start(false, false, creature->GetOwner()->GetGUID());
             else
-                LOG_ERROR("scripts", "Firelands: npc_ancestral_wolf can not obtain owner or owner is not a player.");
+                TC_LOG_ERROR("scripts", "TRINITY: npc_ancestral_wolf can not obtain owner or owner is not a player.");
 
             creature->SetSpeedRate(MOVE_WALK, 1.5f);
             Reset();
@@ -1096,8 +1096,8 @@ struct npc_watch_commander_leonus : public ScriptedAI
                 case EVENT_INFERNAL_RAIN_ATTACK:
                 {
                     std::list<Creature*> infernalrainList;
-                    Firelands::AllCreaturesOfEntryInRange checkerInfernalrain(me, NPC_INFERNAL_RAIN, 200.0f);
-                    Firelands::CreatureListSearcher<Firelands::AllCreaturesOfEntryInRange> searcherInfernal(me, infernalrainList, checkerInfernalrain);
+                    Trinity::AllCreaturesOfEntryInRange checkerInfernalrain(me, NPC_INFERNAL_RAIN, 200.0f);
+                    Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange> searcherInfernal(me, infernalrainList, checkerInfernalrain);
                     Cell::VisitAllObjects(me, searcherInfernal, 200.0f);
 
                     for (Creature* infernal : infernalrainList)
@@ -1109,8 +1109,8 @@ struct npc_watch_commander_leonus : public ScriptedAI
                 case EVENT_FEAR_CONTROLLER_CAST:
                 {
                     std::list<Creature*> fearcontrollerList;
-                    Firelands::AllCreaturesOfEntryInRange checkerFear(me, NPC_FEAR_CONTROLLER, 200.0f);
-                    Firelands::CreatureListSearcher<Firelands::AllCreaturesOfEntryInRange> searcherFear(me, fearcontrollerList, checkerFear);
+                    Trinity::AllCreaturesOfEntryInRange checkerFear(me, NPC_FEAR_CONTROLLER, 200.0f);
+                    Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange> searcherFear(me, fearcontrollerList, checkerFear);
                     Cell::VisitAllObjects(me, searcherFear, 200.0f);
 
                     for (Creature* fearController : fearcontrollerList)
@@ -1171,13 +1171,13 @@ struct npc_infernal_rain_hellfire : public ScriptedAI
                 case EVENT_INFERNAL_RAIN_CAST:
                 {
                     std::list<Creature*> infernalrainList;
-                    Firelands::AllCreaturesOfEntryInRange checker(me, NPC_INFERNAL_RAIN, 200.0f);
-                    Firelands::CreatureListSearcher<Firelands::AllCreaturesOfEntryInRange> searcher(me, infernalrainList, checker);
+                    Trinity::AllCreaturesOfEntryInRange checker(me, NPC_INFERNAL_RAIN, 200.0f);
+                    Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(me, infernalrainList, checker);
                     Cell::VisitAllObjects(me, searcher, 200.0f);
 
                     if (!infernalrainList.empty())
                     {
-                        Creature* random = Firelands::Containers::SelectRandomContainerElement(infernalrainList);
+                        Creature* random = Trinity::Containers::SelectRandomContainerElement(infernalrainList);
                         if (random->isMoving() && random->GetPositionZ() < 118.0f)
                         {
                             me->CastSpell(random, SPELL_INFERNAL_RAIN, true);

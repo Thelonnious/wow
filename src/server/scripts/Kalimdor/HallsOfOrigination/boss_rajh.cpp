@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -103,7 +103,7 @@ struct boss_rajh : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-        instance->instance->SetWorldState(WORLD_STATE_ID_SUN_OF_A, 0);
+        instance->DoUpdateWorldState(WORLD_STATE_ID_SUN_OF_A, 0);
         me->SetReactState(REACT_AGGRESSIVE);
         _randomTimerCase = RAND(0, 1);
         events.ScheduleEvent(EVENT_SOLAR_WINDS, 5s);
@@ -226,7 +226,7 @@ struct boss_rajh : public BossAI
                     break;
                 case EVENT_REENGAGE:
                     if (!instance->instance->GetWorldStateValue(WORLD_STATE_ID_SUN_OF_A))
-                        instance->instance->SetWorldState(WORLD_STATE_ID_SUN_OF_A, 1);
+                        instance->DoUpdateWorldState(WORLD_STATE_ID_SUN_OF_A, 1);
                     _energized = true;
                     _randomTimerCase = RAND(0, 1);
                     events.ScheduleEvent(EVENT_SOLAR_WINDS, 5s);
@@ -317,7 +317,7 @@ struct npc_rajh_orb_of_the_sun : public ScriptedAI
         _events.ScheduleEvent(EVENT_GROW, 1s);
     }
 
-    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_RIDE_VEHICLE)
             _events.ScheduleEvent(EVENT_BLAZING_INFERNO, 500ms);
@@ -360,7 +360,7 @@ class spell_rajh_summon_meteor : public SpellScript
 {
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void Register() override

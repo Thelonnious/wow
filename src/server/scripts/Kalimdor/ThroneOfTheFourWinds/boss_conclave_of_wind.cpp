@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -349,7 +349,7 @@ struct boss_anshal : public BossAI
         }
     }
 
-    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_WIND_DISTANCE_CHECKER)
         {
@@ -359,7 +359,7 @@ struct boss_anshal : public BossAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_GATHER_STRENGTH)
         {
@@ -418,7 +418,7 @@ struct boss_anshal : public BossAI
 
                     if (!_ravenousCreeperGUIDs.empty())
                     {
-                        if (ObjectGuid creeperGuid = Firelands::Containers::SelectRandomContainerElement(_ravenousCreeperGUIDs))
+                        if (ObjectGuid creeperGuid = Trinity::Containers::SelectRandomContainerElement(_ravenousCreeperGUIDs))
                             if (Creature* creeper = ObjectAccessor::GetCreature(*me, creeperGuid))
                                 target = creeper;
 
@@ -597,7 +597,7 @@ struct boss_nezir : public BossAI
         }
     }
 
-    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_WIND_DISTANCE_CHECKER)
         {
@@ -607,7 +607,7 @@ struct boss_nezir : public BossAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_GATHER_STRENGTH)
         {
@@ -836,7 +836,7 @@ struct boss_rohash : public BossAI
         }
     }
 
-    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {
@@ -850,7 +850,7 @@ struct boss_rohash : public BossAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_GATHER_STRENGTH)
         {
@@ -1032,10 +1032,10 @@ struct npc_conclave_of_wind_ravenous_creeper : public ScriptedAI
         */
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
     {
-        if (spell->Id == SPELL_AI_CLEAR_TARGET)
-            ModifyThreatByPercent(target, -100);
+        if (target->IsUnit() && spell->Id == SPELL_AI_CLEAR_TARGET)
+            ModifyThreatByPercent(target->ToUnit(), -100);
     }
 
     void EnterEvadeMode(EvadeReason /*why*/) override

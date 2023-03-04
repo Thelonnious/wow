@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -543,7 +543,7 @@ class boss_thorim : public CreatureScript
                     Talk(SAY_SLAY);
             }
 
-            void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+            void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
             {
                 if (spellInfo->Id == SPELL_TOUCH_OF_DOMINION_TRIGGERED)
                 {
@@ -556,7 +556,7 @@ class boss_thorim : public CreatureScript
                 }
             }
 
-            void SpellHitTarget(Unit* who, SpellInfo const* spellInfo) override
+            void SpellHitTarget(WorldObject* who, SpellInfo const* spellInfo) override
             {
                 if (who->GetTypeId() == TYPEID_PLAYER && spellInfo->Id == SPELL_LIGHTNING_RELEASE)
                     _dontStandInTheLightning = false;
@@ -860,12 +860,12 @@ class boss_thorim : public CreatureScript
 
                 if (count == 1)
                 {
-                    Creature* bunny = Firelands::Containers::SelectRandomContainerElement(triggerList);
+                    Creature* bunny = Trinity::Containers::SelectRandomContainerElement(triggerList);
                     triggerList.clear();
                     triggerList.push_back(bunny);
                 }
                 else
-                    Firelands::Containers::RandomResize(triggerList, count);
+                    Trinity::Containers::RandomResize(triggerList, count);
             }
 
             void SummonWave()
@@ -910,7 +910,7 @@ class boss_thorim : public CreatureScript
 
             bool CanStartPhase2(Unit* actor) const
             {
-                if (actor->GetTypeId() != TYPEID_PLAYER || !me->IsWithinDistInMap(actor, 10.0f))
+                if (!actor || actor->GetTypeId() != TYPEID_PLAYER || !me->IsWithinDistInMap(actor, 10.0f))
                     return false;
 
                 Creature* runicColossus = instance->GetCreature(DATA_RUNIC_COLOSSUS);
@@ -1041,7 +1041,7 @@ struct npc_thorim_trashAI : public ScriptedAI
 
             Unit* target = nullptr;
             MostHPMissingInRange checker(caster, range, heal);
-            Firelands::UnitLastSearcher<MostHPMissingInRange> searcher(caster, target, checker);
+            Trinity::UnitLastSearcher<MostHPMissingInRange> searcher(caster, target, checker);
             Cell::VisitGridObjects(caster, searcher, range);
 
             return target;
@@ -1050,7 +1050,7 @@ struct npc_thorim_trashAI : public ScriptedAI
         static Unit* GetHealTarget(SpellInfo const* spellInfo, Unit* caster)
         {
             Unit* healTarget = nullptr;
-            if (!spellInfo->HasAttribute(SPELL_ATTR1_CANT_TARGET_SELF) && !roll_chance_f(caster->GetHealthPct()) && ((caster->GetHealth() + GetRemainingHealOn(caster) + GetTotalHeal(spellInfo, caster)) <= caster->GetMaxHealth()))
+            if (!spellInfo->HasAttribute(SPELL_ATTR1_EXCLUDE_CASTER) && !roll_chance_f(caster->GetHealthPct()) && ((caster->GetHealth() + GetRemainingHealOn(caster) + GetTotalHeal(spellInfo, caster)) <= caster->GetMaxHealth()))
                 healTarget = caster;
             else
                 healTarget = GetUnitWithMostMissingHp(spellInfo, caster);
@@ -1165,7 +1165,7 @@ class npc_thorim_pre_phase : public CreatureScript
             void DamageTaken(Unit* attacker, uint32& damage) override
             {
                 // nullify spell damage
-                if (!attacker->GetAffectingPlayer())
+                if (!attacker || !attacker->GetAffectingPlayer())
                     damage = 0;
             }
 
@@ -1590,7 +1590,7 @@ class npc_sif : public CreatureScript
                 _events.Reset();
             }
 
-            void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+            void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
             {
                 if (spellInfo->Id == SPELL_STORMHAMMER_SIF)
                 {
@@ -1758,7 +1758,7 @@ class spell_thorim_charge_orb : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -1882,7 +1882,7 @@ class spell_thorim_stormhammer : public SpellScriptLoader
                     return;
                 }
 
-                WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -2051,12 +2051,12 @@ class spell_thorim_activate_lightning_orb_periodic : public SpellScriptLoader
                 std::vector<Creature*> triggers;
 
                 UpperOrbCheck check;
-                Firelands::CreatureListSearcher<UpperOrbCheck> searcher(caster, triggers, check);
+                Trinity::CreatureListSearcher<UpperOrbCheck> searcher(caster, triggers, check);
                 Cell::VisitGridObjects(caster, searcher, 100.f);
 
                 if (!triggers.empty())
                 {
-                    Creature* target = Firelands::Containers::SelectRandomContainerElement(triggers);
+                    Creature* target = Trinity::Containers::SelectRandomContainerElement(triggers);
                     if (Creature* thorim = instance->GetCreature(DATA_THORIM))
                         thorim->AI()->SetGUID(target->GetGUID(), DATA_CHARGED_PILLAR);
                 }

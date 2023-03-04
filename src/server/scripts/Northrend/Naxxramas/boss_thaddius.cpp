@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -604,35 +604,37 @@ public:
                 refreshBeam = true;
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell) override
+            void SpellHit(WorldObject* caster, SpellInfo const* spell) override
             {
-                if (!caster)
+                if (!caster || !caster->IsUnit())
                     return;
                 if (spell->Id != SPELL_STALAGG_TESLA_PERIODIC)
                     return;
+
+                Unit* unitCaster = caster->ToUnit();
                 if (!isFeignDeath && me->IsInCombat() && !me->GetHomePosition().IsInDist(me, OVERLOAD_DISTANCE))
                 {
                     if (!isOverloading)
                     {
                         isOverloading = true;
-                        caster->SetImmuneToPC(false);
+                        unitCaster->SetImmuneToPC(false);
                         if (Creature* creatureCaster = caster->ToCreature())
                             creatureCaster->AI()->Talk(EMOTE_TESLA_LINK_BREAKS);
                         me->RemoveAura(SPELL_STALAGG_CHAIN_VISUAL);
                     }
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                     {
-                        caster->CastStop(SPELL_TESLA_SHOCK);
-                        caster->CastSpell(target, SPELL_TESLA_SHOCK,true);
+                        unitCaster->CastStop(SPELL_TESLA_SHOCK);
+                        unitCaster->CastSpell(target, SPELL_TESLA_SHOCK,true);
                     }
                 }
                 else if (isOverloading || refreshBeam)
                 {
                     isOverloading = false;
                     refreshBeam = false;
-                    caster->CastStop();
-                    caster->CastSpell(me, SPELL_STALAGG_CHAIN_VISUAL, true);
-                    caster->SetImmuneToPC(true);
+                    unitCaster->CastStop();
+                    unitCaster->CastSpell(me, SPELL_STALAGG_CHAIN_VISUAL, true);
+                    unitCaster->SetImmuneToPC(true);
                 }
             }
 
@@ -853,35 +855,37 @@ public:
                 refreshBeam = true;
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell) override
+            void SpellHit(WorldObject* caster, SpellInfo const* spell) override
             {
-                if (!caster)
+                if (!caster || !caster->IsUnit())
                     return;
                 if (spell->Id != SPELL_FEUGEN_TESLA_PERIODIC)
                     return;
+
+                Unit* unitCaster = caster->ToUnit();
                 if (!isFeignDeath && me->IsInCombat() && !me->GetHomePosition().IsInDist(me, OVERLOAD_DISTANCE))
                 {
                     if (!isOverloading)
                     {
                         isOverloading = true;
-                        caster->SetImmuneToPC(false);
+                        unitCaster->SetImmuneToPC(false);
                         if (Creature* creatureCaster = caster->ToCreature())
                             creatureCaster->AI()->Talk(EMOTE_TESLA_LINK_BREAKS);
                         me->RemoveAura(SPELL_STALAGG_CHAIN_VISUAL);
                     }
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     {
-                        caster->CastStop(SPELL_TESLA_SHOCK);
-                        caster->CastSpell(target, SPELL_TESLA_SHOCK,true);
+                        unitCaster->CastStop(SPELL_TESLA_SHOCK);
+                        unitCaster->CastSpell(target, SPELL_TESLA_SHOCK,true);
                     }
                 }
                 else if (isOverloading || refreshBeam)
                 {
                     isOverloading = false;
                     refreshBeam = false;
-                    caster->CastStop();
-                    caster->CastSpell(me, SPELL_FEUGEN_CHAIN_VISUAL, true);
-                    caster->SetImmuneToPC(true);
+                    unitCaster->CastStop();
+                    unitCaster->CastSpell(me, SPELL_FEUGEN_CHAIN_VISUAL, true);
+                    unitCaster->SetImmuneToPC(true);
                 }
             }
 

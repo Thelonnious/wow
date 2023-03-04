@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "AreaBoundary.h"
 #include "Creature.h"
+#include "CreatureAI.h"
 #include "GameObject.h"
 #include "InstanceScript.h"
 #include "magtheridons_lair.h"
@@ -123,7 +124,7 @@ class instance_magtheridons_lair : public InstanceMapScript
                         for (ObjectGuid warderGuid : warderGUIDS)
                             if (Creature* warder = instance->GetCreature(warderGuid))
                                 if (warder->IsAlive())
-                                    warder->SetInCombatWithZone();
+                                    warder->AI()->DoZoneInCombat();
                         break;
                     default:
                         break;

@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -607,7 +607,7 @@ class boss_algalon_the_observer : public CreatureScript
                             me->GetCreatureListWithEntryInGrid(stalkers, NPC_ALGALON_STALKER, 200.0f);
                             if (!stalkers.empty())
                             {
-                                Unit* stalker = Firelands::Containers::SelectRandomContainerElement(stalkers);
+                                Unit* stalker = Trinity::Containers::SelectRandomContainerElement(stalkers);
                                 stalker->m_Events.AddEvent(new ActivateLivingConstellation(stalker), stalker->m_Events.CalculateTime(urand(45000, 50000)));
                             }
                             break;
@@ -780,7 +780,7 @@ class npc_living_constellation : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell) override
+            void SpellHit(WorldObject* caster, SpellInfo const* spell) override
             {
                 if (spell->Id != SPELL_CONSTELLATION_PHASE_EFFECT || caster->GetTypeId() != TYPEID_UNIT)
                     return;
@@ -997,7 +997,7 @@ class go_celestial_planetarium_access : public GameObjectScript
                     return true;
 
                 bool hasKey = true;
-                if (LockEntry const* lock = sLockStore.LookupEntry(me->GetGOInfo()->goober.lockId))
+                if (LockEntry const* lock = sLockStore.LookupEntry(me->GetGOInfo()->goober.open))
                 {
                     hasKey = false;
                     for (uint32 i = 0; i < MAX_LOCK_CASE; ++i)
@@ -1189,7 +1189,7 @@ class spell_algalon_collapse : public SpellScriptLoader
             void HandlePeriodic(AuraEffect const* /*aurEff*/)
             {
                 PreventDefaultAction();
-                GetTarget()->DealDamage(GetTarget(), GetTarget()->CountPctFromMaxHealth(1), nullptr, NODAMAGE);
+                Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(1), nullptr, NODAMAGE);
             }
 
             void Register() override

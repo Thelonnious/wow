@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -243,7 +243,7 @@ struct boss_lord_rhyolith : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_ENGAGE, who);
         instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, 1);
-        me->GetMap()->SetWorldState(WORLD_STATE_ID_NOT_AN_AMBI_TURNER, 0);
+        instance->DoUpdateWorldState(WORLD_STATE_ID_NOT_AN_AMBI_TURNER, 0);
 
         uint8 frameIndex = 2;
         for (uint32 type : { DATA_LEFT_FOOT, DATA_RIGHT_FOOT })
@@ -345,7 +345,8 @@ struct boss_lord_rhyolith : public BossAI
                 summon->m_Events.AddEventAtOffset([summon]()
                 {
                     summon->SetReactState(REACT_AGGRESSIVE);
-                    summon->SetInCombatWithZone();
+                    if (CreatureAI* ai = summon->AI())
+                        ai->DoZoneInCombat(summon);
 
                     if (summon->GetEntry() == NPC_SPARK_OF_RHYOLITH)
                         summon->CastSpell(nullptr, SPELL_IMMOLATION_2);
@@ -535,7 +536,7 @@ struct boss_lord_rhyolith : public BossAI
 
                     if (!_achievementFailed && _currentBalance < CENTER_BALANCE)
                     {
-                        me->GetMap()->SetWorldState(WORLD_STATE_ID_NOT_AN_AMBI_TURNER, 1);
+                        instance->DoUpdateWorldState(WORLD_STATE_ID_NOT_AN_AMBI_TURNER, 1);
                         _achievementFailed = true;
                     }
 
@@ -570,7 +571,7 @@ struct boss_lord_rhyolith : public BossAI
 
                     // Deal damage to trigger the damage taken hook, which manages the model changes and phase switch
                     if (targetHealthPct < me->GetHealthPct())
-                        me->DealDamage(me, CalculatePct(me->GetMaxHealth(), me->GetHealthPct() - targetHealthPct));
+                        Unit::DealDamage(me, me, CalculatePct(me->GetMaxHealth(), me->GetHealthPct() - targetHealthPct));
                     events.Repeat(5s);
                     break;
                 }
@@ -1028,7 +1029,7 @@ class spell_rhyolith_concussive_stomp : public SpellScript
 
         uint8 volcanoTargetCount = urand(2, 3);
         for (uint8 i = 0; i < volcanoTargetCount; ++i)
-            _volcanoTargetGUIDs.emplace_back(Firelands::Containers::SelectRandomContainerElement(targets)->GetGUID());
+            _volcanoTargetGUIDs.emplace_back(Trinity::Containers::SelectRandomContainerElement(targets)->GetGUID());
     }
 
     void HandleDummyEffect(SpellEffIndex effIndex)
@@ -1115,7 +1116,7 @@ class spell_rhyolith_lava_strike: public SpellScript
         uint8 size = GetCaster()->GetMap()->Is25ManRaid() ? 6 : 3;
 
         if (targets.size() > size)
-            Firelands::Containers::RandomResize(targets, size);
+            Trinity::Containers::RandomResize(targets, size);
     }
 
     void HandleDummyEffect(SpellEffIndex effIndex)
@@ -1293,7 +1294,7 @@ class spell_rhyolith_meltdown : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
         _storedTargets = targets;
     }
 
@@ -1338,7 +1339,7 @@ class spell_rhyolith_summon_rock_elementals : public SpellScript
 
         uint8 elementalTargetCount = _summonSpellId == SPELL_SUMMON_FRAGMENT_OF_RHYOLITH ? 5 : 1;
         for (uint8 i = 0; i < elementalTargetCount; ++i)
-            _elementalTargetGUIDs.emplace_back(Firelands::Containers::SelectRandomContainerElement(targets)->GetGUID());
+            _elementalTargetGUIDs.emplace_back(Trinity::Containers::SelectRandomContainerElement(targets)->GetGUID());
     }
 
     void SummonElementals()

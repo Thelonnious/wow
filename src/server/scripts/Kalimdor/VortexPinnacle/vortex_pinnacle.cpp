@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -117,7 +117,7 @@ struct npc_lurking_tempest : public NullCreatureAI
         DoCastSelf(SPELL_LURK_SEARCH_PERIODIC);
     }
 
-    void SpellHit(Unit* /*unit*/, SpellInfo const* spellInfo) override
+    void SpellHit(WorldObject* /*unit*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_FEIGN_DEATH)
             Talk(SAY_FEIGN_DEATH);
@@ -551,7 +551,7 @@ class spell_vp_lurk_search : public SpellScript
                 });
 
                 if (targets.size() > 1)
-                    Firelands::Containers::RandomResize(targets, 1);
+                    Trinity::Containers::RandomResize(targets, 1);
                 break;
             }
             default:
@@ -659,6 +659,7 @@ class spell_vp_howling_gale : public AuraScript
 
     void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
+        PreventDefaultAction();
         Unit* caster = GetTarget();
         if (_inactiveTicks > 0)
         {

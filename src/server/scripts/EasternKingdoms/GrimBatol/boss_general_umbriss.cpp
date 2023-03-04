@@ -1,5 +1,5 @@
 /*
-* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -175,7 +175,7 @@ struct boss_general_umbriss : public BossAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_FRENZY)
             Talk(SAY_ANNOUNCE_FRENZY);
@@ -244,7 +244,7 @@ struct npc_umbriss_skardyn : public ScriptedAI
             _events.ScheduleEvent(EVENT_ATTACK_PLAYER, Milliseconds(1));
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_MODGUDS_MALICE || spell->Id == SPELL_MODGUDS_MALICE_HC)
             _infected = true;
@@ -306,7 +306,7 @@ class spell_umbriss_summon_blitz_trigger : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleSummon(SpellEffIndex effIndex)
@@ -334,7 +334,7 @@ class spell_umbriss_summon_ground_siege_trigger : public SpellScript
         if (targets.empty())
             return;
 
-        Firelands::Containers::RandomResize(targets, 1);
+        Trinity::Containers::RandomResize(targets, 1);
     }
 
     void HandleSummon(SpellEffIndex effIndex)

@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -470,7 +470,7 @@ class instance_halls_of_origination : public InstanceMapScript
                                     anraphet->AI()->DoAction(ACTION_ANRAPHET_INTRO);
                             break;
                         case EVENT_FAIL_VAULTS_OF_LIGHT_ACHIEVEMENT:
-                            instance->SetWorldState(WORLD_STATE_ID_FASTER_THAN_THE_SPEED_OF_LIGHT, 1);
+                            DoUpdateWorldState(WORLD_STATE_ID_FASTER_THAN_THE_SPEED_OF_LIGHT, 1);
                             break;
                         default:
                             break;
@@ -513,7 +513,7 @@ class instance_halls_of_origination : public InstanceMapScript
                 };
 
                 // Wardens are always being randomized on each reset
-                Firelands::Containers::RandomShuffle(wardenEntries);
+                Trinity::Containers::RandomShuffle(wardenEntries);
 
                 for (uint8 i = 0; i < MAX_VAULT_OF_LIGHTS_WARDEN; ++i)
                 {

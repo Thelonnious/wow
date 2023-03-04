@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -466,7 +466,7 @@ public:
                         alexstraszaBunny->GetNearPoint2D(nullptr, pos.m_positionX, pos.m_positionY, 30.0f, alexstraszaBunny->GetAngle(me));
                         me->GetMotionMaster()->MoveLand(POINT_LAND_P_ONE, pos);
                         me->SetImmuneToAll(false);
-                        me->SetInCombatWithZone();
+                        DoZoneInCombat();
                         events.ScheduleEvent(EVENT_LAND_START_ENCOUNTER, 7*IN_MILLISECONDS, 1, PHASE_NOT_STARTED);
                     }
                     break;
@@ -629,7 +629,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        void SpellHit(WorldObject* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_POWER_SPARK_MALYGOS)
             {
@@ -1025,7 +1025,7 @@ public:
             _instance = creature->GetInstanceScript();
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_PORTAL_OPENED)
             {
@@ -1159,7 +1159,7 @@ public:
                 if (unit->GetTypeId() == TYPEID_UNIT)
                 {
                     unit->CastSpell(unit, SPELL_TELEPORT_VISUAL_ONLY);
-                    unit->ToCreature()->SetInCombatWithZone();
+                    DoZoneInCombat(unit->ToCreature());
                 }
                 else if (unit->GetTypeId() == TYPEID_PLAYER)
                     me->SetDisableGravity(true);
@@ -1476,7 +1476,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_ARCANE_BOMB_TRIGGER)
             {
@@ -1709,10 +1709,10 @@ class spell_malygos_arcane_storm : public SpellScriptLoader
                 {
                     // Resize list only to objects that are vehicles.
                     IsCreatureVehicleCheck check(true);
-                    Firelands::Containers::RandomResize(targets, check, (malygos->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL ? 4 : 10));
+                    Trinity::Containers::RandomResize(targets, check, (malygos->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL ? 4 : 10));
                 }
                 else
-                    Firelands::Containers::RandomResize(targets, (malygos->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL ? 4 : 10));
+                    Trinity::Containers::RandomResize(targets, (malygos->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL ? 4 : 10));
             }
 
             void HandleVisual(SpellEffIndex /*effIndex*/)
@@ -1950,7 +1950,7 @@ class spell_scion_of_eternity_arcane_barrage : public SpellScriptLoader
                 // and if 3rd picks X again 4th will pick smth else (by not limiting the cast to certain caster).
                 if (targets.size() > 1)
                     if (malygos && malygos->AI()->GetGUID(DATA_LAST_TARGET_BARRAGE_GUID))
-                        targets.remove_if(Firelands::ObjectGUIDCheck(malygos->AI()->GetGUID(DATA_LAST_TARGET_BARRAGE_GUID)));
+                        targets.remove_if(Trinity::ObjectGUIDCheck(malygos->AI()->GetGUID(DATA_LAST_TARGET_BARRAGE_GUID)));
 
                 // Remove players not on Hover Disk from second list
                 std::list<WorldObject*> playersWithoutDisk;
@@ -1966,7 +1966,7 @@ class spell_scion_of_eternity_arcane_barrage : public SpellScriptLoader
                 // Finally here we remove all targets that have been damaged by Arcane Barrage
                 // and have 2 seconds long aura still lasting. Used to give healers some time.
                 if (!targets.empty())
-                    targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_ARCANE_BARRAGE_DAMAGE));
+                    targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_ARCANE_BARRAGE_DAMAGE));
 
                 // Now we resize the list to max output targets which can be only 1
                 // to take it's guid and send/store it to DATA_LAST_TARGET_BARRAGE_GUID.
@@ -1975,7 +1975,7 @@ class spell_scion_of_eternity_arcane_barrage : public SpellScriptLoader
                 if (!targets.empty())
                 {
                     if (targets.size() > 1)
-                        Firelands::Containers::RandomResize(targets, 1);
+                        Trinity::Containers::RandomResize(targets, 1);
 
                     if (WorldObject* filteredTarget = targets.front())
                         if (malygos)
@@ -2204,7 +2204,7 @@ class spell_malygos_surge_of_power_warning_selector_25 : public SpellScriptLoade
                 std::list<WorldObject*> selectedTargets = targets;
 
                 uint8 guidDataSlot = DATA_FIRST_SURGE_TARGET_GUID; // SetGuid in Malygos AI is reserved for 14th, 15th and 16th Id for the three targets
-                Firelands::Containers::RandomResize(selectedTargets, 3);
+                Trinity::Containers::RandomResize(selectedTargets, 3);
                 for (std::list<WorldObject*>::const_iterator itr = selectedTargets.begin(); itr != selectedTargets.end(); ++itr)
                 {
                     Creature* target = (*itr)->ToCreature();

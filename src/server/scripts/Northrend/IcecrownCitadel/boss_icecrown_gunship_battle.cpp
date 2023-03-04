@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -970,7 +970,7 @@ class npc_high_overlord_saurfang_igb : public CreatureScript
                 return false;
             }
 
-            void DamageTaken(Unit* , uint32& damage) override
+            void DamageTaken(Unit* /*attacker*/, uint32& damage) override
             {
                 if (me->HealthBelowPctDamaged(65, damage) && !me->HasAura(SPELL_TASTE_OF_BLOOD))
                     DoCast(me, SPELL_TASTE_OF_BLOOD, true);
@@ -1236,7 +1236,7 @@ class npc_muradin_bronzebeard_igb : public CreatureScript
                 return false;
             }
 
-            void DamageTaken(Unit* , uint32& damage) override
+            void DamageTaken(Unit* /*attacker*/, uint32& damage) override
             {
                 if (me->HealthBelowPctDamaged(65, damage) && me->HasAura(SPELL_TASTE_OF_BLOOD))
                     DoCast(me, SPELL_TASTE_OF_BLOOD, true);
@@ -1464,8 +1464,8 @@ struct npc_gunship_boarding_addAI : public gunship_npc_AI
             me->GetSpellHistory()->AddCooldown(BurningPitchId, 0, std::chrono::seconds(3));
 
             std::list<Player*> players;
-            Firelands::UnitAuraCheck check(true, Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_ON_ORGRIMS_HAMMER_DECK : SPELL_ON_SKYBREAKER_DECK);
-            Firelands::PlayerListSearcher<Firelands::UnitAuraCheck> searcher(me, players, check);
+            Trinity::UnitAuraCheck check(true, Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_ON_ORGRIMS_HAMMER_DECK : SPELL_ON_SKYBREAKER_DECK);
+            Trinity::PlayerListSearcher<Trinity::UnitAuraCheck> searcher(me, players, check);
             Cell::VisitWorldObjects(me, searcher, 200.0f);
 
             players.remove_if([this](Player* player)
@@ -1475,7 +1475,7 @@ struct npc_gunship_boarding_addAI : public gunship_npc_AI
 
             if (!players.empty())
             {
-                players.sort(Firelands::ObjectDistanceOrderPred(me));
+                players.sort(Trinity::ObjectDistanceOrderPred(me));
                 for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
                     AddThreat(*itr, 1.0f);
 
@@ -1528,8 +1528,8 @@ struct npc_gunship_boarding_addAI : public gunship_npc_AI
     bool HasAttackablePlayerNearby()
     {
         std::list<Player*> players;
-        Firelands::UnitAuraCheck check(true, Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_ON_ORGRIMS_HAMMER_DECK : SPELL_ON_SKYBREAKER_DECK);
-        Firelands::PlayerListSearcher<Firelands::UnitAuraCheck> searcher(me, players, check);
+        Trinity::UnitAuraCheck check(true, Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_ON_ORGRIMS_HAMMER_DECK : SPELL_ON_SKYBREAKER_DECK);
+        Trinity::PlayerListSearcher<Trinity::UnitAuraCheck> searcher(me, players, check);
         Cell::VisitWorldObjects(me, searcher, 200.0f);
 
         players.remove_if([this](Player* player)
@@ -1830,7 +1830,7 @@ class spell_igb_rocket_pack : public SpellScriptLoader
             void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 SpellInfo const* damageInfo = sSpellMgr->AssertSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
-                int32 bp = 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetPeriodic());
+                int32 bp = 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetPeriod());
                 GetTarget()->CastSpell(nullptr, SPELL_ROCKET_PACK_DAMAGE, CastSpellExtraArgs(true).AddSpellBP0(bp));
                 GetTarget()->CastSpell(nullptr, SPELL_ROCKET_BURST, TRIGGERED_FULL_MASK);
             }
@@ -2168,7 +2168,7 @@ class spell_igb_burning_pitch_selector : public SpellScriptLoader
 
                 if (!targets.empty())
                 {
-                    WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
+                    WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
                     targets.clear();
                     targets.push_back(target);
                 }
@@ -2230,7 +2230,7 @@ class spell_igb_rocket_artillery : public SpellScriptLoader
             {
                 if (!targets.empty())
                 {
-                    WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
+                    WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
                     targets.clear();
                     targets.push_back(target);
                 }

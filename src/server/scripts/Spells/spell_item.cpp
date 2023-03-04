@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -349,7 +349,7 @@ class spell_item_aura_of_madness : public SpellScriptLoader
 
                 PreventDefaultAction();
                 Unit* caster = eventInfo.GetActor();
-                uint32 spellId = Firelands::Containers::SelectRandomContainerElement(triggeredSpells[caster->getClass()]);
+                uint32 spellId = Trinity::Containers::SelectRandomContainerElement(triggeredSpells[caster->getClass()]);
                 caster->CastSpell(caster, spellId, aurEff);
 
                 if (roll_chance_i(10))
@@ -613,7 +613,7 @@ class spell_item_deathbringers_will : public SpellScriptLoader
                 if (randomSpells.empty())
                     return;
 
-                uint32 spellId = Firelands::Containers::SelectRandomContainerElement(randomSpells);
+                uint32 spellId = Trinity::Containers::SelectRandomContainerElement(randomSpells);
                 caster->CastSpell(caster, spellId, aurEff);
             }
 
@@ -831,7 +831,7 @@ class spell_item_echoes_of_light : public SpellScriptLoader
                 if (targets.size() < 2)
                     return;
 
-                targets.sort(Firelands::HealthPctOrderPred());
+                targets.sort(Trinity::HealthPctOrderPred());
 
                 WorldObject* target = targets.front();
                 targets.clear();
@@ -3857,7 +3857,7 @@ class spell_item_taunt_flag_targeting : public SpellScriptLoader
                     return;
                 }
 
-                Firelands::Containers::RandomResize(targets, 1);
+                Trinity::Containers::RandomResize(targets, 1);
             }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -4087,7 +4087,7 @@ public:
             if (target->GetPowerType() == POWER_MANA)
                 availableElixirs.push_back(28509); // Elixir of Major Mageblood (22840)
 
-            uint32 chosenElixir = Firelands::Containers::SelectRandomContainerElement(availableElixirs);
+            uint32 chosenElixir = Trinity::Containers::SelectRandomContainerElement(availableElixirs);
 
             bool useElixir = true;
 
@@ -4160,7 +4160,7 @@ public:
             if (target->GetPowerType() == POWER_MANA)
                 availableElixirs.push_back(43186); // Runic Mana Potion(33448)
 
-            uint32 chosenElixir = Firelands::Containers::SelectRandomContainerElement(availableElixirs);
+            uint32 chosenElixir = Trinity::Containers::SelectRandomContainerElement(availableElixirs);
 
             target->CastSpell(target, chosenElixir, GetCastItem());
         }
@@ -4872,7 +4872,8 @@ class spell_item_blind_spot : public SpellScript
         if (AuraEffect const* effect = target->GetAuraEffect(spellId, EFFECT_0, target->GetGUID()))
         {
             std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-            effect->GetBase()->AddProcCooldown(now + 30s);
+            if (SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(spellId))
+                effect->GetBase()->AddProcCooldown(procEntry, now + 30s);
         }
     }
 
@@ -5093,13 +5094,50 @@ class spell_item_blaze_of_life : public SpellScript
         if (targets.size() < 2)
             return;
 
-        targets.sort(Firelands::HealthPctOrderPred());
+        targets.sort(Trinity::HealthPctOrderPred());
         targets.resize(1);
     }
 
     void Register() override
     {
         OnObjectAreaTargetSelect.Register(&spell_item_blaze_of_life::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ALLY);
+    }
+};
+
+static std::array<uint32 /*spellId*/, MAX_SPELL_SCHOOL - 1> const ResistanceSpellsBySchool =
+{
+    // SPELL_SCHOOL_NORMAL has no shield
+    27536, // SPELL_SCHOOL_HOLY
+    27533, // SPELL_SCHOOL_FIRE
+    27538, // SPELL_SCHOOL_NATURE
+    27534, // SPELL_SCHOOL_FROST
+    27535, // SPELL_SCHOOL_SHADOW
+    27540  // SPELL_SCHOOL_ARCANE
+};
+
+// 27539 - Obsidian Armor
+class spell_item_obsidian_armor : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo(ResistanceSpellsBySchool);
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        // There are spells which have multiple schools (Frostfire Bolt for example). So we proc multiple shields
+        for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
+        {
+            if ((eventInfo.GetSpellInfo()->GetSchoolMask() & (1 << i)) != 0)
+                GetTarget()->CastSpell(GetTarget(), ResistanceSpellsBySchool[i - 1], aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc.Register(&spell_item_obsidian_armor::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -5239,4 +5277,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_jom_gabbar);
     RegisterSpellScript(spell_item_satisfied);
     RegisterSpellScript(spell_item_blaze_of_life);
+    RegisterSpellScript(spell_item_obsidian_armor);
 }

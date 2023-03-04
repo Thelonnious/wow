@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,7 +26,6 @@
 #include "PhasingHandler.h"
 #include "TemporarySummon.h"
 #include "WorldPacket.h"
-#include "WorldStatePackets.h"
 
 DoorData const doorData[] =
 {
@@ -144,20 +143,6 @@ class instance_oculus : public InstanceMapScript
                      if (!CentrifugueConstructCounter)
                         if (Creature* varos = instance->GetCreature(VarosGUID))
                             varos->RemoveAllAuras();
-                }
-            }
-
-            void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& data) override
-            {
-                if (GetBossState(DATA_DRAKOS) == DONE && GetBossState(DATA_VAROS) != DONE)
-                {
-                    data.Worldstates.emplace_back(uint32(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW), uint32(1));
-                    data.Worldstates.emplace_back(uint32(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT), uint32(CentrifugueConstructCounter));
-                }
-                else
-                {
-                    data.Worldstates.emplace_back(uint32(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW), uint32(0));
-                    data.Worldstates.emplace_back(uint32(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT), uint32(0));
                 }
             }
 

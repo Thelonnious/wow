@@ -1,5 +1,5 @@
 /*
- * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -444,7 +444,7 @@ class boss_gothik : public CreatureScript
                         {
                             if (RAID_MODE(waves10,waves25).size() <= _waveCount) // bounds check
                             {
-                                LOG_INFO("scripts", "GothikAI: Wave count %d is out of range for difficulty %d.", _waveCount, GetDifficulty());
+                                TC_LOG_INFO("scripts", "GothikAI: Wave count %d is out of range for difficulty %d.", _waveCount, GetDifficulty());
                                 break;
                             }
 
@@ -583,7 +583,7 @@ struct npc_gothik_minion_baseAI : public ScriptedAI
 
         void DamageTaken(Unit* attacker, uint32 &damage) override
         { // do not allow minions to take damage before the gate is opened
-            if (!_gateIsOpen && !isOnSameSide(attacker))
+            if (!_gateIsOpen && (!attacker || !isOnSameSide(attacker)))
                 damage = 0;
         }
 
@@ -908,7 +908,7 @@ public:
 
             return nullptr;
         }
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
         {
             if (!spell)
                 return;
@@ -977,7 +977,7 @@ class spell_gothik_shadow_bolt_volley : public SpellScriptLoader
         {
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Firelands::UnitAuraCheck(false, SPELL_SHADOW_MARK));
+                targets.remove_if(Trinity::UnitAuraCheck(false, SPELL_SHADOW_MARK));
             }
 
             void Register() override
