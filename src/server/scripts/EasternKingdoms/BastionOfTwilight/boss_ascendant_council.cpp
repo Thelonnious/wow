@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -333,7 +333,7 @@ struct boss_ascendant_council_controller final : public BossAI
                     break;
 
                 instance->SetBossState(DATA_ASCENDANT_COUNCIL, IN_PROGRESS);
-                instance->DoUpdateWorldState(WORLD_STATE_ID_ELEMENTARY, 0);
+                instance->instance->SetWorldState(WORLD_STATE_ID_ELEMENTARY, 0);
 
                 if (Creature* feludius = instance->GetCreature(DATA_FELUDIUS))
                 {
@@ -349,14 +349,14 @@ struct boss_ascendant_council_controller final : public BossAI
 
                 if (Creature* arion = instance->GetCreature(DATA_ARION))
                 {
-                    DoZoneInCombat(arion);
+                    arion->SetInCombatWithZone();
                     if (IsHeroic())
                         arion->AI()->DoAction(ACTION_SCHEDULE_HEROIC_ABILITY);
                 }
 
                 if (Creature* terrastra = instance->GetCreature(DATA_TERRASTRA))
                 {
-                    DoZoneInCombat(terrastra);
+                    terrastra->SetInCombatWithZone();
                     if (IsHeroic())
                         terrastra->AI()->DoAction(ACTION_SCHEDULE_HEROIC_ABILITY);
                 }
@@ -563,7 +563,7 @@ struct npc_feludius final : public ScriptedAI
 
     void DamageTaken(Unit* attacker, uint32& damage) override
     {
-        if (attacker && attacker->HasAura(SPELL_FLAME_IMBUED))
+        if (attacker->HasAura(SPELL_FLAME_IMBUED))
             damage *= 2;
 
         if (me->HealthBelowPctDamaged(25, damage))
@@ -731,7 +731,7 @@ struct npc_ignacious final : public ScriptedAI
 
     void DamageTaken(Unit* attacker, uint32& damage) override
     {
-        if (attacker && attacker->HasAura(SPELL_FROST_IMBUED))
+        if (attacker->HasAura(SPELL_FROST_IMBUED))
             damage *= 2;
 
         if (me->HealthBelowPctDamaged(25, damage))
@@ -743,7 +743,7 @@ struct npc_ignacious final : public ScriptedAI
             damage = me->GetHealth() - 1;
     }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_AEGIS_OF_FLAME)
             Talk(SAY_ABILITY);
@@ -1325,22 +1325,18 @@ struct npc_elementium_monstrosity final : public ScriptedAI
         {
             ++_liquidIceCount;
             if (_liquidIceCount == 2)
-                _instance->DoUpdateWorldState(WORLD_STATE_ID_ELEMENTARY, 1);
+                _instance->instance->SetWorldState(WORLD_STATE_ID_ELEMENTARY, 1);
         }
     }
 
-    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
-        Creature* creatureTarget = target->ToCreature();
-        if (!creatureTarget)
-            return;
-
         if (spell->Id == SPELL_MERGE_HEALTH)
         {
-            _mergedHealth += creatureTarget->GetHealth();
+            _mergedHealth += target->GetHealth();
             _mergedTargets++;
 
-            if (Creature* creature = creatureTarget->ToCreature())
+            if (Creature* creature = target->ToCreature())
                 creature->DespawnOrUnsummon();
 
             if (_mergedTargets == 4)
@@ -1408,7 +1404,7 @@ struct npc_ascendant_council_violent_cyclone final : public ScriptedAI
         _events.ScheduleEvent(EVENT_CYCLONE_AGGRO, 2s + 300ms);
     }
 
-    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         // According to sniffs the cyclone uses the positions of the Ascendant Council Target Stalkers
         // as potential waypoints so he stays within a certain area rather than moving arround the room
@@ -1441,7 +1437,7 @@ struct npc_ascendant_council_violent_cyclone final : public ScriptedAI
 
                     if (!potentialDestinations.empty())
                     {
-                        Position destination = Trinity::Containers::SelectRandomContainerElement(potentialDestinations);
+                        Position destination = Firelands::Containers::SelectRandomContainerElement(potentialDestinations);
                         me->GetMotionMaster()->MovePoint(POINT_NONE, destination, true);
                     }
 
@@ -1531,7 +1527,7 @@ struct npc_ascendant_council_plume_stalker final : public NullCreatureAI
 {
     npc_ascendant_council_plume_stalker(Creature* creature) : NullCreatureAI(creature) { }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_LAVA_SEED_DUMMY)
         {
@@ -1629,7 +1625,7 @@ struct npc_ascendant_council_frozen_orb final : public ScriptedAI
             feludius->AI()->JustSummoned(me);
     }
 
-    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {
@@ -1695,7 +1691,7 @@ struct npc_ascendant_council_flame_strike final : public ScriptedAI
         summoner->CastSpell(me, SPELL_FLAME_STRIKE);
     }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_FLAME_STRIKE)
         {
@@ -1704,17 +1700,13 @@ struct npc_ascendant_council_flame_strike final : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(WorldObject* target, SpellInfo const* /*spell*/) override
+    void SpellHitTarget(Unit* target, SpellInfo const* /*spell*/) override
     {
-        Creature* creatureTarget = target->ToCreature();
-        if (!creatureTarget)
-            return;
-
-        if (creatureTarget->GetEntry() == NPC_FROZEN_ORB)
+        if (target->GetEntry() == NPC_FROZEN_ORB)
         {
-            creatureTarget->GetMotionMaster()->Clear();
-            creatureTarget->RemoveAllAuras();
-            creatureTarget->DespawnOrUnsummon(2s + 300ms);
+            target->GetMotionMaster()->Clear();
+            target->RemoveAllAuras();
+            target->ToCreature()->DespawnOrUnsummon(2s + 300ms);
             me->RemoveAllAuras();
             me->DespawnOrUnsummon(2s + 300ms);
         }
@@ -1848,7 +1840,7 @@ class spell_feludius_frost_imbued final : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::UnitAuraCheck(true, GetSpellInfo()->Id));
+        targets.remove_if(Firelands::UnitAuraCheck(true, GetSpellInfo()->Id));
     }
 
     void Register() override
@@ -1887,7 +1879,7 @@ class spell_feludius_frozen_orb_targeting final : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override
@@ -1967,7 +1959,7 @@ class spell_ignacious_flame_imbued final : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::UnitAuraCheck(true, GetSpellInfo()->Id));
+        targets.remove_if(Firelands::UnitAuraCheck(true, GetSpellInfo()->Id));
     }
 
     void Register() override
@@ -2046,7 +2038,7 @@ class spell_ignacious_flame_strike final : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleHit(SpellEffIndex effIndex)
@@ -2118,7 +2110,7 @@ class spell_arion_lightning_rod final : public SpellScript
             return;
 
         uint8 size = GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1;
-        Trinity::Containers::RandomResize(targets, size);
+        Firelands::Containers::RandomResize(targets, size);
     }
 
     void Register() override
@@ -2176,7 +2168,7 @@ class spell_arion_disperse final : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleHit(SpellEffIndex effIndex)
@@ -2205,7 +2197,7 @@ class spell_arion_lightning_blast final : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::Predicates::Invert(Trinity::Predicates::IsVictimOf(GetCaster())));
+        targets.remove_if(Firelands::Predicates::Invert(Firelands::Predicates::IsVictimOf(GetCaster())));
     }
 
     void Register() override
@@ -2222,7 +2214,7 @@ class spell_arion_lightning_blast_dummy final : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::Predicates::Invert(Trinity::Predicates::IsVictimOf(GetCaster())));
+        targets.remove_if(Firelands::Predicates::Invert(Firelands::Predicates::IsVictimOf(GetCaster())));
     }
 
     void Register() override
@@ -2243,12 +2235,12 @@ class spell_arion_static_overload final : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_GRAVITY_CORE));
+        targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_GRAVITY_CORE));
 
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override
@@ -2351,7 +2343,7 @@ class spell_terrastra_quake final : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_SWIRLING_WINDS));
+        targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_SWIRLING_WINDS));
     }
 
     void Register() override
@@ -2403,12 +2395,12 @@ class spell_terrastra_gravity_core final : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_STATIC_OVERLOAD));
+        targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_STATIC_OVERLOAD));
 
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override
@@ -2535,7 +2527,7 @@ class spell_elementium_monstrosity_electric_instability final : public SpellScri
                     size += uint8(std::floor(ticks / 20));
 
         if (targets.size() > size)
-            Trinity::Containers::RandomResize(targets, size);
+            Firelands::Containers::RandomResize(targets, size);
     }
 
     void HandleHit(SpellEffIndex /*effIndex*/)
@@ -2558,12 +2550,12 @@ class spell_elementium_monstrosity_gravity_crush final : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::Predicates::IsVictimOf(GetCaster()));
+        targets.remove_if(Firelands::Predicates::IsVictimOf(GetCaster()));
 
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
+        Firelands::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
     }
 
     void Register() override

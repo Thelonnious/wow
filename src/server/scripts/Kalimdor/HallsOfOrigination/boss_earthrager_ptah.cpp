@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -269,7 +269,7 @@ struct npc_ptah_beetle_stalker : public ScriptedAI
 {
     npc_ptah_beetle_stalker(Creature* creature) : ScriptedAI(creature) { }
 
-    void SpellHit(WorldObject* /*caster*/, const SpellInfo* spellInfo) override
+    void SpellHit(Unit* /*caster*/, const SpellInfo* spellInfo) override
     {
         if (spellInfo->Id == SPELL_BEETLE_BURROW)
             _events.ScheduleEvent(EVENT_SUMMON_JEWELED_SCARAB, Seconds(5), Seconds(6));
@@ -309,7 +309,7 @@ class spell_earthrager_ptah_flame_bolt : public SpellScript
         uint8 size = GetCaster()->GetMap()->IsHeroic() ? 3 : 2;
 
         if (targets.size() > size)
-            Trinity::Containers::RandomResize(targets, size);
+            Firelands::Containers::RandomResize(targets, size);
     }
 
     void Register() override

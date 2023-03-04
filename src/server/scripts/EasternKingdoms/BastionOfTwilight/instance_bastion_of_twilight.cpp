@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -103,7 +103,7 @@ class instance_bastion_of_twilight final : public InstanceMapScript
                 {
                     for (uint8 i = 0; i < 2; i++)
                     {
-                        uint32 entry = Trinity::Containers::SelectRandomContainerElement(_activeDragonEntries);
+                        uint32 entry = Firelands::Containers::SelectRandomContainerElement(_activeDragonEntries);
                         _activeDragonEntries.erase(entry);
                         if (i == 0)
                             _unresponsiveDragonEntryFirst = entry;
@@ -378,7 +378,7 @@ class instance_bastion_of_twilight final : public InstanceMapScript
                 switch (type)
                 {
                     case DATA_RANDOM_VALIONA_DUMMY:
-                        return Trinity::Containers::SelectRandomContainerElement(_valionaDummyGUIDs);
+                        return Firelands::Containers::SelectRandomContainerElement(_valionaDummyGUIDs);
                     case DATA_VALIONA_AURA_DUMMY:
                         return _valionaAuraDummyGUID;
                     default:
@@ -423,7 +423,7 @@ class instance_bastion_of_twilight final : public InstanceMapScript
                     switch (eventId)
                     {
                         case EVENT_CAST_DANCING_FLAMES:
-                            if (ObjectGuid guid = Trinity::Containers::SelectRandomContainerElement(_dancingFlamesInvisibleStalkerGUIDs))
+                            if (ObjectGuid guid = Firelands::Containers::SelectRandomContainerElement(_dancingFlamesInvisibleStalkerGUIDs))
                                 if (Creature* cataclysmStalker = instance->GetCreature(guid))
                                     cataclysmStalker->CastSpell(cataclysmStalker, SPELL_DANCING_FLAMES_VISUAL, true);
 

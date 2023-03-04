@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -36,7 +36,7 @@
 enum Texts
 {
     // Neptulon
-    SAY_INTRO_1                     = 0,    
+    SAY_INTRO_1                     = 0,
     SAY_INTRO_2                     = 1,
     SAY_PURIFY_WATERS_1             = 2,
     SAY_PURIFY_WATERS_2             = 3,
@@ -429,7 +429,6 @@ struct npc_ozumat_neptulon : public ScriptedAI
             default:
                 break;
         }
-        
     }
 
     void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
@@ -451,7 +450,7 @@ struct npc_ozumat_neptulon : public ScriptedAI
         }
     }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_ENTANGLING_GRASP)
         {
@@ -678,13 +677,10 @@ struct npc_ozumat_unyielding_behemoth : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
-        if (!target->IsUnit())
-            return;
-
         if (spell->Id == SPELL_SHADOW_BLAST_VISUAL)
-            target->ToUnit()->RemoveAurasDueToSpell(SPELL_SHRINK);
+            target->RemoveAurasDueToSpell(SPELL_SHRINK);
     }
 
     void UpdateAI(uint32 diff) override

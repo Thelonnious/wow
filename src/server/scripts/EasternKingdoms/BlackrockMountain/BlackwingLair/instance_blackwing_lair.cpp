@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -244,9 +244,9 @@ public:
                 switch (eventId)
                 {
                     case EVENT_RAZOR_SPAWN:
-                        for (uint8 i = urand(2, 5); i > 0; --i)
+                        for (uint8 i = urand(2, 5); i > 0 ; --i)
                             if (Creature* summon = instance->SummonCreature(Entry[urand(0, 4)], SummonPosition[urand(0, 7)]))
-                                summon->AI()->DoZoneInCombat();
+                                summon->SetInCombatWithZone();
                         _events.ScheduleEvent(EVENT_RAZOR_SPAWN, urand(12, 17) * IN_MILLISECONDS);
                         break;
                     case EVENT_RAZOR_PHASE_TWO:

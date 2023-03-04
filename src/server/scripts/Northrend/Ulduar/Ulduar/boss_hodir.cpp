@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -518,8 +518,8 @@ class boss_hodir : public CreatureScript
             void FlashFreeze()
             {
                 std::list<Unit*> TargetList;
-                Trinity::AnyUnfriendlyUnitInObjectRangeCheck checker(me, me, 100.0f);
-                Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, TargetList, checker);
+                Firelands::AnyUnfriendlyUnitInObjectRangeCheck checker(me, me, 100.0f);
+                Firelands::UnitListSearcher<Firelands::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, TargetList, checker);
                 Cell::VisitAllObjects(me, searcher, 100.0f);
                 for (std::list<Unit*>::iterator itr = TargetList.begin(); itr != TargetList.end(); ++itr)
                 {
@@ -692,8 +692,8 @@ class npc_hodir_priest : public CreatureScript
                         case EVENT_DISPEL_MAGIC:
                         {
                             std::list<Unit*> TargetList;
-                            Trinity::AnyFriendlyUnitInObjectRangeCheck checker(me, me, 30.0f);
-                            Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(me, TargetList, checker);
+                            Firelands::AnyFriendlyUnitInObjectRangeCheck checker(me, me, 30.0f);
+                            Firelands::UnitListSearcher<Firelands::AnyFriendlyUnitInObjectRangeCheck> searcher(me, TargetList, checker);
                             Cell::VisitAllObjects(me, searcher, 30.0f);
                             for (std::list<Unit*>::iterator itr = TargetList.begin(); itr != TargetList.end(); ++itr)
                                 if ((*itr)->HasAura(SPELL_FREEZE))
@@ -959,7 +959,7 @@ class npc_toasty_fire : public CreatureScript
                 DoCast(me, SPELL_SINGED, true);
             }
 
-            void SpellHit(WorldObject* /*who*/, SpellInfo const* spell) override
+            void SpellHit(Unit* /*who*/, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_BLOCK_OF_ICE || spell->Id == SPELL_ICE_SHARD || spell->Id == SPELL_ICE_SHARD_HIT)
                 {

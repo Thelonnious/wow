@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -622,7 +622,7 @@ struct npc_alakir_ice_storm : public ScriptedAI
         _events.ScheduleEvent(EVENT_PING_ICE_STORM_TRIGGERS, 1s);
     }
 
-    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_ICE_STORM_PING && target->GetExactDist2d(me) > 20.0f)
             _iceStormPositions.push_back(target->GetPosition());
@@ -664,7 +664,7 @@ struct npc_alakir_ice_storm : public ScriptedAI
 
                     if (!possibleDestinations.empty())
                     {
-                        Position dest = Trinity::Containers::SelectRandomContainerElement(possibleDestinations);
+                        Position dest = Firelands::Containers::SelectRandomContainerElement(possibleDestinations);
                         me->CastSpell({ dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ() }, SPELL_ICE_STORM_CHARGE, true);
                     }
                     break;
@@ -1165,7 +1165,7 @@ class spell_alakir_lightning_script: public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleScriptEffect(SpellEffIndex effIndex)

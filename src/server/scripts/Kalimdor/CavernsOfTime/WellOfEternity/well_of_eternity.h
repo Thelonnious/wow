@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -29,24 +29,17 @@ uint32 const EncounterCount = 3;
 enum WOEDataTypes
 {
     // Bosses
-    BOSS_PEROTHARN              = 0,
-    BOSS_QUEEN_AZSHARA          = 1,
-    BOSS_MANNOROTH_AND_VAROTHEN = 2,
-
-    // Misc
-    DATA_WOE_COURTYARD_DOOR01,
+    DATA_PEROTHARN              = 0,
+    DATA_QUEEN_AZSHARA          = 1,
+    DATA_MANNOROTH_AND_VAROTHEN = 2
 };
 
 enum WOECreatures
 {
-    NPC_PEROTHARN = 55085
 };
 
 enum WOEGameObjectIds
 {
-    GO_WOE_COURTYARD_DOOR01 = 210084,
-    GO_LARGE_FIREWALL_DOOR  = 210234,
-    GO_SMALL_FIREWALL_DOOR  = 210130,
 };
 
 template<class AI>

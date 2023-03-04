@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -428,11 +428,11 @@ class boss_sindragosa : public CreatureScript
                     summon->AI()->JustDied(summon);
             }
 
-            void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+            void SpellHitTarget(Unit* target, SpellInfo const* spell) override
             {
                 if (uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(70127, me))
-                    if (spellId == spell->Id && target->IsUnit())
-                        if (Aura const* mysticBuffet = target->ToUnit()->GetAura(spell->Id))
+                    if (spellId == spell->Id)
+                        if (Aura const* mysticBuffet = target->GetAura(spell->Id))
                             _mysticBuffetStack = std::max<uint8>(_mysticBuffetStack, mysticBuffet->GetStackAmount());
             }
 
@@ -1163,7 +1163,7 @@ class spell_sindragosa_unchained_magic : public SpellScriptLoader
                 unitList.remove_if(UnchainedMagicTargetSelector());
                 uint32 maxSize = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 6 : 2);
                 if (unitList.size() > maxSize)
-                    Trinity::Containers::RandomResize(unitList, maxSize);
+                    Firelands::Containers::RandomResize(unitList, maxSize);
             }
 
             void Register() override
@@ -1470,11 +1470,11 @@ class spell_frostwarden_handler_order_whelp : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+                targets.remove_if(Firelands::ObjectTypeIdCheck(TYPEID_PLAYER, false));
                 if (targets.empty())
                     return;
 
-                WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -1491,7 +1491,7 @@ class spell_frostwarden_handler_order_whelp : public SpellScriptLoader
                 if (unitList.empty())
                     return;
 
-                Trinity::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+                Firelands::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
             }
 
             void Register() override

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1823,7 +1823,7 @@ class spell_madness_of_deathwing_summon_tail : public SpellScript
         }
 
         if (targets.size() > 1)
-            Trinity::Containers::RandomResize(targets, 1);
+            Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override
@@ -1856,7 +1856,7 @@ class spell_madness_of_deathwing_crush : public SpellScript
         }
 
         if (targets.size() > 1)
-            Trinity::Containers::RandomResize(targets, 1);
+            Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override
@@ -2286,7 +2286,7 @@ class spell_madness_of_deathwing_shrapnel : public SpellScript
             return;
 
         if (_targetGUIDs.size() > _fragmentGUIDs.size())
-            Trinity::Containers::RandomResize(_targetGUIDs, _fragmentGUIDs.size());
+            Firelands::Containers::RandomResize(_targetGUIDs, _fragmentGUIDs.size());
 
         for (uint8 i = 0; i < _targetGUIDs.size(); i++)
         {
@@ -2388,7 +2388,7 @@ class spell_madness_of_deathwing_trigger_aspect_yell : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)

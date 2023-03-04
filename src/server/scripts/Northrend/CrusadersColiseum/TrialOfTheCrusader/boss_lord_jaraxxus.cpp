@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -230,7 +230,7 @@ class npc_legion_flame : public CreatureScript
             void Reset() override
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                DoZoneInCombat();
+                me->SetInCombatWithZone();
                 DoCast(SPELL_LEGION_FLAME_EFFECT);
             }
 
@@ -324,7 +324,7 @@ class npc_fel_infernal : public CreatureScript
                         DoCast(target, SPELL_FEL_STREAK_VISUAL);
                     context.Repeat(Seconds(15));
                 });
-                DoZoneInCombat();
+                me->SetInCombatWithZone();
             }
 
             void UpdateAI(uint32 diff) override
@@ -427,7 +427,7 @@ class npc_mistress_of_pain : public CreatureScript
                 _events.ScheduleEvent(EVENT_SPINNING_STRIKE, 30*IN_MILLISECONDS);
                 if (IsHeroic())
                     _events.ScheduleEvent(EVENT_MISTRESS_KISS, 15*IN_MILLISECONDS);
-                DoZoneInCombat();
+                me->SetInCombatWithZone();
             }
 
             void JustDied(Unit* /*killer*/) override
@@ -556,7 +556,7 @@ class spell_mistress_kiss_area : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }

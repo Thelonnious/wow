@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -196,8 +196,8 @@ struct npc_injured_stormwind_infantry_dummy : public ScriptedAI
                 case EVENT_GIVE_RIGHT_CLICK_INSTRUCTIONS:
                 {
                     std::vector<Player*> players;
-                    Trinity::AnyPlayerInObjectRangeCheck checker(me, 50.0f);
-                    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+                    Firelands::AnyPlayerInObjectRangeCheck checker(me, 50.0f);
+                    Firelands::PlayerListSearcher<Firelands::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                     Cell::VisitWorldObjects(me, searcher, 50.0f);
                     for (Player* player : players)
                     {
@@ -326,7 +326,7 @@ struct npc_hogger : public ScriptedAI
         }
     }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_UPSET_STOMACH)
         {
@@ -596,7 +596,7 @@ struct npc_cameron : public ScriptedAI
             { -9377.477f, -67.8297f, 69.201965f, 0.296706f }
         };
 
-        Trinity::Containers::RandomShuffle(MovePosPositions);
+        Firelands::Containers::RandomShuffle(MovePosPositions);
 
         // first we break formation because children will need to move on their own now
         for (auto guid : _childrenGUIDs)

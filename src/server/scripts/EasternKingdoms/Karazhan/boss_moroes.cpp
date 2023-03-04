@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -187,7 +187,7 @@ public:
                 for (uint8 i = 0; i < 6; ++i)
                     AddList.push_back(Adds[i]);
 
-                Trinity::Containers::RandomResize(AddList, 4);
+                Firelands::Containers::RandomResize(AddList, 4);
 
                 uint8 i = 0;
                 for (std::list<uint32>::const_iterator itr = AddList.begin(); itr != AddList.end() && i < 4; ++itr, ++i)

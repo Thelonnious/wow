@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -140,7 +140,7 @@ struct boss_forgemaster_throngus : public BossAI
                 if (_lastWeapon != WEAPON_TO_BE_DECIDED)
                     availableWeaponSet.erase(_lastWeapon);
 
-                uint8 selectedWeapon = Trinity::Containers::SelectRandomContainerElement(availableWeaponSet);
+                uint8 selectedWeapon = Firelands::Containers::SelectRandomContainerElement(availableWeaponSet);
 
                 _lastWeapon = selectedWeapon;
                 switch (selectedWeapon)
@@ -314,7 +314,7 @@ class spell_throngus_flame_arrow_barrage : public SpellScript
         if (targets.size() < 5)
             return;
 
-        Trinity::Containers::RandomResize(targets, 5);
+        Firelands::Containers::RandomResize(targets, 5);
     }
 
     void HandleHit(SpellEffIndex effIndex)
@@ -369,7 +369,7 @@ class spell_throngus_personal_phalanx_aoe : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleSummon(SpellEffIndex effIndex)

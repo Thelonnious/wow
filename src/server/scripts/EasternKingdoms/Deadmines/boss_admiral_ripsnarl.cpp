@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -313,7 +313,7 @@ class npc_ripsnarl_vapor : public CreatureScript
                 me->DespawnOrUnsummon(Seconds(5));
             }
 
-            void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_VAPOR_ANIMUS)
                     DoCastAOE(SPELL_COALESCE, true);
@@ -387,7 +387,7 @@ class spell_ripsnarl_go_for_the_throat_targeting : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                Trinity::Containers::RandomResize(targets, 1);
+                Firelands::Containers::RandomResize(targets, 1);
             }
 
             void HandleHit(SpellEffIndex effIndex)
@@ -434,7 +434,7 @@ class spell_ripsnarl_summon_vapor_targeting : public SpellScriptLoader
                     return;
                 }
 
-                Trinity::Containers::RandomResize(targets, 1);
+                Firelands::Containers::RandomResize(targets, 1);
             }
 
             void HandleHit(SpellEffIndex effIndex)

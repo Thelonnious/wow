@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -146,7 +146,7 @@ struct boss_four_horsemen_baseAI : public BossAI
                             uint32 deathTime = cBoss->AI()->GetData(DATA_DEATH_TIME);
                             if (!deathTime)
                             {
-                                TC_LOG_WARN("scripts", "FourHorsemenAI: Checking for achievement credit but horseman %s is reporting not dead", cBoss->GetName().c_str());
+                                LOG_WARN("scripts", "FourHorsemenAI: Checking for achievement credit but horseman %s is reporting not dead", cBoss->GetName().c_str());
                                 return 0;
                             }
                             if (!minTime || deathTime < minTime)
@@ -156,7 +156,7 @@ struct boss_four_horsemen_baseAI : public BossAI
                         }
                         else
                         {
-                            TC_LOG_WARN("scripts", "FourHorsemenAI: Checking for achievement credit but horseman with id %u is not present", uint32(boss));
+                            LOG_WARN("scripts", "FourHorsemenAI: Checking for achievement credit but horseman with id %u is not present", uint32(boss));
                             return 0;
                         }
                     return (getMSTimeDiff(minTime, maxTime) <= 15 * IN_MILLISECONDS) ? 1 : 0;
@@ -194,7 +194,7 @@ struct boss_four_horsemen_baseAI : public BossAI
                 }
                 else
                 {
-                    TC_LOG_WARN("scripts", "FourHorsemenAI: Checking if movement is finished but horseman with id %u is not present", uint32(boss));
+                    LOG_WARN("scripts", "FourHorsemenAI: Checking if movement is finished but horseman with id %u is not present", uint32(boss));
                     ResetEncounter();
                     return;
                 }
@@ -251,7 +251,7 @@ struct boss_four_horsemen_baseAI : public BossAI
                 }
                 else
                 {
-                    TC_LOG_WARN("scripts", "FourHorsemenAI: Encounter starting but horseman with id %u is not present", uint32(boss));
+                    LOG_WARN("scripts", "FourHorsemenAI: Encounter starting but horseman with id %u is not present", uint32(boss));
                     ResetEncounter();
                     return;
                 }
@@ -268,7 +268,7 @@ struct boss_four_horsemen_baseAI : public BossAI
                 if (Creature* cBoss = getHorsemanHandle(boss))
                     cBoss->DespawnOrUnsummon(0, Seconds(15));
                 else
-                    TC_LOG_WARN("scripts", "FourHorsemenAI: Encounter resetting but horseman with id %u is not present", uint32(boss));
+                    LOG_WARN("scripts", "FourHorsemenAI: Encounter resetting but horseman with id %u is not present", uint32(boss));
             }
         }
 
@@ -339,7 +339,7 @@ struct boss_four_horsemen_baseAI : public BossAI
                 }
                 else
                 {
-                    TC_LOG_WARN("scripts", "FourHorsemenAI: %s died but horseman with id %u is not present", me->GetName().c_str(), uint32(boss));
+                    LOG_WARN("scripts", "FourHorsemenAI: %s died but horseman with id %u is not present", me->GetName().c_str(), uint32(boss));
                     ResetEncounter();
                 }
             }
@@ -443,7 +443,7 @@ class boss_four_horsemen_baron : public CreatureScript
                 DoMeleeAttackIfReady();
             }
 
-            void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
+            void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_UNHOLY_SHADOW)
                     Talk(SAY_SPECIAL);
@@ -519,7 +519,7 @@ class boss_four_horsemen_thane : public CreatureScript
                 DoMeleeAttackIfReady();
             }
 
-            void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
+            void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
             {
                 if (_shouldSay && spell->Id == SPELL_METEOR)
                 {
@@ -671,7 +671,7 @@ class boss_four_horsemen_sir : public CreatureScript
                 }
             }
 
-            void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
+            void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
             {
                 if (_shouldSay && spell->Id == SPELL_HOLY_WRATH)
                 {

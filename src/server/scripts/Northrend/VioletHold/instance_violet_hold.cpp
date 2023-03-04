@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -25,6 +25,7 @@
 #include "TemporarySummon.h"
 #include "violet_hold.h"
 #include "WorldPacket.h"
+#include "WorldStatePackets.h"
 
 /*
  * TODO:
@@ -288,6 +289,13 @@ class instance_violet_hold : public InstanceMapScript
                     default:
                         break;
                 }
+            }
+
+            void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& data) override
+            {
+                data.Worldstates.emplace_back(uint32(WORLD_STATE_VH_SHOW), uint32(EventState == IN_PROGRESS ? 1 : 0));
+                data.Worldstates.emplace_back(uint32(WORLD_STATE_VH_PRISON_STATE), uint32(DoorIntegrity));
+                data.Worldstates.emplace_back(uint32(WORLD_STATE_VH_WAVE_COUNT), uint32(WaveCount));
             }
 
             bool CheckRequiredBosses(uint32 bossId, Player const* player = nullptr) const override

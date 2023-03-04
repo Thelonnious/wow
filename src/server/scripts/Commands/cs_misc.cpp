@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -49,7 +49,6 @@
 #include "SpellAuras.h"
 #include "SpellHistory.h"
 #include "SpellMgr.h"
-#include "TerrainMgr.h"
 #include "Transport.h"
 #include "Weather.h"
 #include "WeatherMgr.h"
@@ -237,7 +236,7 @@ public:
             }
         }
 
-        CellCoord cellCoord = Trinity::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
+        CellCoord cellCoord = Firelands::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
         Cell cell(cellCoord);
 
         uint32 zoneId, areaId;
@@ -257,13 +256,13 @@ public:
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
 
-        GridCoord gridCoord = Trinity::ComputeGridCoord(object->GetPositionX(), object->GetPositionY());
+        GridCoord gridCoord = Firelands::ComputeGridCoord(object->GetPositionX(), object->GetPositionY());
 
         int gridX = (MAX_NUMBER_OF_GRIDS - 1) - gridCoord.x_coord;
         int gridY = (MAX_NUMBER_OF_GRIDS - 1) - gridCoord.y_coord;
 
-        uint32 haveMap = TerrainInfo::ExistMap(mapId, gridX, gridY) ? 1 : 0;
-        uint32 haveVMap = TerrainInfo::ExistVMap(mapId, gridX, gridY) ? 1 : 0;
+        uint32 haveMap = Map::ExistMap(mapId, gridX, gridY) ? 1 : 0;
+        uint32 haveVMap = Map::ExistVMap(mapId, gridX, gridY) ? 1 : 0;
         uint32 haveMMap = (DisableMgr::IsPathfindingEnabled(mapId) && MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId())) ? 1 : 0;
 
         if (haveVMap)
@@ -276,7 +275,7 @@ public:
         else
             handler->PSendSysMessage(LANG_GPS_NO_VMAP);
 
-        char const* unknown = handler->GetTrinityString(LANG_UNKNOWN);
+        char const* unknown = handler->GetFirelandsString(LANG_UNKNOWN);
 
         handler->PSendSysMessage(LANG_MAP_POSITION,
             mapId, (mapEntry ? mapEntry->MapName : unknown),
@@ -286,7 +285,7 @@ public:
         if (Transport* transport = dynamic_cast<Transport*>(object->GetTransport()))
         {
             handler->PSendSysMessage(LANG_TRANSPORT_POSITION,
-                transport->GetGOInfo()->moTransport.SpawnMap, object->GetTransOffsetX(), object->GetTransOffsetY(), object->GetTransOffsetZ(), object->GetTransOffsetO(),
+                transport->GetGOInfo()->moTransport.mapID, object->GetTransOffsetX(), object->GetTransOffsetY(), object->GetTransOffsetZ(), object->GetTransOffsetO(),
                 transport->GetEntry(), transport->GetName().c_str());
         }
         handler->PSendSysMessage(LANG_GRID_POSITION,
@@ -294,10 +293,10 @@ public:
             zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMap);
 
         LiquidData liquidStatus;
-        ZLiquidStatus status = map->GetLiquidStatus(object->GetPhaseShift(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), map_liquidHeaderTypeFlags::AllLiquids, &liquidStatus, object->GetCollisionHeight());
+        ZLiquidStatus status = map->GetLiquidStatus(object->GetPhaseShift(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), MAP_ALL_LIQUIDS, &liquidStatus, object->GetCollisionHeight());
 
         if (status)
-            handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidStatus.level, liquidStatus.depth_level, liquidStatus.entry, uint32(liquidStatus.type_flags.AsUnderlyingType()), status);
+            handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidStatus.level, liquidStatus.depth_level, liquidStatus.entry, liquidStatus.type_flags, status);
 
         PhasingHandler::PrintToChat(handler, object->GetPhaseShift());
 
@@ -318,12 +317,7 @@ public:
         uint32 spellId = handler->extractSpellIdFromLink((char*)args);
 
         if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
-        {
-            AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, target);
-            createInfo.SetCaster(target);
-
-            Aura::TryRefreshStackOrCreate(createInfo);
-        }
+            Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
 
         return true;
     }
@@ -461,7 +455,7 @@ public:
             float x, y, z;
             target->GetContactPoint(_player, x, y, z);
 
-            _player->TeleportTo(target->GetMapId(), x, y, z, _player->GetAngle(target), TELE_TO_GM_MODE, target->GetInstanceId());
+            _player->TeleportTo(target->GetMapId(), x, y, z, _player->GetAngle(target), TELE_TO_GM_MODE);
             PhasingHandler::InheritPhaseShift(_player, target);
             _player->UpdateObjectVisibility();
         }
@@ -550,7 +544,7 @@ public:
                 if (!target->GetMap()->IsBattlegroundOrArena())
                     target->SetBattlegroundEntryPoint();
             }
-            else if (map->IsDungeon())
+            else if (map->Instanceable())
             {
                 Map* targetMap = target->GetMap();
                 Player* targetGroupLeader = nullptr;
@@ -592,7 +586,7 @@ public:
             // before GM
             float x, y, z;
             _player->GetPosition(x, y, z);
-            target->TeleportTo(_player->GetMapId(), x, y, z, target->GetOrientation(), 0, map->GetInstanceId());
+            target->TeleportTo(_player->GetMapId(), x, y, z, target->GetOrientation());
             PhasingHandler::InheritPhaseShift(target, handler->GetSession()->GetPlayer());
             target->UpdateObjectVisibility();
         }
@@ -604,7 +598,7 @@ public:
 
             std::string nameLink = handler->playerLink(targetName);
 
-            handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), handler->GetTrinityString(LANG_OFFLINE));
+            handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), handler->GetFirelandsString(LANG_OFFLINE));
 
             // in point where GM stay
             CharacterDatabaseTransaction dummy;
@@ -644,9 +638,9 @@ public:
         if (target->IsAlive())
         {
             if (sWorld->getBoolConfig(CONFIG_DIE_COMMAND_MODE))
-                Unit::Kill(handler->GetSession()->GetPlayer(), target);
+                handler->GetSession()->GetPlayer()->Kill(target);
             else
-                Unit::DealDamage(handler->GetSession()->GetPlayer(), target, target->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                handler->GetSession()->GetPlayer()->DealDamage(target, target->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
         }
 
         return true;
@@ -797,13 +791,13 @@ public:
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellIid);
             if (!spellInfo)
             {
-                handler->PSendSysMessage(LANG_UNKNOWN_SPELL, owner == handler->GetSession()->GetPlayer() ? handler->GetTrinityString(LANG_YOU) : nameLink.c_str());
+                handler->PSendSysMessage(LANG_UNKNOWN_SPELL, owner == handler->GetSession()->GetPlayer() ? handler->GetFirelandsString(LANG_YOU) : nameLink.c_str());
                 handler->SetSentErrorMessage(true);
                 return false;
             }
 
             target->GetSpellHistory()->ResetCooldown(spellIid, true);
-            handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spellIid, owner == handler->GetSession()->GetPlayer() ? handler->GetTrinityString(LANG_YOU) : nameLink.c_str());
+            handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spellIid, owner == handler->GetSession()->GetPlayer() ? handler->GetFirelandsString(LANG_YOU) : nameLink.c_str());
         }
         return true;
     }
@@ -948,7 +942,7 @@ public:
         if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
 
-        std::string kickReasonStr = handler->GetTrinityString(LANG_NO_REASON);
+        std::string kickReasonStr = handler->GetFirelandsString(LANG_NO_REASON);
         if (*args != '\0')
         {
             char const* kickReason = strtok(nullptr, "\r");
@@ -1113,14 +1107,14 @@ public:
 
             team = data->team;
 
-            std::string team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_NOTEAM);
+            std::string team_name = handler->GetFirelandsString(LANG_COMMAND_GRAVEYARD_NOTEAM);
 
             if (team == 0)
-                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_ANY);
+                team_name = handler->GetFirelandsString(LANG_COMMAND_GRAVEYARD_ANY);
             else if (team == HORDE)
-                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_HORDE);
+                team_name = handler->GetFirelandsString(LANG_COMMAND_GRAVEYARD_HORDE);
             else if (team == ALLIANCE)
-                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
+                team_name = handler->GetFirelandsString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
 
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDNEAREST, graveyardId, team_name.c_str(), zone_id);
         }
@@ -1129,9 +1123,9 @@ public:
             std::string team_name;
 
             if (team == HORDE)
-                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_HORDE);
+                team_name = handler->GetFirelandsString(LANG_COMMAND_GRAVEYARD_HORDE);
             else if (team == ALLIANCE)
-                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
+                team_name = handler->GetFirelandsString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
 
             if (!team)
                 handler->PSendSysMessage(LANG_COMMAND_ZONENOGRAVEYARDS, zone_id);
@@ -1273,7 +1267,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        TC_LOG_DEBUG("misc", handler->GetTrinityString(LANG_ADDITEM), itemId, count);
+        LOG_DEBUG("misc", handler->GetFirelandsString(LANG_ADDITEM), itemId, count);
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
         if (!itemTemplate)
@@ -1352,7 +1346,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        TC_LOG_DEBUG("misc", handler->GetTrinityString(LANG_ADDITEMSET), itemSetId);
+        LOG_DEBUG("misc", handler->GetFirelandsString(LANG_ADDITEMSET), itemSetId);
 
         bool found = false;
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
@@ -1566,38 +1560,38 @@ public:
          */
 
         // Account data print variables
-        std::string userName          = handler->GetTrinityString(LANG_ERROR);
+        std::string userName          = handler->GetFirelandsString(LANG_ERROR);
         uint32 accId                  = 0;
         ObjectGuid::LowType lowguid   = targetGuid.GetCounter();
-        std::string eMail             = handler->GetTrinityString(LANG_ERROR);
-        std::string regMail           = handler->GetTrinityString(LANG_ERROR);
+        std::string eMail             = handler->GetFirelandsString(LANG_ERROR);
+        std::string regMail           = handler->GetFirelandsString(LANG_ERROR);
         uint32 security               = 0;
-        std::string lastIp            = handler->GetTrinityString(LANG_ERROR);
+        std::string lastIp            = handler->GetFirelandsString(LANG_ERROR);
         uint8 locked                  = 0;
-        std::string lastLogin         = handler->GetTrinityString(LANG_ERROR);
+        std::string lastLogin         = handler->GetFirelandsString(LANG_ERROR);
         uint32 failedLogins           = 0;
         uint32 latency                = 0;
-        std::string OS                = handler->GetTrinityString(LANG_UNKNOWN);
+        std::string OS                = handler->GetFirelandsString(LANG_UNKNOWN);
 
         // Mute data print variables
         int64 muteTime                = -1;
-        std::string muteReason        = handler->GetTrinityString(LANG_NO_REASON);
-        std::string muteBy            = handler->GetTrinityString(LANG_UNKNOWN);
+        std::string muteReason        = handler->GetFirelandsString(LANG_NO_REASON);
+        std::string muteBy            = handler->GetFirelandsString(LANG_UNKNOWN);
 
         // Ban data print variables
         int64 banTime                 = -1;
-        std::string banType           = handler->GetTrinityString(LANG_UNKNOWN);
-        std::string banReason         = handler->GetTrinityString(LANG_NO_REASON);
-        std::string bannedBy          = handler->GetTrinityString(LANG_UNKNOWN);
+        std::string banType           = handler->GetFirelandsString(LANG_UNKNOWN);
+        std::string banReason         = handler->GetFirelandsString(LANG_NO_REASON);
+        std::string bannedBy          = handler->GetFirelandsString(LANG_UNKNOWN);
 
         // Character data print variables
         uint8 raceid, classid           = 0; //RACE_NONE, CLASS_NONE
-        std::string raceStr, classStr   = handler->GetTrinityString(LANG_UNKNOWN);
+        std::string raceStr, classStr   = handler->GetFirelandsString(LANG_UNKNOWN);
         uint8 gender                    = 0;
         int8 locale                     = handler->GetSessionDbcLocale();
         uint32 totalPlayerTime          = 0;
         uint8 level                     = 0;
-        std::string alive               = handler->GetTrinityString(LANG_ERROR);
+        std::string alive               = handler->GetFirelandsString(LANG_ERROR);
         uint64 money                    = 0;
         uint32 xp                       = 0;
         uint32 xptotal                  = 0;
@@ -1605,8 +1599,8 @@ public:
         // Position data print
         uint32 mapId;
         uint32 areaId;
-        std::string areaName    = handler->GetTrinityString(LANG_UNKNOWN);
-        std::string zoneName    = handler->GetTrinityString(LANG_UNKNOWN);
+        std::string areaName    = handler->GetFirelandsString(LANG_UNKNOWN);
+        std::string zoneName    = handler->GetFirelandsString(LANG_UNKNOWN);
 
         // Guild data print variables defined so that they exist, but are not necessarily used
         uint32 guildId           = 0;
@@ -1634,7 +1628,7 @@ public:
             muteTime          = target->GetSession()->m_muteTime;
             mapId             = target->GetMapId();
             areaId            = target->GetAreaId();
-            alive             = target->IsAlive() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
+            alive             = target->IsAlive() ? handler->GetFirelandsString(LANG_YES) : handler->GetFirelandsString(LANG_NO);
             gender            = target->getGender();
         }
         // get additional information from DB
@@ -1666,9 +1660,9 @@ public:
             uint32 playerFlags = fields[10].GetUInt32();
 
             if (!health || playerFlags & PLAYER_FLAGS_GHOST)
-                alive = handler->GetTrinityString(LANG_NO);
+                alive = handler->GetFirelandsString(LANG_NO);
             else
-                alive = handler->GetTrinityString(LANG_YES);
+                alive = handler->GetFirelandsString(LANG_YES);
         }
 
         // Query the prepared statement for login data
@@ -1682,6 +1676,16 @@ public:
             Field* fields = result->Fetch();
             userName      = fields[0].GetString();
             security      = fields[1].GetUInt8();
+
+            if(security == 0){
+                if(handler->HasPermission(rbac::RBAC_PERM_SEC_ADMINISTRATOR)){
+                    security = SEC_ADMINISTRATOR;
+                } else if (handler->HasPermission(rbac::RBAC_PERM_SEC_GAMEMASTER)){
+                    security = SEC_GAMEMASTER;
+                } else if (handler->HasPermission(rbac::RBAC_PERM_SEC_MODERATOR)){
+                    security = SEC_MODERATOR;
+                }
+            }
 
             // Only fetch these fields if commander has sufficient rights)
             if (handler->HasPermission(rbac::RBAC_PERM_COMMANDS_PINFO_CHECK_PERSONAL_DATA) && // RBAC Perm. 48, Role 39
@@ -1701,10 +1705,10 @@ public:
             }
             else
             {
-                eMail     = handler->GetTrinityString(LANG_UNAUTHORIZED);
-                regMail   = handler->GetTrinityString(LANG_UNAUTHORIZED);
-                lastIp    = handler->GetTrinityString(LANG_UNAUTHORIZED);
-                lastLogin = handler->GetTrinityString(LANG_UNAUTHORIZED);
+                eMail     = handler->GetFirelandsString(LANG_UNAUTHORIZED);
+                regMail   = handler->GetFirelandsString(LANG_UNAUTHORIZED);
+                lastIp    = handler->GetFirelandsString(LANG_UNAUTHORIZED);
+                lastLogin = handler->GetFirelandsString(LANG_UNAUTHORIZED);
             }
             muteTime      = fields[6].GetUInt64();
             muteReason    = fields[7].GetString();
@@ -1723,7 +1727,7 @@ public:
         PreparedQueryResult result2 = LoginDatabase.Query(stmt2);
         if (!result2)
         {
-            banType = handler->GetTrinityString(LANG_CHARACTER);
+            banType = handler->GetFirelandsString(LANG_CHARACTER);
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_BANS);
             stmt->setUInt32(0, lowguid);
             result2 = CharacterDatabase.Query(stmt);
@@ -1772,7 +1776,7 @@ public:
 
         // Initiate output
         // Output I. LANG_PINFO_PLAYER
-        handler->PSendSysMessage(LANG_PINFO_PLAYER, target ? "" : handler->GetTrinityString(LANG_OFFLINE), nameLink.c_str(), lowguid);
+        handler->PSendSysMessage(LANG_PINFO_PLAYER, target ? "" : handler->GetFirelandsString(LANG_OFFLINE), nameLink.c_str(), lowguid);
 
         // Output II. LANG_PINFO_GM_ACTIVE if character is gamemaster
         if (target && target->IsGameMaster())
@@ -1780,7 +1784,7 @@ public:
 
         // Output III. LANG_PINFO_BANNED if ban exists and is applied
         if (banTime >= 0)
-            handler->PSendSysMessage(LANG_PINFO_BANNED, banType.c_str(), banReason.c_str(), banTime > 0 ? secsToTimeString(banTime - GameTime::GetGameTime(), true).c_str() : handler->GetTrinityString(LANG_PERMANENTLY), bannedBy.c_str());
+            handler->PSendSysMessage(LANG_PINFO_BANNED, banType.c_str(), banReason.c_str(), banTime > 0 ? secsToTimeString(banTime - GameTime::GetGameTime(), true).c_str() : handler->GetFirelandsString(LANG_PERMANENTLY), bannedBy.c_str());
 
         // Output IV. LANG_PINFO_MUTED if mute is applied
         if (muteTime > 0)
@@ -1799,7 +1803,7 @@ public:
         handler->PSendSysMessage(LANG_PINFO_ACC_REGMAILS, regMail.c_str(), eMail.c_str());
 
         // Output IX. LANG_PINFO_ACC_IP
-        handler->PSendSysMessage(LANG_PINFO_ACC_IP, lastIp.c_str(), locked ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO));
+        handler->PSendSysMessage(LANG_PINFO_ACC_IP, lastIp.c_str(), locked ? handler->GetFirelandsString(LANG_YES) : handler->GetFirelandsString(LANG_NO));
 
         // Output X. LANG_PINFO_CHR_LEVEL
         if (level != sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
@@ -1810,7 +1814,7 @@ public:
         // Output XI. LANG_PINFO_CHR_RACE
         raceStr  = DBCManager::GetRaceName(raceid, locale);
         classStr = DBCManager::GetClassName(classid, locale);
-        handler->PSendSysMessage(LANG_PINFO_CHR_RACE, (gender == 0 ? handler->GetTrinityString(LANG_CHARACTER_GENDER_MALE) : handler->GetTrinityString(LANG_CHARACTER_GENDER_FEMALE)), raceStr.c_str(), classStr.c_str());
+        handler->PSendSysMessage(LANG_PINFO_CHR_RACE, (gender == 0 ? handler->GetFirelandsString(LANG_CHARACTER_GENDER_MALE) : handler->GetFirelandsString(LANG_CHARACTER_GENDER_FEMALE)), raceStr.c_str(), classStr.c_str());
 
         // Output XII. LANG_PINFO_CHR_ALIVE
         handler->PSendSysMessage(LANG_PINFO_CHR_ALIVE, alive.c_str());
@@ -1839,8 +1843,8 @@ public:
 
         if (target)
             handler->PSendSysMessage(LANG_PINFO_CHR_MAP, map->MapName,
-                (!zoneName.empty() ? zoneName.c_str() : handler->GetTrinityString(LANG_UNKNOWN)),
-                (!areaName.empty() ? areaName.c_str() : handler->GetTrinityString(LANG_UNKNOWN)));
+                (!zoneName.empty() ? zoneName.c_str() : handler->GetFirelandsString(LANG_UNKNOWN)),
+                (!areaName.empty() ? areaName.c_str() : handler->GetFirelandsString(LANG_UNKNOWN)));
 
         // Output XVII. - XVIX. if they are not empty
         if (!guildName.empty())
@@ -1896,8 +1900,8 @@ public:
         }
 
         // First handle any creatures that still have a corpse around
-        Trinity::RespawnDo u_do;
-        Trinity::WorldObjectWorker<Trinity::RespawnDo> worker(player, u_do);
+        Firelands::RespawnDo u_do;
+        Firelands::WorldObjectWorker<Firelands::RespawnDo> worker(player, u_do);
         Cell::VisitGridObjects(player, worker, player->GetGridActivationRange());
 
         // Now handle any that had despawned, but had respawn time logged.
@@ -1905,7 +1909,7 @@ public:
         player->GetMap()->GetRespawnInfo(data, SPAWN_TYPEMASK_ALL);
         if (!data.empty())
         {
-            uint32 const gridId = Trinity::ComputeGridCoord(player->GetPositionX(), player->GetPositionY()).GetId();
+            uint32 const gridId = Firelands::ComputeGridCoord(player->GetPositionX(), player->GetPositionY()).GetId();
             for (RespawnInfo const* info : data)
                 if (info->gridId == gridId)
                     player->GetMap()->Respawn(info->type, info->spawnId);
@@ -1924,7 +1928,7 @@ public:
             return false;
 
         char const* muteReason = strtok(nullptr, "\r");
-        std::string muteReasonStr = handler->GetTrinityString(LANG_NO_REASON);
+        std::string muteReasonStr = handler->GetFirelandsString(LANG_NO_REASON);
         if (muteReason != nullptr)
             muteReasonStr = muteReason;
 
@@ -1952,7 +1956,7 @@ public:
         if (handler->GetSession())
             muteBy = handler->GetSession()->GetPlayerName();
         else
-            muteBy = handler->GetTrinityString(LANG_CONSOLE);
+            muteBy = handler->GetFirelandsString(LANG_CONSOLE);
 
         if (target)
         {
@@ -2307,7 +2311,7 @@ public:
         // flat melee damage without resistence/etc reduction
         if (!schoolStr)
         {
-            Unit::DealDamage(handler->GetSession()->GetPlayer(), target, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+            handler->GetSession()->GetPlayer()->DealDamage(target, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             if (target != handler->GetSession()->GetPlayer())
                 handler->GetSession()->GetPlayer()->SendAttackStateUpdate (HITINFO_AFFECTS_VICTIM, target, 1, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_HIT, 0);
             return true;
@@ -2320,7 +2324,7 @@ public:
         SpellSchoolMask schoolmask = SpellSchoolMask(1 << school);
 
         if (Unit::IsDamageReducedByArmor(schoolmask))
-            damage = Unit::CalcArmorReducedDamage(handler->GetSession()->GetPlayer(), target, damage, nullptr, BASE_ATTACK);
+            damage = handler->GetSession()->GetPlayer()->CalcArmorReducedDamage(target, damage, nullptr, BASE_ATTACK);
 
         char* spellStr = strtok((char*)nullptr, " ");
 
@@ -2329,7 +2333,7 @@ public:
         {
             Player* attacker = handler->GetSession()->GetPlayer();
             DamageInfo dmgInfo(attacker, target, damage, nullptr, schoolmask, SPELL_DIRECT_DAMAGE, BASE_ATTACK);
-            Unit::CalcAbsorbResist(dmgInfo);
+            attacker->CalcAbsorbResist(dmgInfo);
 
             if (!dmgInfo.GetDamage())
                 return true;
@@ -2338,8 +2342,8 @@ public:
 
             uint32 absorb = dmgInfo.GetAbsorb();
             uint32 resist = dmgInfo.GetResist();
-            Unit::DealDamageMods(target, damage, &absorb);
-            Unit::DealDamage(attacker, target, damage, nullptr, DIRECT_DAMAGE, schoolmask, nullptr, false);
+            attacker->DealDamageMods(target, damage, &absorb);
+            attacker->DealDamage(target, damage, nullptr, DIRECT_DAMAGE, schoolmask, nullptr, false);
             attacker->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, target, 0, schoolmask, damage, absorb, resist, VICTIMSTATE_HIT, 0);
             return true;
         }
@@ -2357,7 +2361,7 @@ public:
 
         Player* attacker = handler->GetSession()->GetPlayer();
         SpellNonMeleeDamage dmgInfo(attacker, target, spellid, spellInfo->GetSchoolMask());
-        Unit::DealDamageMods(dmgInfo.target, dmgInfo.damage, &dmgInfo.absorb);
+        attacker->DealDamageMods(dmgInfo.target, dmgInfo.damage, &dmgInfo.absorb);
         attacker->SendSpellNonMeleeDamageLog(&dmgInfo);
         attacker->DealSpellDamage(&dmgInfo, true);
         return true;

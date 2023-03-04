@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -87,7 +87,7 @@ struct npc_gilneas_horrid_abomination : public ScriptedAI
         me->GetMotionMaster()->MoveRandom(6.0f);
     }
 
-    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {
@@ -244,7 +244,7 @@ struct npc_gilneas_save_the_children : public ScriptedAI
             _events.ScheduleEvent(EVENT_CRY, Seconds(1));
     }
 
-    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {
@@ -392,7 +392,7 @@ struct npc_gilneas_forsaken_catapult : public VehicleAI
             _events.ScheduleEvent(EVENT_CHECK_AREA, Milliseconds(1));
     }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {
@@ -409,21 +409,17 @@ struct npc_gilneas_forsaken_catapult : public VehicleAI
         _targetPos = pos;
     }
 
-    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
-        Unit* unitTarget = target->ToUnit();
-        if (!unitTarget)
-            return;
-
         switch (spell->Id)
         {
             case SPELL_LAUNCH:
-                if (unitTarget->GetVehicleCreatureBase())
+                if (target->GetVehicleCreatureBase())
                 {
-                    Position pos = unitTarget->GetPosition();
+                    Position pos = target->GetPosition();
                     pos.m_positionZ += 6.0f;
-                    unitTarget->ExitVehicle(&pos);
-                    unitTarget->GetMotionMaster()->MoveJump(_targetPos, 58.62504f, 12.75955f);
+                    target->ExitVehicle(&pos);
+                    target->GetMotionMaster()->MoveJump(_targetPos, 58.62504f, 12.75955f);
                 }
                 break;
             default:
@@ -527,7 +523,7 @@ class spell_gilneas_fiery_boulder : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override

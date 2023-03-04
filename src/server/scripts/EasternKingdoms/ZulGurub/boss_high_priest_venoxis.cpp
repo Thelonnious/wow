@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -466,7 +466,7 @@ class spell_venoxis_toxic_link_targeting : public SpellScript
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         if (targets.size() > 2)
-            Trinity::Containers::RandomResize(targets, 2);
+            Firelands::Containers::RandomResize(targets, 2);
     }
 
     void HandleEffect(SpellEffIndex effIndex)
@@ -511,7 +511,7 @@ class spell_venoxis_toxic_link_ally : public SpellScript
             return;
         }
 
-        targets.remove_if(Trinity::UnitAuraCheck(false, SPELL_TOXIC_LINK_AURA));
+        targets.remove_if(Firelands::UnitAuraCheck(false, SPELL_TOXIC_LINK_AURA));
 
         if (targets.empty())
             GetCaster()->RemoveAurasDueToSpell(SPELL_TOXIC_LINK_AURA);
@@ -551,7 +551,7 @@ class spell_venoxis_blood_venom_forcecast : public SpellScript
             return;
 
         if (targets.size() > 3)
-            Trinity::Containers::RandomResize(targets, 3);
+            Firelands::Containers::RandomResize(targets, 3);
     }
 
     void HandleSummon(SpellEffIndex effIndex)

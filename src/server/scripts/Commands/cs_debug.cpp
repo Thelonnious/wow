@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -31,7 +31,6 @@ EndScriptData */
 #include "DBCStores.h"
 #include "GossipDef.h"
 #include "GridNotifiersImpl.h"
-#include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "Language.h"
 #include "Log.h"
@@ -470,11 +469,11 @@ public:
             }
             else
             {
-                TC_LOG_ERROR("misc", "Sending opcode that has unknown type '%s'", type.c_str());
+                LOG_ERROR("misc", "Sending opcode that has unknown type '%s'", type.c_str());
                 break;
             }
         }
-        TC_LOG_DEBUG("network", "Sending opcode %u", data.GetOpcode());
+        LOG_DEBUG("network", "Sending opcode %u", data.GetOpcode());
         data.hexlike();
         player->GetSession()->SendPacket(&data, true);
         handler->PSendSysMessage(LANG_COMMAND_OPCODESENT, data.GetOpcode(), unit->GetName().c_str());
@@ -1074,8 +1073,8 @@ public:
         else
         {
             Creature* passenger = nullptr;
-            Trinity::AllCreaturesOfEntryInRange check(handler->GetSession()->GetPlayer(), entry, 20.0f);
-            Trinity::CreatureSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(handler->GetSession()->GetPlayer(), passenger, check);
+            Firelands::AllCreaturesOfEntryInRange check(handler->GetSession()->GetPlayer(), entry, 20.0f);
+            Firelands::CreatureSearcher<Firelands::AllCreaturesOfEntryInRange> searcher(handler->GetSession()->GetPlayer(), passenger, check);
             Cell::VisitAllObjects(handler->GetSession()->GetPlayer(), searcher, 30.0f);
             if (!passenger || passenger == target)
                 return false;
@@ -1562,7 +1561,7 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        TC_LOG_INFO("sql.dev", "(@PATH, XX, %.3f, %.3f, %.5f, 0, 0, 0, 100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        LOG_INFO("sql.dev", "(@PATH, XX, %.3f, %.3f, %.5f, 0, 0, 0, 100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 
         handler->PSendSysMessage("Waypoint SQL written to SQL Developer log");
         return true;
@@ -1623,31 +1622,14 @@ public:
         if (*args)
         {
             int32 mapId = atoi(args);
-            sMapMgr->DoForAllMapsWithMapId(mapId, [&](Map* map)
-            {
-                HandleDebugLoadCellsCommandHelper(handler, map);
-            });
-            return true;
+            map = sMapMgr->FindBaseNonInstanceMap(mapId);
         }
-
         if (!map)
-        {
-            // Fallback to player's map if no map has been specified
-            return HandleDebugLoadCellsCommandHelper(handler, player->GetMap());
-        }
-
-        return false;
-    }
-
-    static bool HandleDebugLoadCellsCommandHelper(ChatHandler* handler, Map* map)
-    {
-        if (!map)
-            return false;
+            map = player->GetMap();
 
         handler->PSendSysMessage("Loading all cells (mapId: %u). Current next GameObject %u, Creature %u", map->GetId(), map->GetMaxLowGuid<HighGuid::GameObject>(), map->GetMaxLowGuid<HighGuid::Unit>());
         map->LoadAllCells();
         handler->PSendSysMessage("Cells loaded (mapId: %u) After load - Next GameObject %u, Creature %u", map->GetId(), map->GetMaxLowGuid<HighGuid::GameObject>(), map->GetMaxLowGuid<HighGuid::Unit>());
-
         return true;
     }
 
@@ -1740,7 +1722,7 @@ public:
                 nearestLoc = bg->GetClosestGraveyard(player);
             else
             {
-                if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetMap(), player->GetZoneId()))
+                if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId()))
                     nearestLoc = bf->GetClosestGraveyard(player);
                 else
                     nearestLoc = sObjectMgr->GetClosestGraveyard(*player, player->GetTeam(), player);

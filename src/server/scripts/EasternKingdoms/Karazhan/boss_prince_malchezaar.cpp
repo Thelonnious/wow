@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -149,7 +149,7 @@ public:
                     creature->AI()->KilledUnit(who);
         }
 
-        void SpellHit(WorldObject* /*who*/, SpellInfo const* spell) override
+        void SpellHit(Unit* /*who*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_INFERNAL_RELAY)
             {
@@ -162,7 +162,7 @@ public:
 
         void DamageTaken(Unit* done_by, uint32 &damage) override
         {
-            if (!done_by || done_by->GetGUID() != malchezaar)
+            if (done_by->GetGUID() != malchezaar)
                 damage = 0;
         }
 
@@ -359,7 +359,7 @@ public:
                 pos = me->GetRandomNearPosition(60);
             else
             {
-                point = Trinity::Containers::SelectRandomContainerElement(positions);
+                point = Firelands::Containers::SelectRandomContainerElement(positions);
                 pos.Relocate(point->x, point->y, INFERNAL_Z, frand(0.0f, float(M_PI * 2)));
             }
 

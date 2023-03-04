@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,13 +17,12 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "Spell.h"
 #include "DynamicObject.h"
 #include "InstanceScript.h"
-#include "MotionMaster.h"
 #include "ObjectAccessor.h"
-#include "SpellAuraEffects.h"
-#include "Spell.h"
 #include "SpellInfo.h"
+#include "MotionMaster.h"
 #include "SpellScript.h"
 #include "zulgurub.h"
 
@@ -87,6 +86,12 @@ enum Events
     EVENT_KNOCK_AWAY
 };
 
+enum Actions
+{
+    // Zanzil
+    ACTION_CAST_ZANZILI_FLAME = 1
+};
+
 enum SecretTechniques
 {
     TECHNIQUE_NONE = 0,
@@ -140,6 +145,7 @@ struct boss_zanzil : public BossAI
 
     void Initialize()
     {
+        _zanziliFireCount = 0;
         _zombieGroupToRespawn = 0;
         _berserkerToRespawn = 0;
         _lastSecretTechnique = TECHNIQUE_NONE;
@@ -217,10 +223,36 @@ struct boss_zanzil : public BossAI
         }
     }
 
-    void OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason /*reason*/) override
+    void OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason) override
     {
         if (spell->Id == SPELL_VOODOO_BOLT)
             me->MakeInterruptable(false);
+
+        if (reason == SPELL_FINISHED_SUCCESSFUL_CAST && spell->Id == SPELL_ZANZILI_FIRE)
+            _zanzilPosition = me->GetPosition();
+    }
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
+        {
+            case ACTION_CAST_ZANZILI_FLAME:
+            {
+                _zanziliFireCount++;
+                float angle = _zanzilPosition.GetOrientation();
+                float x = _zanzilPosition.GetPositionX() + cos(angle) * (2.0f * _zanziliFireCount);
+                float y = _zanzilPosition.GetPositionY() + sin(angle) * (2.0f * _zanziliFireCount);
+                float z = _zanzilPosition.GetPositionZ();
+
+                if (_zanzilPosition.GetExactDist2d(x, y) <= 30.0f)
+                    me->CastSpell({ x, y, z }, SPELL_ZANZILI_FIRE_TRIGGERED, true);
+                else
+                    me->RemoveAurasDueToSpell(SPELL_ZANZILI_FIRE);
+                break;
+            }
+            default:
+                break;
+        }
     }
 
     void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
@@ -243,6 +275,7 @@ struct boss_zanzil : public BossAI
             switch (eventId)
             {
                 case EVENT_ZANZILI_FIRE:
+                    _zanziliFireCount = 0;
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
                         DoCast(target, SPELL_ZANZILI_FIRE);
                     events.Repeat(13s, 14s);
@@ -354,6 +387,8 @@ struct boss_zanzil : public BossAI
     }
 
 private:
+    Position _zanzilPosition;
+    uint8 _zanziliFireCount;
     uint8 _zombieGroupToRespawn;
     uint8 _berserkerToRespawn;
     SecretTechniques _lastSecretTechnique;
@@ -373,7 +408,7 @@ struct npc_zanzil_zanzili_berserker : public ScriptedAI
         _elixirHits = 0;
     }
 
-    void SpellHit(WorldObject* /*caster*/, const SpellInfo* spellInfo) override
+    void SpellHit(Unit* /*caster*/, const SpellInfo* spellInfo) override
     {
         if (spellInfo->Id == SPELL_ZANZILS_RESURRECTION_ELIXIR_TRIGGERED)
         {
@@ -391,15 +426,15 @@ struct npc_zanzil_zanzili_berserker : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(WorldObject* victim, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit* victim, const SpellInfo* spellInfo) override
     {
-        if (!victim || !victim->IsUnit())
+        if (!victim)
             return;
 
         if (spellInfo->Id == SPELL_PURSUIT)
         {
             me->GetThreatManager().ResetAllThreat();
-            AddThreat(victim->ToUnit(), spellInfo->Effects[EFFECT_1].CalcValue());
+            AddThreat(victim, spellInfo->Effects[EFFECT_1].BasePoints);
             Talk(SAY_WHISPER_PURSUIT_PLAYER, victim);
             Talk(SAY_ANNOUNCE_PURSUIT_PLAYER, victim);
         }
@@ -445,34 +480,17 @@ private:
 
 class spell_zanzil_zanzili_fire : public AuraScript
 {
-    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        _applyPosition = GetUnitOwner()->GetPosition();
-    }
-
-    void HandlePeriodic(AuraEffect const* aurEff)
-    {
-        if (aurEff->GetTickNumber() > 15)
-        {
-            Remove();
-            return;
-        }
-
-        Position dest = _applyPosition;
-        float distance = aurEff->GetTickNumber() * 2.f;
-        dest.m_positionX += std::cos(_applyPosition.GetOrientation()) * distance;
-        dest.m_positionY += std::sin(_applyPosition.GetOrientation()) * distance;
-        GetTarget()->CastSpell(dest, SPELL_ZANZILI_FIRE_TRIGGERED, aurEff);
+        if (Creature* zanzil = GetTarget()->ToCreature())
+            if (zanzil->IsAIEnabled())
+                zanzil->AI()->DoAction(ACTION_CAST_ZANZILI_FLAME);
     }
 
     void Register() override
     {
-        AfterEffectApply.Register(&spell_zanzil_zanzili_fire::AfterApply, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         OnEffectPeriodic.Register(&spell_zanzil_zanzili_fire::HandlePeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
-
-private:
-    Position _applyPosition;
 };
 
 class spell_zanzil_zanzils_resurrection_elixir : public AuraScript
@@ -540,7 +558,7 @@ class spell_zanzil_zanzils_resurrection_elixir_red_script : public SpellScript
         if (targets.empty())
             targets = targetsCopy;
 
-        Trinity::Containers::RandomResize(targets, 5);
+        Firelands::Containers::RandomResize(targets, 5);
     }
 
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
@@ -604,7 +622,7 @@ class spell_zanzil_zanzils_graveyard_gas : public SpellScript
         if (targets.empty())
             targets = targetsCopy;
 
-        Trinity::Containers::RandomResize(targets, 3);
+        Firelands::Containers::RandomResize(targets, 3);
     }
 
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)

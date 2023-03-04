@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -655,15 +655,11 @@ struct spell_jindo_body_slam : public SpellScript
 {
     void HandleShieldBreakEffect(SpellEffIndex /*effIndex*/)
     {
-        Unit* target = GetHitUnit();
+        Unit* target = GetHitCreature();
         if (!target)
             return;
 
-        // Sniffs confirm that the spell is going to negate the damage against immune targets rather than not hitting at all
-        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE))
-            SetHitDamage(0);
-
-        if (target->IsCreature() && target->GetEntry() == NPC_HAKKARS_CHAINS && target->HasAura(SPELL_BRITTLE_BARRIER))
+        if (target->GetEntry() == NPC_HAKKARS_CHAINS && target->HasAura(SPELL_BRITTLE_BARRIER))
         {
             target->RemoveAurasDueToSpell(SPELL_BRITTLE_BARRIER);
             target->CastSpell(target, SPELL_ARCANE_EXPLOSION_VISUAL);

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -220,7 +220,7 @@ class boss_svala : public CreatureScript
                 Talk(SAY_DEATH);
             }
 
-            void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spellInfo) override
+            void SpellHitTarget(Unit* /*target*/, SpellInfo const* spellInfo) override
             {
                 if (spellInfo->Id == SPELL_RITUAL_STRIKE_EFF_1 && !events.IsInPhase(NORMAL) && !events.IsInPhase(SVALADEAD))
                 {
@@ -557,7 +557,7 @@ class npc_scourge_hulk : public CreatureScript
 
             void DamageTaken(Unit* attacker, uint32 &damage) override
             {
-                if (damage >= me->GetHealth() && attacker && attacker->GetEntry() == NPC_SVALA_SORROWGRAVE)
+                if (damage >= me->GetHealth() && attacker->GetEntry() == NPC_SVALA_SORROWGRAVE)
                     killedByRitualStrike = true;
             }
 

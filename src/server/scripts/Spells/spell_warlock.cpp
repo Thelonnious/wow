@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -117,8 +117,7 @@ enum WarlockSpellIcons
     WARLOCK_ICON_ID_SOUL_SIPHON                     = 5001,
     WARLOCK_ICON_ID_SOULBURN_SEED_OF_CORRUPTION     = 1932,
     WARLOCK_ICON_ID_FIRE_AND_BRIMSTONE              = 3173,
-    WARLOCK_ICON_ID_JINX                            = 5002,
-    WARLOCK_ICON_ID_GLYPH_OF_FEAR                   = 98
+    WARLOCK_ICON_ID_JINX                            = 5002
 };
 
 enum MiscSpells
@@ -457,7 +456,7 @@ class spell_warl_everlasting_affliction : public SpellScript
             {
                 aurEff->RecalculateAmount(caster);
                 aurEff->CalculatePeriodic(caster, false, false);
-                aurEff->GetBase()->RefreshDuration();
+                aurEff->GetBase()->RefreshDuration(true);
             }
         }
     }
@@ -612,7 +611,7 @@ class spell_warl_health_funnel : public AuraScript
         uint32 damage = caster->CountPctFromMaxHealth(aurEff->GetBaseAmount());
 
         if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetId(), SpellModOp::PowerCost0, damage);
+            modOwner->ApplySpellMod(GetId(), SPELLMOD_COST, damage);
 
         SpellNonMeleeDamage damageInfo(caster, caster, GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
         damageInfo.damage = damage;
@@ -1632,7 +1631,7 @@ class spell_warl_pandemic_script : public SpellScript
         {
             aurEff->RecalculateAmount(caster);
             aurEff->CalculatePeriodic(caster, false, false);
-            aurEff->GetBase()->RefreshDuration();
+            aurEff->GetBase()->RefreshDuration(true);
         }
     }
 
@@ -1659,43 +1658,6 @@ class spell_warl_decimation : public AuraScript
     }
 };
 
-// 5782 - Fear
-class spell_warl_fear : public SpellScript
-{
-    void HandleGlyphEffect(WorldObject*& target)
-    {
-        if (!GetCaster()->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_GLYPH_OF_FEAR, EFFECT_0))
-            target = nullptr;
-    }
-
-    void Register() override
-    {
-        OnObjectTargetSelect.Register(&spell_warl_fear::HandleGlyphEffect, EFFECT_2, TARGET_UNIT_TARGET_ENEMY);
-    }
-};
-
-// 56244 - Glyph of Fear
-class spell_warl_glyph_of_fear : public AuraScript
-{
-    void HandleCooldownMod(AuraEffect const* aurEff, SpellModifier*& spellMod)
-    {
-        if (!spellMod)
-        {
-            spellMod = new SpellModifier(GetAura());
-            spellMod->op = SpellModOp::Cooldown;
-            spellMod->type = SPELLMOD_FLAT;
-            spellMod->spellId = GetId();
-            spellMod->mask = GetSpellInfo()->Effects[aurEff->GetEffIndex()].SpellClassMask;
-        }
-        spellMod->value = aurEff->GetAmount() * IN_MILLISECONDS;
-    }
-
-    void Register() override
-    {
-        DoEffectCalcSpellMod.Register(&spell_warl_glyph_of_fear::HandleCooldownMod, EFFECT_0, SPELL_AURA_DUMMY);
-    }
-};
-
 void AddSC_warlock_spell_scripts()
 {
     RegisterSpellScript(spell_warl_aftermath);
@@ -1714,11 +1676,9 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_drain_life);
     RegisterSpellScript(spell_warl_drain_soul);
     RegisterSpellScript(spell_warl_everlasting_affliction);
-    RegisterSpellScript(spell_warl_fear);
     RegisterSpellScript(spell_warl_fel_flame);
     RegisterSpellScript(spell_warl_fel_synergy);
     RegisterSpellScript(spell_warl_fel_armor);
-    RegisterSpellScript(spell_warl_glyph_of_fear);
     RegisterSpellScript(spell_warl_glyph_of_shadowflame);
     RegisterSpellAndAuraScriptPair(spell_warl_haunt, spell_warl_haunt_AuraScript);
     RegisterSpellScript(spell_warl_health_funnel);

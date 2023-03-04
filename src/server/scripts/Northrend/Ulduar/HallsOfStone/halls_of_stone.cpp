@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -579,7 +579,7 @@ public:
                         me->SetStandState(UNIT_STAND_STATE_STAND);
                         instance->HandleGameObject(instance->GetGuidData(DATA_GO_SKY_FLOOR), true);
                         if (Creature* temp = ObjectAccessor::GetCreature(*me, uiControllerGUID))
-                            temp->KillSelf();
+                            temp->DealDamage(temp, temp->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                         bIsBattle = true;
                         SetEscortPaused(false);
                         JumpToNextStep(6500);

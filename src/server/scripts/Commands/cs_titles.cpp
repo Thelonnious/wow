@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -135,7 +135,7 @@ public:
         }
 
         std::string tNameLink = handler->GetNameLink(target);
-        std::string titleNameStr = Trinity::StringFormat(target->getGender() == GENDER_MALE ? titleInfo->Name : titleInfo->Name1, target->GetName().c_str());
+        std::string titleNameStr = Firelands::StringFormat(target->getGender() == GENDER_MALE ? titleInfo->Name : titleInfo->Name1, target->GetName().c_str());
 
         target->SetTitle(titleInfo);
         handler->PSendSysMessage(LANG_TITLE_ADD_RES, id, titleNameStr.c_str(), tNameLink.c_str());

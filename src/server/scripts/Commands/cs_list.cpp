@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -31,7 +31,6 @@ EndScriptData */
 #include "GameObject.h"
 #include "GameTime.h"
 #include "Language.h"
-#include "Map.h"
 #include "Map.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"
@@ -130,18 +129,28 @@ public:
                 bool liveFound = false;
 
                 // Get map (only support base map from console)
-                Map* thisMap = nullptr;
+                Map* thisMap;
                 if (handler->GetSession())
                     thisMap = handler->GetSession()->GetPlayer()->GetMap();
+                else
+                    thisMap = sMapMgr->FindBaseNonInstanceMap(mapId);
 
                 // If map found, try to find active version of this creature
                 if (thisMap)
                 {
-                    auto const creBounds = Trinity::Containers::MapEqualRange(thisMap->GetCreatureBySpawnIdStore(), guid);
-                    for (auto& [spawnId, creature] : creBounds)
-                        handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, std::to_string(guid).c_str(), std::to_string(guid).c_str(), cInfo->Name.c_str(),
-                        x, y, z, mapId, creature->GetGUID().ToString().c_str(), creature->IsAlive() ? "*" : " ");
-                    liveFound = creBounds.begin() != creBounds.end();
+                    auto const creBounds = thisMap->GetCreatureBySpawnIdStore().equal_range(guid);
+                    if (creBounds.first != creBounds.second)
+                    {
+                        for (std::unordered_multimap<uint32, Creature*>::const_iterator itr = creBounds.first; itr != creBounds.second;)
+                        {
+                            if (handler->GetSession())
+                                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
+                            else
+                                handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
+                            ++itr;
+                        }
+                        liveFound = true;
+                    }
                 }
 
                 if (!liveFound)
@@ -439,18 +448,28 @@ public:
                 bool liveFound = false;
 
                 // Get map (only support base map from console)
-                Map* thisMap = nullptr;
+                Map* thisMap;
                 if (handler->GetSession())
                     thisMap = handler->GetSession()->GetPlayer()->GetMap();
+                else
+                    thisMap = sMapMgr->FindBaseNonInstanceMap(mapId);
 
                 // If map found, try to find active version of this object
                 if (thisMap)
                 {
-                    auto const goBounds = Trinity::Containers::MapEqualRange(thisMap->GetGameObjectBySpawnIdStore(), guid);
-                    for (auto& [spawnId, go] : goBounds)
-                        handler->PSendSysMessage(LANG_GO_LIST_CHAT, std::to_string(guid).c_str(), entry, std::to_string(guid).c_str(), gInfo->name.c_str(), x, y, z, mapId,
-                        go->GetGUID().ToString().c_str(), go->isSpawned() ? "*" : " ");
-                    liveFound = goBounds.begin() != goBounds.end();
+                    auto const goBounds = thisMap->GetGameObjectBySpawnIdStore().equal_range(guid);
+                    if (goBounds.first != goBounds.second)
+                    {
+                        for (std::unordered_multimap<uint32, GameObject*>::const_iterator itr = goBounds.first; itr != goBounds.second;)
+                        {
+                            if (handler->GetSession())
+                                handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gInfo->name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->isSpawned() ? "*" : " ");
+                            else
+                                handler->PSendSysMessage(LANG_GO_LIST_CONSOLE, guid, gInfo->name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->isSpawned() ? "*" : " ");
+                            ++itr;
+                        }
+                        liveFound = true;
+                    }
                 }
 
                 if (!liveFound)
@@ -479,8 +498,8 @@ public:
             return false;
         }
 
-        char const* talentStr = handler->GetTrinityString(LANG_TALENT);
-        char const* passiveStr = handler->GetTrinityString(LANG_PASSIVE);
+        char const* talentStr = handler->GetFirelandsString(LANG_TALENT);
+        char const* passiveStr = handler->GetFirelandsString(LANG_PASSIVE);
 
         Unit::AuraApplicationMap const& auras = unit->GetAppliedAuras();
         handler->PSendSysMessage(LANG_COMMAND_TARGET_LISTAURAS, auras.size());
@@ -677,13 +696,13 @@ public:
             range = atoi((char*)args);
 
         LocaleConstant locale = handler->GetSession()->GetSessionDbcLocale();
-        char const* stringOverdue = sObjectMgr->GetTrinityString(LANG_LIST_RESPAWNS_OVERDUE, locale);
+        char const* stringOverdue = sObjectMgr->GetFirelandsString(LANG_LIST_RESPAWNS_OVERDUE, locale);
 
         uint32 zoneId = player->GetZoneId();
         char const* zoneName = GetZoneName(zoneId, locale);
 
-        char const* stringCreature = sObjectMgr->GetTrinityString(LANG_LIST_RESPAWNS_CREATURES, locale);
-        char const* stringGameobject = sObjectMgr->GetTrinityString(LANG_LIST_RESPAWNS_GAMEOBJECTS, locale);
+        char const* stringCreature = sObjectMgr->GetFirelandsString(LANG_LIST_RESPAWNS_CREATURES, locale);
+        char const* stringGameobject = sObjectMgr->GetFirelandsString(LANG_LIST_RESPAWNS_GAMEOBJECTS, locale);
 
         for (SpawnObjectType type : { SPAWN_TYPE_CREATURE, SPAWN_TYPE_GAMEOBJECT })
         {

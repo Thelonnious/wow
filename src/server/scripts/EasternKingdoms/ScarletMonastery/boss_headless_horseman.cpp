@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -183,7 +183,7 @@ public:
                 DoCast(me, _spell);
         }
 
-        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_WISP_FLIGHT_PORT && Creaturetype == 4)
                 me->SetDisplayId(2027);
@@ -298,9 +298,9 @@ public:
             }
         }
 
-        void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (!withbody || !caster->IsUnit())
+            if (!withbody)
                 return;
 
             if (spell->Id == SPELL_FLYING_HEAD)
@@ -319,7 +319,7 @@ public:
                 DoCast(me, SPELL_HEAD, false);
                 SaySound(SAY_LOST_HEAD);
                 me->GetMotionMaster()->Clear(false);
-                me->GetMotionMaster()->MoveFleeing(caster->ToUnit()->GetVictim());
+                me->GetMotionMaster()->MoveFleeing(caster->GetVictim());
             }
         }
 
@@ -528,7 +528,7 @@ public:
             }
         }
 
-        void SaySound(uint8 textEntry, WorldObject* target = 0)
+        void SaySound(uint8 textEntry, Unit* target = 0)
         {
             Talk(textEntry, target);
             laugh += 4000;
@@ -555,13 +555,10 @@ public:
             return nullptr;
         }
 
-        void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+        void SpellHitTarget(Unit* unit, SpellInfo const* spell) override
         {
-            if (!target->IsUnit())
-                return;
-
-            if (spell->Id == SPELL_CONFLAGRATION && target->ToUnit()->HasAura(SPELL_CONFLAGRATION))
-                SaySound(SAY_CONFLAGRATION, target);
+            if (spell->Id == SPELL_CONFLAGRATION && unit->HasAura(SPELL_CONFLAGRATION))
+                SaySound(SAY_CONFLAGRATION, unit);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -584,11 +581,8 @@ public:
             }
         }
 
-        void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (!caster->IsCreature())
-                return;
-
             if (withhead)
                 return;
 
@@ -604,9 +598,8 @@ public:
                 me->SetFullHealth();
                 SaySound(SAY_REJOINED);
                 DoCast(me, SPELL_HEAD);
-
-                caster->ToCreature()->GetMotionMaster()->Clear(false);
-                caster->ToCreature()->GetMotionMaster()->MoveFollow(me, 6, float(urand(0, 5)));
+                caster->GetMotionMaster()->Clear(false);
+                caster->GetMotionMaster()->MoveFollow(me, 6, float(urand(0, 5)));
             }
         }
 
@@ -819,7 +812,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override { }
 
-        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_SPROUTING)
             {

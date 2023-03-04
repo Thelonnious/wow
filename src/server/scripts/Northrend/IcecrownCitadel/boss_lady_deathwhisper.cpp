@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -386,7 +386,7 @@ class boss_lady_deathwhisper : public CreatureScript
                 }
             }
 
-            void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+            void SpellHitTarget(Unit* target, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_SUMMON_SPIRITS)
                     _nextVengefulShadeTargetGUID.push_back(target->GetGUID());
@@ -480,7 +480,7 @@ class boss_lady_deathwhisper : public CreatureScript
                 if (_cultistQueue.empty())
                     return;
 
-                _cultistGUID = Trinity::Containers::SelectRandomContainerElement(_cultistQueue);
+                _cultistGUID = Firelands::Containers::SelectRandomContainerElement(_cultistQueue);
                 _cultistQueue.remove(_cultistGUID);
                 Creature* cultist = ObjectAccessor::GetCreature(*me, _cultistGUID);
                 if (!cultist)
@@ -545,7 +545,7 @@ class npc_cult_fanatic : public CreatureScript
                     });
             }
 
-            void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
             {
                 switch (spell->Id)
                 {
@@ -652,7 +652,7 @@ class npc_cult_adherent : public CreatureScript
                    });
             }
 
-            void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
             {
                 switch (spell->Id)
                 {
@@ -745,7 +745,7 @@ class npc_vengeful_shade : public CreatureScript
                 _targetGUID = guid;
             }
 
-            void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
+            void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
             {
                 switch (spell->Id)
                 {

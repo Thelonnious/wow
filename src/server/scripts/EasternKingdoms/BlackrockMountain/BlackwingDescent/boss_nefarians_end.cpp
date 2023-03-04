@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -785,7 +785,7 @@ struct boss_nefarians_end : public BossAI
                     break;
                 case EVENT_LAND_PHASE_THREE:
                     if (me->GetHealthPct() > 50.f)
-                        instance->DoUpdateWorldState(WORLD_STATE_ID_KEEPING_IT_IN_THE_FAMILY, 0);
+                        instance->instance->SetWorldState(WORLD_STATE_ID_KEEPING_IT_IN_THE_FAMILY, 0);
 
                     me->RemoveAurasDueToSpell(SPELL_NEFARIAN_PHASE_2_HEALTH_AURA);
                     me->SendSetPlayHoverAnim(true);
@@ -930,7 +930,7 @@ struct npc_nefarians_end_onyxia : public ScriptedAI
         if (_instance->GetBossState(DATA_NEFARIANS_END) != IN_PROGRESS)
         {
             _instance->SetBossState(DATA_NEFARIANS_END, IN_PROGRESS);
-            _instance->DoUpdateWorldState(WORLD_STATE_ID_KEEPING_IT_IN_THE_FAMILY, 1);
+            _instance->instance->SetWorldState(WORLD_STATE_ID_KEEPING_IT_IN_THE_FAMILY, 1);
         }
 
         _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, FRAME_INDEX_ONYXIA);
@@ -1313,7 +1313,7 @@ struct npc_nefarians_end_shadowblaze : public NullCreatureAI
                 nefarian->AI()->JustSummoned(me);
     }
 
-    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {

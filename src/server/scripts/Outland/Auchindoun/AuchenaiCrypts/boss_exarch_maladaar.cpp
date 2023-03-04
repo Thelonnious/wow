@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -225,7 +225,7 @@ public:
         {
             if (summoned->GetEntry() == ENTRY_STOLEN_SOUL)
             {
-                //SPELL_STOLEN_SOUL_VISUAL has shapeshift effect, but not implemented feature in Trinity for this spell.
+                //SPELL_STOLEN_SOUL_VISUAL has shapeshift effect, but not implemented feature in Firelands for this spell.
                 summoned->CastSpell(summoned, SPELL_STOLEN_SOUL_VISUAL, false);
                 summoned->SetDisplayId(soulmodel);
                 summoned->SetFaction(me->GetFaction());

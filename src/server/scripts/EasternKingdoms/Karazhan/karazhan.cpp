@@ -1,5 +1,5 @@
  /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -249,7 +249,7 @@ public:
 
         void PrepareEncounter()
         {
-            TC_LOG_DEBUG("scripts", "Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
+            LOG_DEBUG("scripts", "Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
             uint8 index = 0;
             uint8 count = 0;
 
@@ -359,17 +359,17 @@ public:
                 case GOSSIP_ACTION_INFO_DEF + 3:
                     CloseGossipMenuFor(player);
                     m_uiEventId = EVENT_OZ;
-                    TC_LOG_DEBUG("scripts", "player (%s) manually set Opera event to EVENT_OZ", player->GetGUID().ToString().c_str());
+                    LOG_DEBUG("scripts", "player (%s) manually set Opera event to EVENT_OZ", player->GetGUID().ToString().c_str());
                     break;
                 case GOSSIP_ACTION_INFO_DEF + 4:
                     CloseGossipMenuFor(player);
                     m_uiEventId = EVENT_HOOD;
-                    TC_LOG_DEBUG("scripts", "player (%s) manually set Opera event to EVENT_HOOD", player->GetGUID().ToString().c_str());
+                    LOG_DEBUG("scripts", "player (%s) manually set Opera event to EVENT_HOOD", player->GetGUID().ToString().c_str());
                     break;
                 case GOSSIP_ACTION_INFO_DEF + 5:
                     CloseGossipMenuFor(player);
                     m_uiEventId = EVENT_RAJ;
-                    TC_LOG_DEBUG("scripts", "player (%s) manually set Opera event to EVENT_RAJ", player->GetGUID().ToString().c_str());
+                    LOG_DEBUG("scripts", "player (%s) manually set Opera event to EVENT_RAJ", player->GetGUID().ToString().c_str());
                     break;
             }
 
@@ -583,7 +583,7 @@ public:
             }
             case 15:
                 if (Creature* arca = ObjectAccessor::GetCreature(*me, ArcanagosGUID))
-                    arca->KillSelf();
+                    arca->DealDamage(arca, arca->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 return 5000;
             default:
                 return 9999999;

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -185,7 +185,6 @@ public:
             AirForceSpawn const& _spawn;
             ObjectGuid _myGuard;
             std::unordered_set<ObjectGuid> _toAttack;
-            
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -423,7 +422,7 @@ public:
 
             if (!targets.empty())
             {
-                _lastTargetGUID = Trinity::Containers::SelectRandomContainerElement(targets)->GetGUID();
+                _lastTargetGUID = Firelands::Containers::SelectRandomContainerElement(targets)->GetGUID();
 
                 return _lastTargetGUID;
             }
@@ -505,8 +504,8 @@ public:
         {
             // Returns true if no nearby player has aura "Test Ribbon Pole Channel".
             std::list<Player*> players;
-            Trinity::UnitAuraCheck check(true, SPELL_RIBBON_DANCE_COSMETIC);
-            Trinity::PlayerListSearcher<Trinity::UnitAuraCheck> searcher(me, players, check);
+            Firelands::UnitAuraCheck check(true, SPELL_RIBBON_DANCE_COSMETIC);
+            Firelands::PlayerListSearcher<Firelands::UnitAuraCheck> searcher(me, players, check);
             Cell::VisitWorldObjects(me, searcher, 10.0f);
 
             return players.empty();
@@ -829,7 +828,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override { }
 
-        void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             Player* player = caster->ToPlayer();
             if (!player || !me->IsAlive() || spell->Id != 20804)
@@ -921,7 +920,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
                     patientEntry = HordeSoldierId[rand32() % 3];
                     break;
                 default:
-                    TC_LOG_ERROR("scripts", "Invalid entry for Triage doctor. Please check your database");
+                    LOG_ERROR("scripts", "Invalid entry for Triage doctor. Please check your database");
                     return;
             }
 
@@ -1035,7 +1034,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override { }
 
-        void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_LESSER_HEAL_R2 || spell->Id == SPELL_FORTITUDE_R1)
             {
@@ -1744,7 +1743,7 @@ struct npc_training_dummy : NullCreatureAI
     }
 
     // Todo: the involved training dummys have a proc aura for that. Drop this part here, once converted.
-    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
         switch (spell->Id)
         {
@@ -1965,6 +1964,7 @@ class npc_experience : public CreatureScript
             bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
             {
                 uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
+                ClearGossipMenuFor(player);
 
                 switch (action)
                 {
@@ -1976,7 +1976,7 @@ class npc_experience : public CreatureScript
                         break;
                 }
                 CloseGossipMenuFor(player);
-                return false;
+                return true;
             }
 
             bool GossipHello(Player* player) override
@@ -3070,9 +3070,9 @@ struct npc_darkmoon_island_gnoll : public ScriptedAI
         _events.ScheduleEvent(EVENT_REGULAR_SUBMERGE, 3s + 500ms);
     }
 
-    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
-        if (!caster || _hit)
+        if (_hit)
             return;
 
         if (spell->Id == SPELL_WHACK)

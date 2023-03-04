@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -353,7 +353,7 @@ public:
             summon->m_Events.AddEvent(new VoidSpawnSummon(summon), summon->m_Events.CalculateTime(1500));
         }
 
-        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             switch (spell->Id)
             {

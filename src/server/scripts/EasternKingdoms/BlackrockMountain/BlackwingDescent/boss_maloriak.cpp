@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,21 +15,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackwing_descent.h"
-#include "ScriptMgr.h"
 #include "ObjectMgr.h"
+#include "ScriptMgr.h"
 #include "CommonPredicates.h"
 #include "DBCStores.h"
 #include "GridNotifiers.h"
-#include "InstanceScript.h"
-#include "Map.h"
-#include "MotionMaster.h"
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
-#include "SpellScript.h"
+#include "InstanceScript.h"
+#include "MotionMaster.h"
 #include "TemporarySummon.h"
+#include "MapInstanced.h"
+#include "blackwing_descent.h"
 
 enum Spells
 {
@@ -981,7 +981,7 @@ class spell_maloriak_flash_freeze_targeting : public SpellScript
         if (targets.size() <= 1)
             return;
 
-        targets.remove_if(Trinity::Predicates::IsVictimOf(GetCaster()));
+        targets.remove_if(Firelands::Predicates::IsVictimOf(GetCaster()));
 
         if (targets.empty())
             return;
@@ -1000,7 +1000,7 @@ class spell_maloriak_flash_freeze_targeting : public SpellScript
         });
 
         if (!targets.empty())
-            Trinity::Containers::RandomResize(targets, 1);
+            Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleDummyEffect(SpellEffIndex effIndex)
@@ -1070,10 +1070,10 @@ class spell_maloriak_release_experiments : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::UnitAuraCheck(false, SPELL_DROWNED_STATE));
+        targets.remove_if(Firelands::UnitAuraCheck(false, SPELL_DROWNED_STATE));
 
         if (!targets.empty() && GetSpellInfo()->Id == SPELL_RELEASE_ABERRATIONS)
-            Trinity::Containers::RandomResize(targets, 3);
+            Firelands::Containers::RandomResize(targets, 3);
     }
 
     void HandleDummyEffect(SpellEffIndex /*effIndex*/)

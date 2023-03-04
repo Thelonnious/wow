@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -139,7 +139,7 @@ public:
         handler->PSendSysMessage("gridloc [%i, %i]", gy, gx);
 
         // calculate navmesh tile location
-        uint32 terrainMapId = PhasingHandler::GetTerrainMapId(player->GetPhaseShift(), player->GetMapId(), player->GetMap()->GetTerrain(), x, y);
+        uint32 terrainMapId = PhasingHandler::GetTerrainMapId(player->GetPhaseShift(), player->GetMap(), x, y);
         dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(terrainMapId);
         dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMeshQuery(terrainMapId, player->GetInstanceId());
         if (!navmesh || !navmeshquery)
@@ -190,7 +190,7 @@ public:
     static bool HandleMmapLoadedTilesCommand(ChatHandler* handler, char const* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
-        uint32 terrainMapId = PhasingHandler::GetTerrainMapId(player->GetPhaseShift(), player->GetMapId(), player->GetMap()->GetTerrain(), player->GetPositionX(), player->GetPositionY());
+        uint32 terrainMapId = PhasingHandler::GetTerrainMapId(player->GetPhaseShift(), player->GetMap(), player->GetPositionX(), player->GetPositionY());
         dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(terrainMapId);
         dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMeshQuery(terrainMapId, player->GetInstanceId());
         if (!navmesh || !navmeshquery)
@@ -216,7 +216,7 @@ public:
     static bool HandleMmapStatsCommand(ChatHandler* handler, char const* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
-        uint32 terrainMapId = PhasingHandler::GetTerrainMapId(player->GetPhaseShift(), player->GetMapId(), player->GetMap()->GetTerrain(), player->GetPositionX(), player->GetPositionY());
+        uint32 terrainMapId = PhasingHandler::GetTerrainMapId(player->GetPhaseShift(), player->GetMap(), player->GetPositionX(), player->GetPositionY());
         handler->PSendSysMessage("mmap stats:");
         handler->PSendSysMessage("  global mmap pathfinding is %sabled", DisableMgr::IsPathfindingEnabled(player->GetMapId()) ? "en" : "dis");
 
@@ -269,8 +269,8 @@ public:
 
         // Get Creatures
         std::list<Creature*> creatureList;
-        Trinity::AnyUnitInObjectRangeCheck go_check(object, radius);
-        Trinity::CreatureListSearcher<Trinity::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
+        Firelands::AnyUnitInObjectRangeCheck go_check(object, radius);
+        Firelands::CreatureListSearcher<Firelands::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
         Cell::VisitGridObjects(object, go_search, radius);
 
         if (!creatureList.empty())

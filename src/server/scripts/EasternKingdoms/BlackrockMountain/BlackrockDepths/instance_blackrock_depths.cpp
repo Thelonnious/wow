@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -189,7 +189,7 @@ public:
 
         void SetGuidData(uint32 type, ObjectGuid data) override
         {
-            TC_LOG_DEBUG("scripts", "Instance Blackrock Depths: SetGuidData update (Type: %u Data %s)", type, data.ToString().c_str());
+            LOG_DEBUG("scripts", "Instance Blackrock Depths: SetGuidData update (Type: %u Data %s)", type, data.ToString().c_str());
 
             switch (type)
             {
@@ -205,7 +205,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            TC_LOG_DEBUG("scripts", "Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
+            LOG_DEBUG("scripts", "Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
 
             switch (type)
             {

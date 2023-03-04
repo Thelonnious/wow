@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -116,7 +116,6 @@ enum PriestSpellIcons
     PRIEST_ICON_ID_IMPROVED_MIND_BLAST              = 95,
     PRIEST_ICON_ID_MIND_MELT                        = 3139,
     PRIEST_ICON_ID_SHADOW_ORB                       = 4941,
-    PRIEST_ICON_ID_GLYPH_OF_PSYCHIC_SCREAM          = 1488,
     PRIEST_ICON_ID_GLYPH_OF_SHADOW_WORD_DEATH       = 1980,
     PRIEST_ICON_ID_IMPROVED_DEVOURING_PLAGUE        = 3790
 };
@@ -215,7 +214,7 @@ class spell_pri_circle_of_healing : public SpellScript
 
         if (targets.size() > maxTargets)
         {
-            targets.sort(Trinity::HealthPctOrderPred());
+            targets.sort(Firelands::HealthPctOrderPred());
             targets.resize(maxTargets);
         }
     }
@@ -328,7 +327,7 @@ class spell_pri_divine_hymn : public SpellScript
 
         if (targets.size() > maxTargets)
         {
-            targets.sort(Trinity::HealthPctOrderPred());
+            targets.sort(Firelands::HealthPctOrderPred());
             targets.resize(maxTargets);
         }
     }
@@ -461,7 +460,7 @@ class spell_pri_hymn_of_hope : public SpellScript
 
         if (targets.size() > maxTargets)
         {
-            targets.sort(Trinity::PowerPctOrderPred(POWER_MANA));
+            targets.sort(Firelands::PowerPctOrderPred(POWER_MANA));
             targets.resize(maxTargets);
         }
     }
@@ -549,7 +548,7 @@ class spell_pri_mind_sear : public SpellScript
 {
     void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        unitList.remove_if(Trinity::ObjectGUIDCheck(GetCaster()->GetChannelObjectGuid()));
+        unitList.remove_if(Firelands::ObjectGUIDCheck(GetCaster()->GetChannelObjectGuid()));
     }
 
     void Register() override
@@ -1606,7 +1605,7 @@ class spell_pri_atonement_heal : public SpellScript
 
         if (targets.size() > 1)
         {
-            targets.sort(Trinity::HealthPctOrderPred());
+            targets.sort(Firelands::HealthPctOrderPred());
             targets.resize(1);
         }
     }
@@ -1777,7 +1776,7 @@ class spell_pri_harnessed_shadows : public AuraScript
     }
 };
 
-// 2944 - Devouring Plague 
+// 2944 - Devouring Plague
 class spell_pri_devouring_plague : public AuraScript
 {
     bool Validate(SpellInfo const* /*spellInfo*/) override
@@ -1802,21 +1801,6 @@ class spell_pri_devouring_plague : public AuraScript
     void Register() override
     {
         AfterEffectApply.Register(&spell_pri_devouring_plague::AfterApply, EFFECT_0, SPELL_AURA_PERIODIC_LEECH, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-    }
-};
-
-// 8122 - Psychic Scream
-class spell_pri_psychic_scream : public SpellScript
-{
-    void FilterGlyphTargets(std::list<WorldObject*>& targets)
-    {
-        if (!GetCaster()->GetDummyAuraEffect(SPELLFAMILY_PRIEST, PRIEST_ICON_ID_GLYPH_OF_PSYCHIC_SCREAM, EFFECT_0))
-            targets.clear();
-    }
-
-    void Register() override
-    {
-        OnObjectAreaTargetSelect.Register(&spell_pri_psychic_scream::FilterGlyphTargets, EFFECT_2, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1856,7 +1840,6 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_pain_and_suffering_proc);
     RegisterSpellScript(spell_pri_penance);
     RegisterSpellScript(spell_pri_phantasm);
-    RegisterSpellScript(spell_pri_psychic_scream);
     RegisterSpellScript(spell_power_word_barrier);
     RegisterSpellAndAuraScriptPair(spell_pri_power_word_shield, spell_pri_power_word_shield_AuraScript);
     RegisterSpellScript(spell_pri_prayer_of_mending_heal);

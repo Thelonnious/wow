@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -23,6 +23,7 @@
 #include "Map.h"
 #include "MotionMaster.h"
 #include "TemporarySummon.h"
+#include "WorldStatePackets.h"
 #include "vortex_pinnacle.h"
 
 #define MAX_ENCOUNTER 3
@@ -223,6 +224,11 @@ class instance_vortex_pinnacle : public InstanceMapScript
                             break;
                     }
                 }
+            }
+
+            void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& data) override
+            {
+                data.Worldstates.emplace_back(uint32(WS_GOLDEN_ORBS_COLLECTED), uint32(_collectedGoldenOrbs));
             }
 
             void WriteSaveDataMore(std::ostringstream& data) override

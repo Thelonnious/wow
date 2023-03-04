@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -473,7 +473,7 @@ public:
                 DrinkInturrupted = true;
         }
 
-        void SpellHit(WorldObject* /*pAttacker*/, SpellInfo const* Spell) override
+        void SpellHit(Unit* /*pAttacker*/, SpellInfo const* Spell) override
         {
             //We only care about interrupt effects and only if they are durring a spell currently being cast
             if ((Spell->Effects[0].Effect != SPELL_EFFECT_INTERRUPT_CAST &&

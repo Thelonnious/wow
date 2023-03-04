@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -76,25 +76,23 @@ struct npc_pet_mage_mirror_image : ScriptedAI
         me->FollowTarget(summoner);
     }
 
-    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
-        if (spell->Id == SPELL_INHERIT_MASTERS_THREAT_LIST && target->IsUnit())
+        if (spell->Id == SPELL_INHERIT_MASTERS_THREAT_LIST)
         {
             Unit* summoner = me->ToTempSummon()->GetSummoner();
             if (!summoner)
                 return;
 
-            Unit* unitTarget = target->ToUnit();
-
-            if (unitTarget->IsInCombatWith(summoner))
+            if (target->IsInCombatWith(summoner))
             {
-                AddThreat(me, unitTarget->GetThreatManager().GetThreat(summoner), unitTarget);
-                me->EngageWithTarget(unitTarget);
+                AddThreat(me, target->GetThreatManager().GetThreat(summoner), target);
+                me->EngageWithTarget(target);
             }
         }
     }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_INITIALIZE_IMAGES)
         {

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -27,6 +27,7 @@
 #include "TemporarySummon.h"
 #include "Transport.h"
 #include "TransportMgr.h"
+#include "WorldStatePackets.h"
 
 Position const JainaSpawnPos           = { 5236.659f, 1929.894f, 707.7781f, 0.8726646f }; // Jaina Spawn Position
 Position const SylvanasSpawnPos        = { 5236.667f, 1929.906f, 707.7781f, 0.8377581f }; // Sylvanas Spawn Position (sniffed)
@@ -293,6 +294,12 @@ class instance_halls_of_reflection : public InstanceMapScript
                 }
             }
 
+            void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& data) override
+            {
+                data.Worldstates.emplace_back(uint32(WORLD_STATE_HOR_WAVES_ENABLED), uint32(_introState == DONE && GetBossState(DATA_MARWYN) != DONE));
+                data.Worldstates.emplace_back(uint32(WORLD_STATE_HOR_WAVE_COUNT), uint32(_waveCount));
+            }
+
             bool SetBossState(uint32 type, EncounterState state) override
             {
                 if (!InstanceScript::SetBossState(type, state))
@@ -553,9 +560,9 @@ class instance_halls_of_reflection : public InstanceMapScript
                                 ObjectGuid bossGuid = i <= 3 ? FalricGUID : MarwynGUID;
 
                                 if (!i)
-                                    Trinity::Containers::RandomResize(tempList, 3);
+                                    Firelands::Containers::RandomResize(tempList, 3);
                                 else if (i < 6 && i != 3)
-                                    Trinity::Containers::RandomResize(tempList, 4);
+                                    Firelands::Containers::RandomResize(tempList, 4);
 
                                 for (uint32 entry : tempList)
                                 {

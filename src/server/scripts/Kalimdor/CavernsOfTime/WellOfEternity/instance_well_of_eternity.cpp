@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,21 +21,17 @@
 
 ObjectData const creatureData[] =
 {
-    { NPC_PEROTHARN,    BOSS_PEROTHARN  },
-    { 0,                0               } // END
+    { 0, 0  } // END
 };
 
 ObjectData const gameobjectData[] =
 {
-    { GO_WOE_COURTYARD_DOOR01,  DATA_WOE_COURTYARD_DOOR01   },
-    { 0,                        0                           } // END
+    { 0, 0 } // END
 };
 
 DoorData const doorData[] =
 {
-    { GO_LARGE_FIREWALL_DOOR,   BOSS_PEROTHARN, DOOR_TYPE_ROOM },
-    { GO_SMALL_FIREWALL_DOOR,   BOSS_PEROTHARN, DOOR_TYPE_ROOM },
-    { 0,                        0,              DOOR_TYPE_ROOM } // END
+    { 0, 0, DOOR_TYPE_ROOM } // END
 };
 
 class instance_well_of_eternity : public InstanceMapScript

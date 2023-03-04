@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,7 +16,7 @@
  */
 
 /* To-do: */
-// - AreaTrigger: unknown purpose (id: 1843; pos: front-right stairs) - dust animation, aggro snakes? 
+// - AreaTrigger: unknown purpose (id: 1843; pos: front-right stairs) - dust animation, aggro snakes?
 
 #include "halls_of_origination.h"
 #include "ScriptMgr.h"
@@ -35,7 +35,7 @@ enum Texts
 {
     SAY_AGGRO                    = 0,
     SAY_SHIELD                   = 1,
-    EMOTE_SHIELD                 = 2, 
+    EMOTE_SHIELD                 = 2,
     EMOTE_SHIELD_REMOVED         = 3,
     SAY_KILL                     = 4,
     SAY_DEATH                    = 5
@@ -105,7 +105,7 @@ struct boss_temple_guardian_anhuur : public BossAI
     {
         BossAI::JustEngagedWith(who);
         instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-        instance->DoUpdateWorldState(WORLD_STATE_ID_I_HATE_THAT_SONG, 0);
+        instance->instance->SetWorldState(WORLD_STATE_ID_I_HATE_THAT_SONG, 0);
         Talk(SAY_AGGRO);
         events.SetPhase(PHASE_FIGHT);
         events.ScheduleEvent(EVENT_DIVINE_RECKONING, 10s, 0, PHASE_FIGHT);
@@ -235,7 +235,7 @@ struct boss_temple_guardian_anhuur : public BossAI
                     instance->SetData(DATA_HANDLE_BEAM_OF_LIGHT, IN_PROGRESS);
                     break;
                 case EVENT_ACHIEVEMENT_FAILED:
-                    instance->DoUpdateWorldState(WORLD_STATE_ID_I_HATE_THAT_SONG, 1);
+                    instance->instance->SetWorldState(WORLD_STATE_ID_I_HATE_THAT_SONG, 1);
                     break;
                 default:
                     break;
@@ -258,16 +258,16 @@ struct boss_temple_guardian_anhuur : public BossAI
 
         std::list<Creature*> stalkers;
         GetCreatureListWithEntryInGrid(stalkers, me, NPC_CAVE_IN_STALKER, 100.0f);
-        stalkers.remove_if(Trinity::HeightDifferenceCheck(door, 5.0f, true));
+        stalkers.remove_if(Firelands::HeightDifferenceCheck(door, 5.0f, true));
         if (stalkers.empty())
             return;
 
-        stalkers.sort(Trinity::ObjectDistanceOrderPred(target));
+        stalkers.sort(Firelands::ObjectDistanceOrderPred(target));
 
         // Get the closest statue face (any of its eyes)
         Creature* eye1 = stalkers.front();
         stalkers.remove(eye1); // Remove the eye.
-        stalkers.sort(Trinity::ObjectDistanceOrderPred(eye1)); // Find the second eye.
+        stalkers.sort(Firelands::ObjectDistanceOrderPred(eye1)); // Find the second eye.
         Creature* eye2 = stalkers.front();
 
         eye1->CastSpell(eye1, SPELL_BURNING_LIGHT_SEAR, true);
@@ -316,7 +316,7 @@ struct go_anhuur_beacon_of_light : public GameObjectAI
         me->SendCustomAnim(0);
         me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
         me->DespawnOrUnsummon(1s + 200ms, 5s);
-        me->CastSpell(nullptr, me->GetGOInfo()->goober.spell);
+        me->CastSpell(nullptr, me->GetGOInfo()->goober.spellId);
         return true;
     }
 };
@@ -347,7 +347,7 @@ class spell_anhuur_shield_of_light : public SpellScript
             return;
 
         targets.remove(GetCaster());
-        targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+        targets.sort(Firelands::ObjectDistanceOrderPred(GetCaster()));
 
         if (targets.size() > 2)
             targets.resize(2);
@@ -387,14 +387,9 @@ class spell_anhuur_disable_beacon_beams : public SpellScript
 
     void Notify(SpellEffIndex /*index*/)
     {
-        GameObject* caster = GetGObjCaster();
-        if (!caster)
-            return;
-
-        if (InstanceScript* instance = caster->GetInstanceScript())
-            if (Creature* anhuur = instance->GetCreature(DATA_TEMPLE_GUARDIAN_ANHUUR))
-                if (CreatureAI* ai = anhuur->AI())
-                    ai->DoAction(GetEffectValue() == SPELL_BEAM_OF_LIGHT_LEFT ? ACTION_DISABLE_BEACON_L : ACTION_DISABLE_BEACON_R);
+        if (InstanceScript * instance = GetCaster()->GetInstanceScript())
+            if (Creature * anhuur = instance->GetCreature(DATA_TEMPLE_GUARDIAN_ANHUUR))
+                anhuur->AI()->DoAction(GetEffectValue() == SPELL_BEAM_OF_LIGHT_LEFT ? ACTION_DISABLE_BEACON_L : ACTION_DISABLE_BEACON_R);
     }
 
     void Register() override
@@ -418,7 +413,7 @@ class spell_anhuur_burning_light_forcecast : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override
