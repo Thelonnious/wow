@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -109,7 +109,7 @@ struct ChaseAngle
 inline bool IsInvalidMovementGeneratorType(uint8 const type) { return type == MAX_DB_MOTION_TYPE || type >= MAX_MOTION_TYPE; }
 inline bool IsInvalidMovementSlot(uint8 const slot) { return slot >= MAX_MOTION_SLOT; }
 
-class TC_GAME_API MotionMaster
+class FC_GAME_API MotionMaster
 {
     public:
         explicit MotionMaster(Unit* unit) : _owner(unit), _top(-1), _cleanFlag(MMCF_NONE)
@@ -147,7 +147,7 @@ class TC_GAME_API MotionMaster
 
         void MoveIdle();
         void MoveTargetedHome();
-        void MoveRandom(float wanderDistance = 0.0f);
+        void MoveRandom(float spawndist = 0.0f);
         void MoveFollow(Unit* target, float dist, float angle, bool joinFormation = false, bool catchUpToTarget = false, bool faceTarget = false, MovementSlot slot = MOTION_SLOT_IDLE);
 
         void MoveChase(Unit* target, float dist = 0.f, Optional<ChaseAngle> angle = {});

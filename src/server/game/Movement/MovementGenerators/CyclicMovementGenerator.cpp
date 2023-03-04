@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -90,7 +90,7 @@ bool CyclicMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 diff
         if (_moveTimer.Passed())
         {
             _moveTimer.Reset(0);
-            StartMovement(creature); 
+            StartMovement(creature);
         }
     }
 

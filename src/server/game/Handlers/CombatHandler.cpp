@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -70,7 +70,7 @@ void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& se
 {
     if (setSheathed.CurrentSheathState >= MAX_SHEATH_STATE)
     {
-        TC_LOG_ERROR("network", "Player %s tried to change his sheath state to an unknown value (%u)", _player->GetGUID().ToString().c_str(), setSheathed.CurrentSheathState);
+        LOG_ERROR("network", "Player %s tried to change his sheath state to an unknown value (%u)", _player->GetGUID().ToString().c_str(), setSheathed.CurrentSheathState);
         return;
     }
 

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,7 +17,6 @@
 
 #include "GossipDef.h"
 #include "Formulas.h"
-#include "NPCPackets.h"
 #include "ObjectMgr.h"
 #include "QuestDef.h"
 #include "QuestPackets.h"
@@ -34,27 +33,27 @@ GossipMenu::~GossipMenu()
     ClearMenu();
 }
 
-uint32 GossipMenu::AddMenuItem(int32 menuItemId, GossipOptionIcon icon, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded /*= false*/)
+uint32 GossipMenu::AddMenuItem(int32 optionIndex, uint8 icon, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded /*= false*/)
 {
     ASSERT(_menuItems.size() <= GOSSIP_MAX_MENU_ITEMS);
 
     // Find a free new id - script case
-    if (menuItemId == -1)
+    if (optionIndex == -1)
     {
-        menuItemId = 0;
+        optionIndex = 0;
         if (!_menuItems.empty())
         {
             for (GossipMenuItemContainer::const_iterator itr = _menuItems.begin(); itr != _menuItems.end(); ++itr)
             {
-                if (int32(itr->first) > menuItemId)
+                if (int32(itr->first) > optionIndex)
                     break;
 
-                menuItemId = itr->first + 1;
+                optionIndex = itr->first + 1;
             }
         }
     }
 
-    GossipMenuItem& menuItem = _menuItems[menuItemId];
+    GossipMenuItem& menuItem = _menuItems[optionIndex];
 
     menuItem.MenuItemIcon    = icon;
     menuItem.Message         = message;
@@ -63,8 +62,7 @@ uint32 GossipMenu::AddMenuItem(int32 menuItemId, GossipOptionIcon icon, std::str
     menuItem.OptionType      = action;
     menuItem.BoxMessage      = boxMessage;
     menuItem.BoxMoney        = boxMoney;
-
-    return menuItemId;
+    return optionIndex;
 }
 
 /**
@@ -126,8 +124,8 @@ void GossipMenu::AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, ui
         }
 
         /// Add menu item with existing method. Menu item id -1 is also used in ADD_GOSSIP_ITEM macro.
-        uint32 newOptionId = AddMenuItem(-1, itr->second.OptionIcon, strOptionText, sender, action, strBoxText, itr->second.BoxMoney, itr->second.BoxCoded);
-        AddGossipMenuItemData(newOptionId, itr->second.ActionMenuID, itr->second.ActionPoiID);
+        uint32 optionIndex = AddMenuItem(-1, itr->second.OptionIcon, strOptionText, sender, action, strBoxText, itr->second.BoxMoney, itr->second.BoxCoded);
+        AddGossipMenuItemData(optionIndex, itr->second.ActionMenuID, itr->second.ActionPoiID);
     }
 }
 
@@ -203,51 +201,58 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID)
     _interactionData.Reset();
     _interactionData.SourceGuid = objectGUID;
 
-    WorldPackets::NPC::GossipMessage gossipMessage;
-    gossipMessage.GossipGUID = objectGUID;
-    gossipMessage.GossipID = _gossipMenu.GetMenuId();
-    gossipMessage.TextID = titleTextId;
+    WorldPacket data(SMSG_GOSSIP_MESSAGE, 100);         // guess size
+    data << uint64(objectGUID);
+    data << uint32(_gossipMenu.GetMenuId());            // new 2.4.0
+    data << uint32(titleTextId);
+    data << uint32(_gossipMenu.GetMenuItemCount());     // max count 0x10
 
-    gossipMessage.GossipOptions.reserve(_gossipMenu.GetMenuItems().size());
-    for (auto const& itr : _gossipMenu.GetMenuItems())
+    for (GossipMenuItemContainer::const_iterator itr = _gossipMenu.GetMenuItems().begin(); itr != _gossipMenu.GetMenuItems().end(); ++itr)
     {
-        WorldPackets::NPC::SGossipOptions& option = gossipMessage.GossipOptions.emplace_back();
-        option.ClientOption = itr.first;
-        option.OptionNPC = itr.second.MenuItemIcon;
-        option.OptionFlags = itr.second.IsCoded;     // makes pop up box password
-        option.OptionCost = itr.second.BoxMoney;     // money required to open menu, 2.0.3
-        option.Text = itr.second.Message;            // text for gossip item
-        option.Confirm = itr.second.BoxMessage;      // accept text (related to money) pop up box, 2.0.3
+        GossipMenuItem const& item = itr->second;
+        data << uint32(itr->first);
+        data << uint8(item.MenuItemIcon);
+        data << uint8(item.IsCoded);                    // makes pop up box password
+        data << uint32(item.BoxMoney);                  // money required to open menu, 2.0.3
+        data << item.Message;                           // text for gossip item
+        data << item.BoxMessage;                        // accept text (related to money) pop up box, 2.0.3
     }
+
+    size_t count_pos = data.wpos();
+    data << uint32(0);                                  // max count 0x20
+    uint32 count = 0;
 
     // Store this instead of checking the Singleton every loop iteration
     bool questLevelInTitle = sWorld->getBoolConfig(CONFIG_UI_QUESTLEVELS_IN_DIALOGS);
 
-    gossipMessage.GossipQuestText.reserve(_questMenu.GetQuestMenuItems().size());
-    for (auto const& itr : _questMenu.GetQuestMenuItems())
+    for (uint8 i = 0; i < _questMenu.GetMenuItemCount(); ++i)
     {
-        Quest const* quest = sObjectMgr->GetQuestTemplate(itr.QuestId);
-        if (!quest)
-            continue;
+        QuestMenuItem const& item = _questMenu.GetItem(i);
+        uint32 questID = item.QuestId;
+        if (Quest const* quest = sObjectMgr->GetQuestTemplate(questID))
+        {
+            ++count;
+            data << uint32(questID);
+            data << uint32(item.QuestIcon);
+            data << int32(quest->GetQuestLevel());
+            data << uint32(quest->GetFlags()); // 3.3.3 quest flags
+            data << uint8(quest->IsAutoComplete() && quest->IsRepeatable() && !quest->IsDailyOrWeekly() && !quest->IsMonthly()); // 3.3.3 icon changes - 0: yellow exclapamtion mark, 1: blue question mark
+            std::string title = quest->GetTitle();
 
-        WorldPackets::NPC::GossipText& text = gossipMessage.GossipQuestText.emplace_back();
-        text.QuestID = itr.QuestId;
-        text.QuestType = itr.QuestIcon;
-        text.QuestFlags = quest->GetFlags();
-        text.QuestLevel = quest->GetQuestLevel();
-        text.Repeatable = quest->IsAutoComplete() && quest->IsRepeatable() && !quest->IsDailyOrWeekly() && !quest->IsMonthly();
+            LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
+            if (localeConstant != LOCALE_enUS)
+                if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(questID))
+                    ObjectMgr::GetLocaleString(localeData->Title, localeConstant, title);
 
-        text.QuestTitle = quest->GetTitle();
-        LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
-        if (localeConstant != LOCALE_enUS)
-            if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(itr.QuestId))
-                ObjectMgr::GetLocaleString(localeData->Title, localeConstant, text.QuestTitle);
+            if (questLevelInTitle)
+                Quest::AddQuestLevelToTitle(title, quest->GetQuestLevel());
 
-        if (questLevelInTitle)
-            Quest::AddQuestLevelToTitle(text.QuestTitle, quest->GetQuestLevel());
+            data << title;                                  // max 0x200
+        }
     }
 
-    _session->SendPacket(gossipMessage.Write());
+    data.put<uint8>(count_pos, count);
+    _session->SendPacket(&data);
 }
 
 void PlayerMenu::SendCloseGossip()
@@ -263,7 +268,7 @@ void PlayerMenu::SendPointOfInterest(uint32 id) const
     PointOfInterest const* poi = sObjectMgr->GetPointOfInterest(id);
     if (!poi)
     {
-        TC_LOG_ERROR("sql.sql", "Request to send non-existing POI (Id: %u), ignored.", id);
+        LOG_ERROR("sql.sql", "Request to send non-existing POI (Id: %u), ignored.", id);
         return;
     }
 
@@ -379,7 +384,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, const std::string
     }
 
     _session->SendPacket(questList.Write());
-    TC_LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_GIVER_QUEST_LIST_MESSAGE (QuestGiverGUID: %s)", guid.ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_GIVER_QUEST_LIST_MESSAGE (QuestGiverGUID: %s)", guid.ToString().c_str());
 }
 
 void PlayerMenu::SendQuestGiverStatus(uint32 questStatus, ObjectGuid npcGUID) const
@@ -389,7 +394,7 @@ void PlayerMenu::SendQuestGiverStatus(uint32 questStatus, ObjectGuid npcGUID) co
     packet.QuestGiver.Status = questStatus;
 
     _session->SendPacket(packet.Write());
-    TC_LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_GIVER_STATUS Guid = %s, Status = %u", npcGUID.ToString().c_str(), questStatus);
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_GIVER_STATUS Guid = %s, Status = %u", npcGUID.ToString().c_str(), questStatus);
 }
 
 void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGUID, bool autoLaunched, bool displayPopup) const
@@ -446,7 +451,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
 
     _session->SendPacket(packet.Write());
 
-    TC_LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS NPC=%s, questid=%u", npcGUID.ToString().c_str(), quest->GetQuestId());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS NPC=%s, questid=%u", npcGUID.ToString().c_str(), quest->GetQuestId());
 }
 
 void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
@@ -459,7 +464,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
         _session->SendPacket(&queryPacket);
     }
 
-    TC_LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid=%u", quest->GetQuestId());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid=%u", quest->GetQuestId());
 }
 
 void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUID, bool autoLaunched) const
@@ -595,5 +600,5 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, ObjectGuid npcGU
     packet.StatusFlags[4] = QUEST_STATUS_FLAG_UNK_7;
 
     _session->SendPacket(packet.Write());
-    TC_LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_GIVER_REQUEST_ITEMS NPC=%s, questid=%u", npcGUID.ToString().c_str(), quest->GetQuestId());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_GIVER_REQUEST_ITEMS NPC=%s, questid=%u", npcGUID.ToString().c_str(), quest->GetQuestId());
 }

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -104,7 +104,7 @@ float const TRIANGLE_TOP_Z  = 654.7143f;
 static uint8 const MaxStormTargetTrios = 13;
 static uint8 const MaxStormTargetTrianglePoints = 3;
 
-static std::array<Position, 39> StormTargetSummonPositions = 
+static std::array<Position, 39> StormTargetSummonPositions =
 {
     Position(-633.771f, 490.976f, TRIANGLE_Z, 3.141593f),
     Position(-625.688f, 501.934f, TRIANGLE_Z, 3.141593f),
@@ -686,7 +686,7 @@ class spell_asaad_supremacy_of_the_storm_visual: public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 5);
+        Firelands::Containers::RandomResize(targets, 5);
     }
 
     void Register() override

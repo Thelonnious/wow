@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2022 Firelands <https://github.com/FirelandsProject/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -129,40 +129,6 @@ namespace WorldPackets
             uint8 Reason = 0;
             std::vector<VendorItem> Items;
             ObjectGuid Vendor;
-        };
-
-        struct GossipText
-        {
-            int32 QuestID = 0;
-            int32 QuestType = 0;
-            int32 QuestLevel = 0;
-            int32 QuestFlags = 0;
-            std::string QuestTitle;
-            bool Repeatable = false;
-        };
-
-        struct SGossipOptions
-        {
-            int32 ClientOption = 0;
-            int32 OptionCost = 0;
-            uint8 OptionNPC = 0;
-            int8 OptionFlags = 0;
-            std::string Text;
-            std::string Confirm;
-        };
-
-        class GossipMessage final : public ServerPacket
-        {
-        public:
-            GossipMessage() : ServerPacket(SMSG_GOSSIP_MESSAGE, 100) { }
-
-            WorldPacket const* Write() override;
-
-            ObjectGuid GossipGUID;
-            int32 TextID = 0;
-            int32 GossipID = 0;
-            std::vector<SGossipOptions> GossipOptions;
-            std::vector<GossipText> GossipQuestText;
         };
     }
 }

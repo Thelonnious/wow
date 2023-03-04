@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,9 +21,9 @@
 #include "Object.h"
 #include "SharedDefines.h"
 
-Trinity::Predicates::IsVictimOf::IsVictimOf(Unit const* attacker) : _victim(attacker ? attacker->GetVictim() : nullptr) { }
+Firelands::Predicates::IsVictimOf::IsVictimOf(Unit const* attacker) : _victim(attacker ? attacker->GetVictim() : nullptr) { }
 
-bool Trinity::Predicates::HasPhaseId::operator()(WorldObject const* obj) const
+bool Firelands::Predicates::HasPhaseId::operator()(WorldObject const* obj) const
 {
     return obj->GetPhaseShift().HasPhase(_phaseId);
 }

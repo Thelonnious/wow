@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -47,7 +47,7 @@ void ArchaeologyMgr::LoadData()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 archaeology sites. DB table `archaeology_site` is empty!");
+        LOG_INFO("server.loading", ">> Loaded 0 archaeology sites. DB table `archaeology_site` is empty!");
         return;
     }
 
@@ -90,7 +90,7 @@ void ArchaeologyMgr::LoadData()
     }
     while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u archaeology sites in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded %u archaeology sites in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 
     oldMSTime = getMSTime();
     count = 0;
@@ -110,7 +110,7 @@ void ArchaeologyMgr::LoadData()
 
                 if (_polygonMap[site])
                 {
-                    TC_LOG_ERROR("server.loading", "Archaeology: Tried to overwrite polygonData of site %u", site);
+                    LOG_ERROR("server.loading", "Archaeology: Tried to overwrite polygonData of site %u", site);
                     break;
                 }
 
@@ -123,7 +123,7 @@ void ArchaeologyMgr::LoadData()
                     entry = sQuestPOIPointStore.LookupEntry(++i);
                     if (poiRel != entry->QuestPOIBlobID)
                     {
-                        TC_LOG_ERROR("server.loading", "Archaeology: Tried to use POI %u not related to site %u", entry->ID, poiRel);
+                        LOG_ERROR("server.loading", "Archaeology: Tried to use POI %u not related to site %u", entry->ID, poiRel);
                         break;
                     }
 
@@ -144,9 +144,9 @@ void ArchaeologyMgr::LoadData()
     }
 
     for (std::list<std::pair<uint16, uint32> >::iterator itr = sites.begin(); itr != sites.end(); itr++)
-        TC_LOG_ERROR("player.skills", "Archaeology: SiteEntry:%u links at POIBlob:%u which does not exist", itr->first, itr->second);
+        LOG_ERROR("player.skills", "Archaeology: SiteEntry:%u links at POIBlob:%u which does not exist", itr->first, itr->second);
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u archaeology site polygons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded %u archaeology site polygons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 
     oldMSTime = getMSTime();
     count = 0;
@@ -167,7 +167,7 @@ void ArchaeologyMgr::LoadData()
             _branchMap[branchId] = branch;
         }
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u archaeology branches in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded %u archaeology branches in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 
     oldMSTime = getMSTime();
     count = 0;
@@ -177,7 +177,7 @@ void ArchaeologyMgr::LoadData()
     result = WorldDatabase.Query("SELECT Entry, Branch, Rarity, ReqSkill, Fragments, Keystone, Spell FROM archaeology_projects");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 archaeology projects. DB table `archaeology_projects` is empty!");
+        LOG_INFO("server.loading", ">> Loaded 0 archaeology projects. DB table `archaeology_projects` is empty!");
         return;
     }
 
@@ -211,7 +211,7 @@ void ArchaeologyMgr::LoadData()
         ++count;
     }
     while (result->NextRow());
-    TC_LOG_INFO("server.loading", ">> Loaded %u archaeology projects in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded %u archaeology projects in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 
     oldMSTime = getMSTime();
     count = 0;
@@ -226,7 +226,7 @@ void ArchaeologyMgr::LoadData()
 
         ++count;
     }
-    TC_LOG_INFO("server.loading", ">> Calculated %u archaeology branch chances in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Calculated %u archaeology branch chances in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 bool ArchaeologyMgr::isSiteValid(SiteData* sites, uint16 entry)
@@ -280,7 +280,7 @@ bool ArchaeologyMgr::SetSiteCoords(SiteData &site)
 uint32 ArchaeologyMgr::GetSiteType(uint16 entry)
 {
     if (!_objectMap[entry])
-        TC_LOG_ERROR("player.skills", "Archaeology: Entry %u has no find object Type!", entry);
+        LOG_ERROR("player.skills", "Archaeology: Entry %u has no find object Type!", entry);
 
     return _objectMap[entry];
 }

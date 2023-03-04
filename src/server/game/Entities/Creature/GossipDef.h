@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_GOSSIP_H
-#define TRINITYCORE_GOSSIP_H
+#ifndef _FIRELANDS_GOSSIP_H
+#define _FIRELANDS_GOSSIP_H
 
 #include "Common.h"
 #include "ObjectGuid.h"
@@ -55,7 +55,7 @@ enum Gossip_Option
     GOSSIP_OPTION_MAX
 };
 
-enum GossipOptionIcon : uint8
+enum GossipOptionIcon
 {
     GOSSIP_ICON_CHAT                = 0,                    // white chat bubble
     GOSSIP_ICON_VENDOR              = 1,                    // brown bag
@@ -159,13 +159,13 @@ struct QuestMenuItem
 
 typedef std::vector<QuestMenuItem> QuestMenuItemList;
 
-class TC_GAME_API GossipMenu
+class FC_GAME_API GossipMenu
 {
     public:
         GossipMenu();
         ~GossipMenu();
 
-        uint32 AddMenuItem(int32 menuItemId, GossipOptionIcon icon, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded = false);
+        uint32 AddMenuItem(int32 menuItemId, uint8 icon, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded = false);
         void AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, uint32 action);
 
         void SetMenuId(uint32 menu_id) { _menuId = menu_id; }
@@ -173,7 +173,7 @@ class TC_GAME_API GossipMenu
         void SetLocale(LocaleConstant locale) { _locale = locale; }
         LocaleConstant GetLocale() const { return _locale; }
 
-        void AddGossipMenuItemData(uint32 menuItemId, uint32 gossipActionMenuId, uint32 gossipActionPoi);
+        void AddGossipMenuItemData(uint32 optionIndex, uint32 gossipActionMenuId, uint32 gossipActionPoi);
 
         uint32 GetMenuItemCount() const
         {
@@ -222,7 +222,7 @@ class TC_GAME_API GossipMenu
         LocaleConstant _locale;
 };
 
-class TC_GAME_API QuestMenu
+class FC_GAME_API QuestMenu
 {
     public:
         QuestMenu();
@@ -248,11 +248,6 @@ class TC_GAME_API QuestMenu
             return _questMenuItems[index];
         }
 
-        QuestMenuItemList const& GetQuestMenuItems() const
-        {
-            return _questMenuItems;
-        }
-
     private:
         QuestMenuItemList _questMenuItems;
 };
@@ -272,7 +267,7 @@ public:
     uint32 TrainerId;
 };
 
-class TC_GAME_API PlayerMenu
+class FC_GAME_API PlayerMenu
 {
     public:
         explicit PlayerMenu(WorldSession* session);

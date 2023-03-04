@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -164,7 +164,7 @@ DBCStorage <MountTypeEntry> sMountTypeStore(MountTypefmt);
 NameGenVectorArraysMap sGenNameVectoArraysMap;
 DBCStorage <NumTalentsAtLevelEntry> sNumTalentsAtLevelStore(NumTalentsAtLevelfmt);
 
-typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
+typedef std::array<std::vector<Firelands::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 NameValidationRegexContainer NamesProfaneValidators;
 NameValidationRegexContainer NamesReservedValidators;
 
@@ -277,7 +277,7 @@ DBCManager& DBCManager::Instance()
 
 static bool LoadDBC_assert_print(uint32 fsize, uint32 rsize, const std::string& filename)
 {
-    TC_LOG_ERROR("misc", "Size of '%s' set by format string (%u) not equal size of C++ structure (%u).", filename.c_str(), fsize, rsize);
+    LOG_ERROR("misc", "Size of '%s' set by format string (%u) not equal size of C++ structure (%u).", filename.c_str(), fsize, rsize);
 
     // ASSERT must fail after function call
     return false;
@@ -322,7 +322,7 @@ inline void LoadDBC(uint32& availableDbcLocales, StoreProblemList& errors, DBCSt
         if (FILE* f = fopen(dbcFilename.c_str(), "rb"))
         {
             std::ostringstream stream;
-            stream << dbcFilename << " exists, and has " << storage.GetFieldCount() << " field(s) (expected " << strlen(storage.GetFormat()) << "). Extracted file might be from wrong client version or a database-update has been forgotten. Search on forum for TCE00008 for more info.";
+            stream << dbcFilename << " exists, and has " << storage.GetFieldCount() << " field(s) (expected " << strlen(storage.GetFormat()) << "). Extracted file might be from wrong client version or a database-update has been forgotten. Search on forum for FCE00008 for more info.";
             std::string buf = stream.str();
             errors.push_back(buf);
             fclose(f);
@@ -593,10 +593,10 @@ void DBCManager::LoadStores(const std::string& dataPath, uint32 defaultLocale)
         ASSERT(conversionResult);
 
         if (namesProfanity->Language != -1)
-            NamesProfaneValidators[namesProfanity->Language].emplace_back(wname, Trinity::regex::icase | Trinity::regex::optimize);
+            NamesProfaneValidators[namesProfanity->Language].emplace_back(wname, Firelands::regex::icase | Firelands::regex::optimize);
         else
             for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
-                NamesProfaneValidators[i].emplace_back(wname, Trinity::regex::icase | Trinity::regex::optimize);
+                NamesProfaneValidators[i].emplace_back(wname, Firelands::regex::icase | Firelands::regex::optimize);
     }
 
     for (NamesReservedEntry const* namesReserved : sNamesReservedStore)
@@ -607,10 +607,10 @@ void DBCManager::LoadStores(const std::string& dataPath, uint32 defaultLocale)
         ASSERT(conversionResult);
 
         if (namesReserved->Language != -1)
-            NamesReservedValidators[namesReserved->Language].emplace_back(wname, Trinity::regex::icase | Trinity::regex::optimize);
+            NamesReservedValidators[namesReserved->Language].emplace_back(wname, Firelands::regex::icase | Firelands::regex::optimize);
         else
             for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
-                NamesReservedValidators[i].emplace_back(wname, Trinity::regex::icase | Trinity::regex::optimize);
+                NamesReservedValidators[i].emplace_back(wname, Firelands::regex::icase | Firelands::regex::optimize);
     }
 
     for (PhaseGroupEntry const* group : sPhaseGroupStore)
@@ -664,7 +664,7 @@ void DBCManager::LoadStores(const std::string& dataPath, uint32 defaultLocale)
             if (spellDiff->DifficultySpellID[x] <= 0 || !sSpellStore.LookupEntry(spellDiff->DifficultySpellID[x]))
             {
                 if (spellDiff->DifficultySpellID[x] > 0)//don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
-                    TC_LOG_ERROR("sql.sql", "spelldifficulty_dbc: spell %i at field id:%u at spellid%i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->DifficultySpellID[x], spellDiff->ID, x);
+                    LOG_ERROR("sql.sql", "spelldifficulty_dbc: spell %i at field id:%u at spellid%i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->DifficultySpellID[x], spellDiff->ID, x);
                 newEntry.DifficultySpellID[x] = 0;//spell was <= 0 or invalid, set to 0
             }
             else
@@ -789,7 +789,7 @@ void DBCManager::LoadStores(const std::string& dataPath, uint32 defaultLocale)
     // error checks
     if (bad_dbc_files.size() >= DBCFileCount)
     {
-        TC_LOG_ERROR("misc", "Incorrect DataDir value in worldserver.conf or ALL required *.dbc files (%d) not found by path: %sdbc/%s", DBCFileCount, dataPath.c_str(), localeNames[defaultLocale]);
+        LOG_ERROR("misc", "Incorrect DataDir value in worldserver.conf or ALL required *.dbc files (%d) not found by path: %sdbc/%s", DBCFileCount, dataPath.c_str(), localeNames[defaultLocale]);
         exit(1);
     }
     else if (!bad_dbc_files.empty())
@@ -798,7 +798,7 @@ void DBCManager::LoadStores(const std::string& dataPath, uint32 defaultLocale)
         for (StoreProblemList::iterator i = bad_dbc_files.begin(); i != bad_dbc_files.end(); ++i)
             str += *i + "\n";
 
-        TC_LOG_ERROR("misc", "Some required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFileCount, str.c_str());
+        LOG_ERROR("misc", "Some required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFileCount, str.c_str());
         exit(1);
     }
 
@@ -809,16 +809,16 @@ void DBCManager::LoadStores(const std::string& dataPath, uint32 defaultLocale)
         !sMapStore.LookupEntry(980)            ||     // last map added in 4.3.4 (15595)
         !sSpellStore.LookupEntry(121820)       )      // last spell added in 4.3.4 (15595)
     {
-        TC_LOG_ERROR("misc", "You have _outdated_ DBC files. Please extract correct versions from current using client.");
+        LOG_ERROR("misc", "You have _outdated_ DBC files. Please extract correct versions from current using client.");
         exit(1);
     }
 
-    TC_LOG_INFO("server.loading", ">> Initialized %d DBC data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Initialized %d DBC data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
 }
 
 std::string const& DBCManager::GetRandomCharacterName(uint8 race, uint8 gender)
 {
-    return Trinity::Containers::SelectRandomContainerElement(sGenNameVectoArraysMap[race].stringVectorArray[gender]);
+    return Firelands::Containers::SelectRandomContainerElement(sGenNameVectoArraysMap[race].stringVectorArray[gender]);
 }
 
 SimpleFactionsList const* DBCManager::GetFactionTeamList(uint32 faction)
@@ -955,19 +955,17 @@ bool DBCManager::IsTotemCategoryCompatibleWith(uint32 itemTotemCategoryId, uint3
     return (itemEntry->TotemCategoryMask & reqEntry->TotemCategoryMask) == reqEntry->TotemCategoryMask;
 }
 
-bool DBCManager::Zone2MapCoordinates(float& x, float& y, uint32 zone) const
+void DBCManager::Zone2MapCoordinates(float& x, float& y, uint32 zone)
 {
     WorldMapAreaEntry const* maEntry = sWorldMapAreaStore.LookupEntry(zone);
 
     // if not listed then map coordinates (instance)
     if (!maEntry)
-        return false;
+        return;
 
     std::swap(x, y);                                         // at client map coords swapped
     x = x * ((maEntry->LocBottom - maEntry->LocTop) / 100) + maEntry->LocTop;
     y = y * ((maEntry->LocRight - maEntry->LocLeft) / 100) + maEntry->LocLeft;      // client y coord from top to down
-
-    return true;
 }
 
 void DBCManager::Map2ZoneCoordinates(float& x, float& y, uint32 zone)
@@ -1280,7 +1278,7 @@ uint32 DBCManager::GetDefaultMapLight(uint32 mapId)
 
 std::vector<SkillLineAbilityEntry const*> const* DBCManager::GetSkillLineAbilitiesBySkill(uint32 skillId) const
 {
-    return Trinity::Containers::MapGetValuePtr(_skillLineAbilitiesBySkillupSkill, skillId);
+    return Firelands::Containers::MapGetValuePtr(_skillLineAbilitiesBySkillupSkill, skillId);
 }
 
 SkillRaceClassInfoEntry const* DBCManager::GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_)
@@ -1312,13 +1310,13 @@ ResponseCodes DBCManager::ValidateName(std::wstring const& name, LocaleConstant 
     if (locale >= TOTAL_LOCALES)
         return RESPONSE_FAILURE;
 
-    for (Trinity::wregex const& regex : NamesProfaneValidators[locale])
-        if (Trinity::regex_search(name, regex))
+    for (Firelands::wregex const& regex : NamesProfaneValidators[locale])
+        if (Firelands::regex_search(name, regex))
             return CHAR_NAME_PROFANE;
 
     // regexes at TOTAL_LOCALES are loaded from NamesReserved which is not locale specific
-    for (Trinity::wregex const& regex : NamesReservedValidators[locale])
-        if (Trinity::regex_search(name, regex))
+    for (Firelands::wregex const& regex : NamesReservedValidators[locale])
+        if (Firelands::regex_search(name, regex))
             return CHAR_NAME_RESERVED;
 
     return CHAR_NAME_SUCCESS;

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_CREATURE_TEXT_MGR_H
-#define TRINITY_CREATURE_TEXT_MGR_H
+#ifndef FIRELANDS_CREATURE_TEXT_MGR_H
+#define FIRELANDS_CREATURE_TEXT_MGR_H
 
 #include "Common.h"
 #include "SharedDefines.h"
@@ -89,7 +89,7 @@ typedef std::unordered_map<uint32, CreatureTextHolder> CreatureTextMap;     // a
 
 typedef std::map<CreatureTextId, CreatureTextLocale> LocaleCreatureTextMap;
 
-class TC_GAME_API CreatureTextMgr
+class FC_GAME_API CreatureTextMgr
 {
     private:
         CreatureTextMgr() { }

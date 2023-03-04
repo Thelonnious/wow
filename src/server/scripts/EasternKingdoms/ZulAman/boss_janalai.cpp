@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -562,7 +562,7 @@ class spell_janalai_hatch_eggs : public SpellScript
         if (targets.empty())
             return;
 
-        targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+        targets.sort(Firelands::ObjectDistanceOrderPred(GetCaster()));
 
         if (targets.size() > 3)
             targets.resize(3);

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -23,7 +23,6 @@
 #include "GameTime.h"
 #include "Log.h"
 #include "Opcodes.h"
-#include "MiscPackets.h"
 #include "Player.h"
 #include "Random.h"
 #include "ScriptMgr.h"
@@ -39,7 +38,7 @@ Weather::Weather(uint32 zone, WeatherData const* weatherChances)
     m_type = WEATHER_TYPE_FINE;
     m_grade = 0;
 
-    TC_LOG_INFO("misc", "WORLD: Starting weather system for zone %u (change every %u minutes).", m_zone, (uint32)(m_timer.GetInterval() / (MINUTE*IN_MILLISECONDS)));
+    LOG_INFO("misc", "WORLD: Starting weather system for zone %u (change every %u minutes).", m_zone, (uint32)(m_timer.GetInterval() / (MINUTE*IN_MILLISECONDS)));
 }
 
 /// Launch a weather update
@@ -100,7 +99,7 @@ bool Weather::ReGenerate()
 
     static char const* seasonName[WEATHER_SEASONS] = { "spring", "summer", "fall", "winter" };
 
-    TC_LOG_INFO("misc", "Generating a change in %s weather for zone %u.", seasonName[season], m_zone);
+    LOG_INFO("misc", "Generating a change in %s weather for zone %u.", seasonName[season], m_zone);
 
     if ((u < 60) && (m_grade < 0.33333334f))                // Get fair
     {
@@ -194,14 +193,20 @@ bool Weather::ReGenerate()
 
 void Weather::SendWeatherUpdateToPlayer(Player* player)
 {
-    WorldPackets::Misc::Weather weather(GetWeatherState(), m_grade);
-    player->SendDirectMessage(weather.Write());
+    WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
+    data << uint32(GetWeatherState());
+    data << (float)m_grade;
+    data << uint8(0);
+    player->SendDirectMessage(&data);
 }
 
 void Weather::SendFineWeatherUpdateToPlayer(Player* player)
 {
-    WorldPackets::Misc::Weather weather(WEATHER_STATE_FINE);
-    player->SendDirectMessage(weather.Write());
+    WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
+    data << uint32(WEATHER_STATE_FINE);
+    data << (float)0;
+    data << uint8(0);
+    player->SendDirectMessage(&data);
 }
 
 /// Send the new weather to all players in the zone
@@ -215,10 +220,13 @@ bool Weather::UpdateWeather()
 
     WeatherState state = GetWeatherState();
 
-    WorldPackets::Misc::Weather weather(state, m_grade);
+    WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
+    data << uint32(state);
+    data << (float)m_grade;
+    data << uint8(0);
 
     //- Returns false if there were no players found to update
-    if (!sWorld->SendZoneMessage(m_zone, weather.Write()))
+    if (!sWorld->SendZoneMessage(m_zone, &data))
         return false;
 
     ///- Log the event
@@ -267,7 +275,7 @@ bool Weather::UpdateWeather()
             break;
     }
 
-    TC_LOG_INFO("misc", "Change the weather of zone %u to %s.", m_zone, wthstr);
+    LOG_INFO("misc", "Change the weather of zone %u to %s.", m_zone, wthstr);
     sScriptMgr->OnWeatherChange(this, state, m_grade);
     return true;
 }
@@ -286,29 +294,29 @@ void Weather::SetWeather(WeatherType type, float grade)
 /// Get the sound number associated with the current weather
 WeatherState Weather::GetWeatherState() const
 {
-    if (m_grade < 0.27f)
+    if (m_grade<0.27f)
         return WEATHER_STATE_FINE;
 
     switch (m_type)
     {
         case WEATHER_TYPE_RAIN:
-            if (m_grade < 0.40f)
+            if (m_grade<0.40f)
                 return WEATHER_STATE_LIGHT_RAIN;
-            else if (m_grade < 0.70f)
+            else if (m_grade<0.70f)
                 return WEATHER_STATE_MEDIUM_RAIN;
             else
                 return WEATHER_STATE_HEAVY_RAIN;
         case WEATHER_TYPE_SNOW:
-            if (m_grade < 0.40f)
+            if (m_grade<0.40f)
                 return WEATHER_STATE_LIGHT_SNOW;
-            else if (m_grade < 0.70f)
+            else if (m_grade<0.70f)
                 return WEATHER_STATE_MEDIUM_SNOW;
             else
                 return WEATHER_STATE_HEAVY_SNOW;
         case WEATHER_TYPE_STORM:
-            if (m_grade < 0.40f)
+            if (m_grade<0.40f)
                 return WEATHER_STATE_LIGHT_SANDSTORM;
-            else if (m_grade < 0.70f)
+            else if (m_grade<0.70f)
                 return WEATHER_STATE_MEDIUM_SANDSTORM;
             else
                 return WEATHER_STATE_HEAVY_SANDSTORM;

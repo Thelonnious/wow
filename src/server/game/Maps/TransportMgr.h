@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2022 Firelands <https://github.com/FirelandsProject/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -106,7 +106,7 @@ struct TransportTemplate
     bool InInstance = false;
 };
 
-struct TC_GAME_API TransportAnimation
+struct FC_GAME_API TransportAnimation
 {
     TransportAnimation() : TotalTime(0) { }
     std::map<uint32, TransportAnimationEntry const*> Path;
@@ -130,7 +130,7 @@ struct TransportSpawn
     uint32 PhaseGroup = 0;
 };
 
-class TC_GAME_API TransportMgr
+class FC_GAME_API TransportMgr
 {
 public:
     static TransportMgr* instance();

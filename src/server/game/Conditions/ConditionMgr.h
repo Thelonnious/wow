@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_CONDITIONMGR_H
-#define TRINITY_CONDITIONMGR_H
+#ifndef FIRELANDS_CONDITIONMGR_H
+#define FIRELANDS_CONDITIONMGR_H
 
 #include "Define.h"
 #include "Hash.h"
@@ -27,7 +27,6 @@
 #include <vector>
 
 class Creature;
-class Map;
 class Player;
 class Unit;
 class WorldObject;
@@ -84,7 +83,23 @@ enum ConditionTypes
     CONDITION_PET_TYPE              = 45,                   // mask             0              0                  true if player has a pet of given type(s)
     CONDITION_TAXI                  = 46,                   // 0                0              0                  true if player is on taxi
     CONDITION_QUESTSTATE            = 47,                   // quest_id         state_mask     0                  true if player is in any of the provided quest states for the quest (1 = not taken, 2 = completed, 8 = in progress, 32 = failed, 64 = rewarded)
-    CONDITION_MAX                   = 48                    // MAX
+    // End Trinity conditions
+
+    CONDITION_HAS_GROUP             = 48,                   // 0                0              0                  true if player is in group
+    CONDITION_SAI_PHASE             = 49,                   // phase            0              0                  true if object sai phase = value1
+    CONDITION_WEEKLY_QUEST_DONE     = 50,                   // quest            0              0                  true if weekly quest has been completed for the week
+    CONDITION_MONTHLY_QUEST_DONE    = 51,                   // quest            0              0                  true if monthly quest has been completed for the month
+    CONDITION_REPUTATION_VALUE      = 52,                   // faction_id       rep_value      0                  true if reputation value more or equal than rep_value
+    CONDITION_CURRENCY              = 53,                   // currency_id      countMin       countMax           true if has #countMin and countMax
+    CONDITION_CURRENCY_ON_WEEK      = 54,                   // currency_id      countMin       countMax           true if has #countMin and countMax
+    CONDITION_ON_TRANSPORT          = 55,                   // 0                0              0                  true if on vehicle
+    CONDITION_IN_RAID_OR_GROUP      = 56,                   // 0 - not in raid  isRaid         isGroup
+    CONDITION_HAS_POWER             = 57,                   // PowerType        > this         < this             true if power > or power < if set
+    CONDITION_GAMEMASTER            = 58,                   // 0                0              0                  true if player is GameMaster
+    CONDITION_HAS_EMOTE_STATE       = 59,                   // 0                0              0                  true if has EmoteState
+    CONDITION_IN_COMBAT             = 60,                   // 0                0              0                  true if in combat
+
+    CONDITION_MAX                   = 61                    // MAX
 };
 
 /*! Documentation on implementing a new ConditionSourceType:
@@ -145,12 +160,8 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_PHASE                          = 26,
     CONDITION_SOURCE_TYPE_GRAVEYARD                      = 27,
     CONDITION_SOURCE_TYPE_SPELL_AREA                     = 28,
-    //CONDITION_SOURCE_TYPE_CONVERSATION_LINE              = 29, // master only
-    //CONDITION_SOURCE_TYPE_AREATRIGGER_CLIENT_TRIGGERED   = 30, // master only
-    //CONDITION_SOURCE_TYPE_TRAINER_SPELL                  = 31, // master only
-    //CONDITION_SOURCE_TYPE_OBJECT_ID_VISIBILITY           = 32, // master only
-    CONDITION_SOURCE_TYPE_SPAWN_GROUP                    = 33,
-    CONDITION_SOURCE_TYPE_MAX                            = 34  // MAX
+    CONDITION_SOURCE_TYPE_SPAWN                          = 29,
+    CONDITION_SOURCE_TYPE_MAX                            = 30  // MAX
 };
 
 enum RelationType
@@ -177,16 +188,20 @@ enum MaxConditionTargets
     MAX_CONDITION_TARGETS = 3
 };
 
-struct TC_GAME_API ConditionSourceInfo
+struct FC_GAME_API ConditionSourceInfo
 {
     WorldObject* mConditionTargets[MAX_CONDITION_TARGETS]; // an array of targets available for conditions
-    Map const* mConditionMap;
     Condition const* mLastFailedCondition;
-    ConditionSourceInfo(WorldObject* target0, WorldObject* target1 = nullptr, WorldObject* target2 = nullptr);
-    ConditionSourceInfo(Map const* map);
+    ConditionSourceInfo(WorldObject* target0, WorldObject* target1 = nullptr, WorldObject* target2 = nullptr)
+    {
+        mConditionTargets[0] = target0;
+        mConditionTargets[1] = target1;
+        mConditionTargets[2] = target2;
+        mLastFailedCondition = nullptr;
+    }
 };
 
-struct TC_GAME_API Condition
+struct FC_GAME_API Condition
 {
     ConditionSourceType     SourceType;        //SourceTypeOrReferenceId
     uint32                  SourceGroup;
@@ -238,7 +253,7 @@ typedef std::unordered_map<uint32, ConditionsByEntryMap> ConditionEntriesByCreat
 typedef std::unordered_map<std::pair<int32, uint32 /*SAI source_type*/>, ConditionsByEntryMap> SmartEventConditionContainer;
 typedef std::unordered_map<uint32, ConditionContainer> ConditionReferenceContainer;//only used for references
 
-class TC_GAME_API ConditionMgr
+class FC_GAME_API ConditionMgr
 {
     private:
         ConditionMgr();
@@ -256,16 +271,15 @@ class TC_GAME_API ConditionMgr
         bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionContainer const& conditions) const;
         static bool CanHaveSourceGroupSet(ConditionSourceType sourceType);
         static bool CanHaveSourceIdSet(ConditionSourceType sourceType);
-        static bool CanHaveConditionType(ConditionSourceType sourceType, ConditionTypes conditionType);
         bool IsObjectMeetingNotGroupedConditions(ConditionSourceType sourceType, uint32 entry, ConditionSourceInfo& sourceInfo) const;
         bool IsObjectMeetingNotGroupedConditions(ConditionSourceType sourceType, uint32 entry, WorldObject* target0, WorldObject* target1 = nullptr, WorldObject* target2 = nullptr) const;
-        bool IsMapMeetingNotGroupedConditions(ConditionSourceType sourceType, uint32 entry, Map const* map) const;
         bool HasConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry) const;
         bool IsObjectMeetingSpellClickConditions(uint32 creatureId, uint32 spellId, WorldObject* clicker, WorldObject* target) const;
         ConditionContainer const* GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId) const;
         bool IsObjectMeetingVehicleSpellConditions(uint32 creatureId, uint32 spellId, Player* player, Unit* vehicle) const;
         bool IsObjectMeetingSmartEventConditions(int32 entryOrGuid, uint32 eventId, uint32 sourceType, Unit* unit, WorldObject* baseObject) const;
         bool IsObjectMeetingVendorItemConditions(uint32 creatureId, uint32 itemId, Player* player, Creature* vendor) const;
+        bool IsObjectMeetingSpawnConditions(uint32 objectType, uint32 entry, WorldObject* seer) const;
 
         bool IsSpellUsedInSpellClickConditions(uint32 spellId) const;
 
@@ -300,6 +314,7 @@ class TC_GAME_API ConditionMgr
         ConditionEntriesByCreatureIdMap SpellClickEventConditionStore;
         ConditionEntriesByCreatureIdMap NpcVendorConditionContainerStore;
         SmartEventConditionContainer    SmartEventConditionStore;
+        ConditionEntriesByCreatureIdMap SpawnConditionContainerStore;
 
         std::unordered_set<uint32> SpellsUsedInSpellClickConditions;
 };

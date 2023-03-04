@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYSERVER_MOVESPLINEINIT_H
-#define TRINITYSERVER_MOVESPLINEINIT_H
+#ifndef FIRELANDSSERVER_MOVESPLINEINIT_H
+#define FIRELANDSSERVER_MOVESPLINEINIT_H
 
 #include "MoveSplineInitArgs.h"
 
@@ -27,7 +27,7 @@ enum class AnimationTier : uint8;
 namespace Movement
 {
     // Transforms coordinates from global to transport offsets
-    class TC_GAME_API TransportPathTransform
+    class FC_GAME_API TransportPathTransform
     {
     public:
         TransportPathTransform(Unit* owner, bool transformForTransport)
@@ -41,7 +41,7 @@ namespace Movement
 
     /*  Initializes and launches spline movement
      */
-    class TC_GAME_API MoveSplineInit
+    class FC_GAME_API MoveSplineInit
     {
     public:
 
@@ -196,4 +196,4 @@ namespace Movement
 
     inline void MoveSplineInit::DisableTransportPathTransformations() { args.TransformForTransport = false; }
 }
-#endif // TRINITYSERVER_MOVESPLINEINIT_H
+#endif // FIRELANDSSERVER_MOVESPLINEINIT_H

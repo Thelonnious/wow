@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -116,7 +116,7 @@ float UnitAI::DoGetSpellMaxRange(uint32 spellId, bool positive)
     return spellInfo ? spellInfo->GetMaxRange(positive) : 0;
 }
 
-SpellCastResult UnitAI::DoCast(uint32 spellId)
+void UnitAI::DoCast(uint32 spellId)
 {
     Unit* target = nullptr;
 
@@ -133,23 +133,8 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
         {
             if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
             {
-                DefaultTargetSelector targetSelectorInner(me, spellInfo->GetMaxRange(false), false, true, 0);
-                auto targetSelector = [&](Unit const* candidate) -> bool
-                {
-                    if (!candidate->IsPlayer())
-                    {
-                        if (spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
-                            return false;
-
-                        if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC) && candidate->IsControlledByPlayer())
-                            return false;
-                    }
-                    else if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
-                        return false;
-
-                    return targetSelectorInner(candidate);
-                };
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, targetSelector);
+                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+                target = SelectTarget(SELECT_TARGET_RANDOM, 0, spellInfo->GetMaxRange(false), playerOnly);
             }
             break;
         }
@@ -163,24 +148,10 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
         {
             if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
             {
+                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
                 float range = spellInfo->GetMaxRange(false);
 
-                DefaultTargetSelector targetSelectorInner(me, range, false, true, -(int32)spellId);
-                auto targetSelector = [&](Unit const* candidate) -> bool
-                {
-                    if (!candidate->IsPlayer())
-                    {
-                        if (spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
-                            return false;
-
-                        if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC) && candidate->IsControlledByPlayer())
-                            return false;
-                    }
-                    else if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
-                        return false;
-
-                    return targetSelectorInner(candidate);
-                };
+                DefaultTargetSelector targetSelector(me, range, playerOnly, true, -(int32)spellId);
                 if (!spellInfo->HasAuraInterruptFlag(SpellAuraInterruptFlags::NOT_VICTIM) && targetSelector(me->GetVictim()))
                     target = me->GetVictim();
                 else
@@ -191,25 +162,30 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
     }
 
     if (target)
-        return me->CastSpell(target, spellId, false);
-
-    return SPELL_FAILED_BAD_TARGETS;
+        me->CastSpell(target, spellId, false);
 }
 
-SpellCastResult UnitAI::DoCast(Unit* victim, uint32 spellId, CastSpellExtraArgs const& args)
+void UnitAI::DoCast(Unit* victim, uint32 spellId, CastSpellExtraArgs const& args)
 {
     if (me->HasUnitState(UNIT_STATE_CASTING) && !(args.TriggerFlags & TRIGGERED_IGNORE_CAST_IN_PROGRESS))
-        return SPELL_FAILED_SPELL_IN_PROGRESS;
+        return;
 
-    return me->CastSpell(victim, spellId, args);
+    me->CastSpell(victim, spellId, args);
 }
 
-SpellCastResult UnitAI::DoCastVictim(uint32 spellId, CastSpellExtraArgs const& args)
+void UnitAI::DoCastVictim(uint32 spellId, CastSpellExtraArgs const& args)
 {
     if (Unit* victim = me->GetVictim())
-        return DoCast(victim, spellId, args);
+        DoCast(victim, spellId, args);
+}
 
-    return SPELL_FAILED_BAD_TARGETS;
+void UnitAI::DoCastRandom(uint32 spellId, float dist, CastSpellExtraArgs const& args, int32 aura, uint32 position)
+{
+    if (me->HasUnitState(UNIT_STATE_CASTING) && !(args.TriggerFlags & TRIGGERED_IGNORE_CAST_IN_PROGRESS))
+        return;
+
+    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, position, dist, true, aura))
+        me->CastSpell(target, spellId, args);
 }
 
 #define UPDATE_TARGET(a) {if (AIInfo->target<a) AIInfo->target=a;}
@@ -225,7 +201,7 @@ void UnitAI::FillAISpellInfo()
         if (!spellInfo)
             continue;
 
-        if (spellInfo->HasAttribute(SPELL_ATTR0_ALLOW_CAST_WHILE_DEAD))
+        if (spellInfo->HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_DEAD))
             AIInfo->condition = AICOND_DIE;
         else if (spellInfo->IsPassive() || spellInfo->GetDuration() == -1)
             AIInfo->condition = AICOND_AGGRO;
@@ -268,7 +244,7 @@ ThreatManager& UnitAI::GetThreatManager()
 
 void UnitAI::SortByDistance(std::list<Unit*>& list, bool ascending)
 {
-    list.sort(Trinity::ObjectDistanceOrderPred(me, ascending));
+    list.sort(Firelands::ObjectDistanceOrderPred(me, ascending));
 }
 
 DefaultTargetSelector::DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, bool withTank, int32 aura)

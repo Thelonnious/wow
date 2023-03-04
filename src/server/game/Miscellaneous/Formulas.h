@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_FORMULAS_H
-#define TRINITY_FORMULAS_H
+#ifndef FIRELANDS_FORMULAS_H
+#define FIRELANDS_FORMULAS_H
 
 #include "DBCStores.h"
 #include "Creature.h"
@@ -27,7 +27,7 @@
 #include "SharedDefines.h"
 #include "World.h"
 
-namespace Trinity
+namespace Firelands
 {
     namespace Honor
     {
@@ -42,7 +42,7 @@ namespace Trinity
         {
             return uint32(ceil(hk_honor_at_level_f(level, multiplier)));
         }
-    } // namespace Trinity::Honor
+    } // namespace Firelands::Honor
 
     namespace XP
     {
@@ -135,7 +135,7 @@ namespace Trinity
                     nBaseExp = 1878;
                     break;
                 default:
-                    TC_LOG_ERROR("misc", "BaseGain: Unsupported content level %u", content);
+                    LOG_ERROR("misc", "BaseGain: Unsupported content level %u", content);
                     nBaseExp = 45;
                     break;
             }
@@ -240,7 +240,7 @@ namespace Trinity
             sScriptMgr->OnGroupRateCalculation(rate, count, isRaid);
             return rate;
         }
-    } // namespace Trinity::XP
+    } // namespace Firelands::XP
 
     namespace Currency
     {
@@ -260,7 +260,7 @@ namespace Trinity
             // WowWiki: Battleground ratings receive a bonus of 22.2% to the cap they generate
             return uint32((ConquestRatingCalculator(rate) * 1.222f) + 0.5f);
         }
-    } // namespace Trinity::Currency
-} // namespace Trinity
+    } // namespace Firelands::Currency
+} // namespace Firelands
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -371,7 +371,7 @@ class npc_crystal_shard : public CreatureScript
                 _events.ScheduleEvent(EVENT_REMOVE_SHRINK_AURA, Seconds(1) + Milliseconds(200));
             }
 
-            void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
+            void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_CRYSTAL_SHARDS_TARGET)
                 {
@@ -432,7 +432,7 @@ class spell_corborus_crystal_barrage_targeting : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleEffect(SpellEffIndex /*effIndex*/)

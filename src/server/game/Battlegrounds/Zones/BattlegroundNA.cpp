@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,6 +19,7 @@
 #include "Log.h"
 #include "Player.h"
 #include "WorldPacket.h"
+#include "WorldStatePackets.h"
 
 BattlegroundNA::BattlegroundNA()
 {
@@ -56,6 +57,12 @@ void BattlegroundNA::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
+void BattlegroundNA::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& data)
+{
+    data.Worldstates.emplace_back(uint32(0xa11), uint32(1));     // 9 show
+    Arena::FillInitialWorldStates(data);
+}
+
 bool BattlegroundNA::SetupBattleground()
 {
     // gates
@@ -67,7 +74,7 @@ bool BattlegroundNA::SetupBattleground()
         || !AddObject(BG_NA_OBJECT_BUFF_1, BG_NA_OBJECT_TYPE_BUFF_1, 4009.189941f, 2895.250000f, 13.052700f, -1.448624f, 0, 0, 0.6626201f, -0.7489557f, 120)
         || !AddObject(BG_NA_OBJECT_BUFF_2, BG_NA_OBJECT_TYPE_BUFF_2, 4103.330078f, 2946.350098f, 13.051300f, -0.06981307f, 0, 0, 0.03489945f, -0.9993908f, 120))
     {
-        TC_LOG_ERROR("sql.sql", "BatteGroundNA: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundNA: Failed to spawn some object!");
         return false;
     }
 

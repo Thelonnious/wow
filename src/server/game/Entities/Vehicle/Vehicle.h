@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TRINITY_VEHICLE_H
-#define __TRINITY_VEHICLE_H
+#ifndef __FIRELANDS_VEHICLE_H
+#define __FIRELANDS_VEHICLE_H
 
 #include "ObjectDefines.h"
 #include "Object.h"
@@ -28,7 +28,7 @@ struct VehicleEntry;
 class Unit;
 class VehicleJoinEvent;
 
-class TC_GAME_API Vehicle : public TransportBase
+class FC_GAME_API Vehicle : public TransportBase
 {
     protected:
         friend bool Unit::CreateVehicleKit(uint32 id, uint32 creatureEntry, bool loading /*= false*/);
@@ -129,7 +129,7 @@ class TC_GAME_API Vehicle : public TransportBase
         PendingJoinEventContainer _pendingJoinEvents;       ///< Collection of delayed join events for prospective passengers
 };
 
-class TC_GAME_API VehicleJoinEvent : public BasicEvent
+class FC_GAME_API VehicleJoinEvent : public BasicEvent
 {
     friend class Vehicle;
     protected:

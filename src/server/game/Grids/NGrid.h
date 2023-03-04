@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_NGRID_H
-#define TRINITY_NGRID_H
+#ifndef FIRELANDS_NGRID_H
+#define FIRELANDS_NGRID_H
 
 /** NGrid is nothing more than a wrapper of the Grid with an NxN cells
  */
@@ -28,7 +28,7 @@
 
 #define DEFAULT_VISIBILITY_NOTIFY_PERIOD      1000
 
-class TC_GAME_API GridInfo
+class FC_GAME_API GridInfo
 {
 public:
     GridInfo();

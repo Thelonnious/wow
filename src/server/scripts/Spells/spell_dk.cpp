@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -48,7 +48,6 @@ enum DeathKnightSpells
     SPELL_DK_BUTCHERY                           = 50163,
     SPELL_DK_CORPSE_EXPLOSION_TRIGGERED         = 43999,
     SPELL_DK_DANCING_RUNE_WEAPON_PARRY_BONUS    = 81256,
-    SPELL_DK_DARK_SIMULACRUM_OVERRIDE_BAR       = 77616,
     SPELL_DK_DARK_TRANSFORMATION                = 63560,
     SPELL_DK_DARK_TRANSFORMATION_DUMMY          = 93426,
     SPELL_DK_DEATH_AND_DECAY_DAMAGE             = 52212,
@@ -110,38 +109,34 @@ enum DKSpellIcons
     DK_ICON_ID_BLOOD_SHIELD_MASTERY             = 2624
 };
 
-// 48707 - Anti-Magic Shell
+// 48707 - Anti-Magic Shell (on self)
 class spell_dk_anti_magic_shell : public AuraScript
 {
     bool Load() override
     {
-        _healthAmount = CalculatePct(GetCaster()->GetMaxHealth(), GetSpellInfo()->Effects[EFFECT_1].CalcValue(GetCaster()));
+        absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
+        healthPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue(GetCaster());
         return true;
     }
 
-    // We do have to do a manual absorb handling because the tooltip of anti-magic shell only absorbs a part of the damage, not all of it
-    void Absorb(AuraEffect* aurEff, DamageInfo& damageInfo, uint32& /*absorbAmount*/)
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
     {
-        PreventDefaultAction();
+        amount = GetCaster()->CountPctFromMaxHealth(healthPct);
+    }
 
-        int32 currentAbsorb = _healthAmount;
-        currentAbsorb = RoundToInterval(currentAbsorb, 0, CalculatePct<int32>(damageInfo.GetDamage(), aurEff->GetAmount()));
-        damageInfo.AbsorbDamage(currentAbsorb);
-
-        if (_healthAmount >= 0)
-        {
-            _healthAmount -= currentAbsorb;
-            if (_healthAmount <= 0)
-                aurEff->GetBase()->Remove(AuraRemoveFlags::ByEnemySpell);
-        }
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
+    {
+        absorbAmount = std::min(CalculatePct(dmgInfo.GetDamage(), absorbPct), GetTarget()->CountPctFromMaxHealth(healthPct));
     }
 
     void Register() override
     {
+        DoEffectCalcAmount.Register(&spell_dk_anti_magic_shell::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
         OnEffectAbsorb.Register(&spell_dk_anti_magic_shell::Absorb, EFFECT_0);
     }
 private:
-    int32 _healthAmount = 0;
+    int32 absorbPct;
+    int32 healthPct;
 };
 
 // 50461 - Anti-Magic Zone
@@ -149,14 +144,7 @@ class spell_dk_anti_magic_zone : public AuraScript
 {
     bool Load() override
     {
-        _absorbAmount = 0;
-        if (!GetCaster()->IsSummon())
-            return true;
-
-        TempSummon* summon = GetCaster()->ToTempSummon();
-        if (Unit* summoner = summon->GetSummoner())
-            _absorbAmount = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT)->Effects[0].CalcValue(summoner) + 2 * summoner->GetTotalAttackPowerValue(BASE_ATTACK);
-
+        absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
         return true;
     }
 
@@ -165,29 +153,26 @@ class spell_dk_anti_magic_zone : public AuraScript
         return ValidateSpellInfo({ SPELL_DK_ANTI_MAGIC_SHELL_TALENT });
     }
 
-    void Absorb(AuraEffect* aurEff, DamageInfo& damageInfo, uint32& /*absorbAmount*/)
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
     {
-        PreventDefaultAction();
+        SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
+        amount = talentSpell->Effects[EFFECT_0].CalcValue(GetCaster());
+        if (Player* player = GetCaster()->ToPlayer())
+            amount += int32(2 * player->GetTotalAttackPowerValue(BASE_ATTACK));
+    }
 
-        int32 currentAbsorb = _absorbAmount;
-        currentAbsorb = RoundToInterval(currentAbsorb, 0, CalculatePct<int32>(damageInfo.GetDamage(), aurEff->GetAmount()));
-        damageInfo.AbsorbDamage(currentAbsorb);
-
-        if (_absorbAmount >= 0)
-        {
-            _absorbAmount -= currentAbsorb;
-            if (_absorbAmount <= 0)
-                if (Unit* caster = GetCaster())
-                    caster->InterruptNonMeleeSpells(true);
-        }
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
+    {
+        absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
     }
 
     void Register() override
     {
+        DoEffectCalcAmount.Register(&spell_dk_anti_magic_zone::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
         OnEffectAbsorb.Register(&spell_dk_anti_magic_zone::Absorb, EFFECT_0);
     }
 private:
-    int32 _absorbAmount = 0;
+    uint32 absorbPct = 0;
 };
 
 // 48721 - Blood Boil
@@ -357,21 +342,6 @@ class spell_dk_death_coil : public SpellScript
 // 52751 - Death Gate
 class spell_dk_death_gate : public SpellScript
 {
-    void HandleScript(SpellEffIndex /*effIndex*/)
-    {
-        if (Unit* target = GetHitUnit())
-            target->CastSpell(target, GetEffectValue(), false);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget.Register(&spell_dk_death_gate::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
-};
-
-// 53822 - Death Gate
-class spell_dk_death_gate_teleport : public SpellScript
-{
     SpellCastResult CheckClass()
     {
         if (GetCaster()->getClass() != CLASS_DEATH_KNIGHT)
@@ -383,9 +353,17 @@ class spell_dk_death_gate_teleport : public SpellScript
         return SPELL_CAST_OK;
     }
 
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, GetEffectValue(), false);
+    }
+
     void Register() override
     {
-        OnCheckCast.Register(&spell_dk_death_gate_teleport::CheckClass);
+        OnCheckCast.Register(&spell_dk_death_gate::CheckClass);
+        OnEffectHitTarget.Register(&spell_dk_death_gate::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -700,35 +678,37 @@ class spell_dk_pestilence : public SpellScript
         {
             if (Aura* aurOld = victim->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID())) // Check Blood Plague application on victim.
             {
-                float donePct = aurOld->GetDonePct();
-                float critChance = aurOld->GetCritChance();
-
                 if (AuraEffect* aurEffOld = aurOld->GetEffect(EFFECT_0))
                 {
+                    float donePct = aurEffOld->GetDonePct();
+
                     caster->CastSpell(hitUnit, SPELL_DK_BLOOD_PLAGUE, true); // Spread the disease to hitUnit.
 
                     if (Aura* aurNew = hitUnit->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID())) // Check Blood Plague application on hitUnit.
                     {
-                        aurNew->SetCritChance(critChance); // Blood Plague can crit if caster has T9.
-                        aurNew->SetDonePct(donePct);
                         if (AuraEffect* aurEffNew = aurNew->GetEffect(EFFECT_0))
-                            aurEffNew->ChangeAmount(aurEffNew->CalculateAmount(aurEffNew->GetCaster()), false);
+                        {
+                            aurEffNew->SetDonePct(donePct);
+                            aurEffNew->SetBonusAmount(caster->SpellDamageBonusDone(hitUnit, aurEffNew->GetSpellInfo(), 0, DOT, aurEffNew->GetEffIndex()));
+                        }
                     }
                 }
+            }
 
-                if (Aura* aurOld = victim->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID())) // Check Frost Fever application on victim.
+            if (Aura* aurOld = victim->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID())) // Check Frost Fever application on victim.
+            {
+                if (AuraEffect* aurEffOld = aurOld->GetEffect(EFFECT_0))
                 {
-                    float donePct = aurOld->GetDonePct();
+                    float donePct = aurEffOld->GetDonePct();
 
-                    if (AuraEffect* aurEffOld = aurOld->GetEffect(EFFECT_0))
+                    caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true); // Spread the disease to hitUnit.
+
+                    if (Aura* aurNew = hitUnit->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID())) // Check Frost Fever application on hitUnit.
                     {
-                        caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true); // Spread the disease to hitUnit.
-
-                        if (Aura* aurNew = hitUnit->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID())) // Check Frost Fever application on hitUnit.
+                        if (AuraEffect* aurEffNew = aurNew->GetEffect(EFFECT_0))
                         {
-                            aurNew->SetDonePct(donePct);
-                            if (AuraEffect* aurEffNew = aurNew->GetEffect(EFFECT_0))
-                                aurEffNew->ChangeAmount(aurEffNew->CalculateAmount(aurEffNew->GetCaster()), false);
+                            aurEffNew->SetDonePct(donePct);
+                            aurEffNew->SetBonusAmount(caster->SpellDamageBonusDone(hitUnit, aurEffNew->GetSpellInfo(), 0, DOT, aurEffNew->GetEffIndex()));
                         }
                     }
                 }
@@ -1199,7 +1179,7 @@ class spell_dk_runic_empowerment : public AuraScript
 
         if (!fullyDepletedRuneIndexes.empty())
         {
-            uint8 runeIndex = Trinity::Containers::SelectRandomContainerElement(fullyDepletedRuneIndexes);
+            uint8 runeIndex = Firelands::Containers::SelectRandomContainerElement(fullyDepletedRuneIndexes);
             ActivateRune(player, runeIndex);
         }
     }
@@ -1801,48 +1781,6 @@ class spell_dk_dancing_rune_weapon : public AuraScript
     }
 };
 
-// 77606 - Dark Simulacrum
-class spell_dk_dark_simulacrum : public AuraScript
-{
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_DK_DARK_SIMULACRUM_OVERRIDE_BAR });
-    }
-
-    bool CheckProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-    {
-        // Spells with the attribute or player spells can be copied. Other abilities will have their damage negated
-        if (eventInfo.GetSpellInfo()->HasAttribute(SPELL_ATTR9_ALLOW_DARK_SIMULACRUM) || eventInfo.GetActor()->IsPlayer())
-        {
-            if (eventInfo.GetActor()->IsPlayer())
-            {
-                Spell const* spell = eventInfo.GetProcSpell();
-                if (!spell || !spell->GetPowerCost() || eventInfo.GetSpellInfo()->PowerType != POWER_MANA || spell->IsTriggered())
-                    return false;
-            }
-            else // Creature spells are simply defined by the attribute
-                return true;
-        }
-
-        return false;
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-
-        if (int32 spellId = eventInfo.GetSpellInfo()->Id)
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(nullptr, SPELL_DK_DARK_SIMULACRUM_OVERRIDE_BAR, CastSpellExtraArgs(aurEff).AddSpellBP0(spellId));
-    }
-
-    void Register() override
-    {
-        DoCheckEffectProc.Register(&spell_dk_dark_simulacrum::CheckProc, EFFECT_0, SPELL_AURA_DUMMY);
-        OnEffectProc.Register(&spell_dk_dark_simulacrum::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-    }
-};
-
 void AddSC_deathknight_spell_scripts()
 {
     RegisterSpellScript(spell_dk_anti_magic_shell);
@@ -1854,13 +1792,11 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_butchery);
     RegisterSpellScript(spell_dk_crimson_scourge);
     RegisterSpellScript(spell_dk_dancing_rune_weapon);
-    RegisterSpellScript(spell_dk_dark_simulacrum);
     RegisterSpellScript(spell_dk_dark_transformation);
     RegisterSpellScript(spell_dk_dark_transformation_aura);
     RegisterSpellScript(spell_dk_death_and_decay);
     RegisterSpellScript(spell_dk_death_coil);
     RegisterSpellScript(spell_dk_death_gate);
-    RegisterSpellScript(spell_dk_death_gate_teleport);
     RegisterSpellScript(spell_dk_death_grip);
     RegisterSpellScript(spell_dk_death_grip_initial);
     RegisterSpellScript(spell_dk_item_death_knight_t12_dps_4p_bonus);

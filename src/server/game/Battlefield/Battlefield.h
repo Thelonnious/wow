@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -25,9 +25,8 @@
 
 enum BattlefieldTypes
 {
-    BATTLEFIELD_WG = 1,                                     // Wintergrasp
-    BATTLEFIELD_TB = 2,                                     // Tol Barad (cataclysm)
-    BATTLEFIELD_MAX
+    BATTLEFIELD_WG,                                         // Wintergrasp
+    BATTLEFIELD_TB                                          // Tol Barad (cataclysm)
 };
 
 enum BattlefieldIDs
@@ -90,12 +89,14 @@ namespace WorldPackets
 typedef std::vector<BfGraveyard*> GraveyardVect;
 typedef std::map<ObjectGuid, time_t> PlayerTimerMap;
 
-class TC_GAME_API BfCapturePoint
+class FC_GAME_API BfCapturePoint
 {
     public:
         BfCapturePoint(Battlefield* bf);
 
         virtual ~BfCapturePoint() { }
+
+        virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*data*/) { }
 
         // Send world state update to all players present
         void SendUpdateWorldState(uint32 field, uint32 value);
@@ -153,10 +154,10 @@ class TC_GAME_API BfCapturePoint
         uint32 m_capturePointEntry;
 
         // Gameobject related to that capture point
-        ObjectGuid m_capturePointGUID;
+        ObjectGuid m_capturePointSpawnId;
 };
 
-class TC_GAME_API BfGraveyard
+class FC_GAME_API BfGraveyard
 {
     public:
         BfGraveyard(Battlefield* Bf);
@@ -203,13 +204,13 @@ class TC_GAME_API BfGraveyard
         Battlefield* m_Bf;
 };
 
-class TC_GAME_API Battlefield : public ZoneScript
+class FC_GAME_API Battlefield : public ZoneScript
 {
     friend class BattlefieldMgr;
 
     public:
         /// Constructor
-        explicit Battlefield(Map* map);
+        Battlefield();
         /// Destructor
         virtual ~Battlefield();
 
@@ -218,6 +219,9 @@ class TC_GAME_API Battlefield : public ZoneScript
 
         /// Call this to init the Battlefield
         virtual bool SetupBattlefield() { return true; }
+
+        /// Update data of a worldstate to all players present in zone
+        void SendUpdateWorldState(uint32 field, uint32 value);
 
         /**
          * \brief Called every time for update bf data and time
@@ -240,8 +244,6 @@ class TC_GAME_API Battlefield : public ZoneScript
 
         uint32 GetTypeId() const { return m_TypeId; }
         uint32 GetZoneId() const { return m_ZoneId; }
-        uint32 GetMapId() const { return m_MapId; }
-        Map* GetMap() const { return m_Map; }
         ObjectGuid GetGUID()   { return m_Guid; }
 
         void TeamApplyBuff(TeamId team, uint32 spellId, uint32 spellId2 = 0);
@@ -336,6 +338,10 @@ class TC_GAME_API Battlefield : public ZoneScript
 
         virtual void DoCompleteOrIncrementAchievement(uint32 /*achievement*/, Player* /*player*/, uint8 /*incrementNumber = 1*/) { }
 
+        /// Send all worldstate data to all player in zone.
+        virtual void SendInitWorldStatesToAll() = 0;
+        virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*data*/) = 0;
+
         /// Return if we can use mount in battlefield
         bool CanFlyIn() { return !m_isActive; }
 
@@ -419,8 +425,15 @@ class TC_GAME_API Battlefield : public ZoneScript
         void BroadcastPacketToWar(WorldPacket const* data) const;
 
         // CapturePoint system
-        void AddCapturePoint(BfCapturePoint* cp);
-        BfCapturePoint* GetCapturePoint(uint32 entry) const;
+        void AddCapturePoint(BfCapturePoint* cp) { m_capturePoints[cp->GetCapturePointEntry()] = cp; }
+
+        BfCapturePoint* GetCapturePoint(ObjectGuid::LowType lowguid) const
+        {
+            Battlefield::BfCapturePointMap::const_iterator itr = m_capturePoints.find(lowguid);
+            if (itr != m_capturePoints.end())
+                return itr->second;
+            return nullptr;
+        }
 
         void RegisterZone(uint32 zoneid);
         bool HasPlayer(Player* player) const;

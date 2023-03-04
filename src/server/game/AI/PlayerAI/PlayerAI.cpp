@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -659,21 +659,7 @@ void PlayerAI::DoRangedAttackIfReady()
     if (!rangedAttackSpell)
         return;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(rangedAttackSpell);
-    if (!spellInfo)
-        return;
-
-    Spell* spell = new Spell(me, spellInfo, TRIGGERED_CAST_DIRECTLY);
-    if (spell->CheckPetCast(victim) != SPELL_CAST_OK)
-    {
-        delete spell;
-        return;
-    }
-
-    SpellCastTargets targets;
-    targets.SetUnitTarget(victim);
-    spell->prepare(targets);
-
+    me->CastSpell(victim, rangedAttackSpell, TRIGGERED_CAST_DIRECTLY);
     me->resetAttackTimer(RANGED_ATTACK);
 }
 
@@ -697,7 +683,7 @@ void PlayerAI::CancelAllShapeshifts()
         SpellInfo const* auraInfo = aura->GetSpellInfo();
         if (!auraInfo)
             continue;
-        if (auraInfo->HasAttribute(SPELL_ATTR0_NO_AURA_CANCEL))
+        if (auraInfo->HasAttribute(SPELL_ATTR0_CANT_CANCEL))
             continue;
         if (!auraInfo->IsPositive() || auraInfo->IsPassive())
             continue;

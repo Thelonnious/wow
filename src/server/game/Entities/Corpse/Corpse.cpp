@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,7 +19,6 @@
 #include "CharacterCache.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "GameTime.h"
 #include "Log.h"
 #include "Map.h"
@@ -78,7 +77,7 @@ bool Corpse::Create(ObjectGuid::LowType guidlow, Player* owner)
 
     if (!IsPositionValid())
     {
-        TC_LOG_ERROR("entities.player", "Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        LOG_ERROR("entities.player", "Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
             guidlow, owner->GetName().c_str(), owner->GetPositionX(), owner->GetPositionY());
         return false;
     }
@@ -88,7 +87,7 @@ bool Corpse::Create(ObjectGuid::LowType guidlow, Player* owner)
     SetObjectScale(1.0f);
     SetGuidValue(CORPSE_FIELD_OWNER, owner->GetGUID());
 
-    _cellCoord = Trinity::ComputeCellCoord(GetPositionX(), GetPositionY());
+    _cellCoord = Firelands::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     PhasingHandler::InheritPhaseShift(this, owner);
 
@@ -148,15 +147,6 @@ void Corpse::DeleteFromDB(ObjectGuid const& ownerGuid, CharacterDatabaseTransact
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }
 
-uint32 Corpse::GetFaction() const
-{
-    // inherit faction from player race
-    uint32 const race = GetByteValue(CORPSE_FIELD_BYTES_1, 1);
-
-    ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
-    return rEntry ? rEntry->FactionID : 0;
-}
-
 void Corpse::ResetGhostTime()
 {
     m_time = GameTime::GetGameTime();
@@ -195,12 +185,12 @@ bool Corpse::LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields)
 
     if (!IsPositionValid())
     {
-        TC_LOG_ERROR("entities.player", "Corpse (%s, owner: %s) is not created, given coordinates are not valid (X: %f, Y: %f, Z: %f)",
+        LOG_ERROR("entities.player", "Corpse (%s, owner: %s) is not created, given coordinates are not valid (X: %f, Y: %f, Z: %f)",
             GetGUID().ToString().c_str(), GetOwnerGUID().ToString().c_str(), posX, posY, posZ);
         return false;
     }
 
-    _cellCoord = Trinity::ComputeCellCoord(GetPositionX(), GetPositionY());
+    _cellCoord = Firelands::ComputeCellCoord(GetPositionX(), GetPositionY());
     return true;
 }
 

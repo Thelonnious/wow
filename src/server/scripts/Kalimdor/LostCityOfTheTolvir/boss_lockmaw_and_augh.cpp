@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -536,7 +536,7 @@ class spell_lockmaw_scent_of_blood : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                Trinity::Containers::RandomResize(targets, 1);
+                Firelands::Containers::RandomResize(targets, 1);
             }
 
             void Register() override
@@ -563,7 +563,7 @@ class spell_lockmaw_paralytic_blow_dart : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                Trinity::Containers::RandomResize(targets, 1);
+                Firelands::Containers::RandomResize(targets, 1);
             }
 
             void Register() override
@@ -590,7 +590,7 @@ class spell_lockmaw_random_aggro_taunt : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                Trinity::Containers::RandomResize(targets, 1);
+                Firelands::Containers::RandomResize(targets, 1);
             }
 
             void EffectScriptEffect(SpellEffIndex /*effIndex*/)

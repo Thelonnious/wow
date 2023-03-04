@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -719,7 +719,7 @@ struct boss_ragnaros_firelands : public BossAI
                         }
 
                         if (sonOfFlamesPositions.size() > 8)
-                            Trinity::Containers::RandomResize(sonOfFlamesPositions, 8);
+                            Firelands::Containers::RandomResize(sonOfFlamesPositions, 8);
                         else if (sonOfFlamesPositions.size() < 8)
                         {
                             // There are too few Sons of Flame spawn positions available. Reset encounter
@@ -1359,7 +1359,7 @@ struct npc_ragnaros_dreadflame : public NullCreatureAI
                 if (availableSpreadLocations.empty())
                     break;
 
-                Trinity::Containers::RandomResize(availableSpreadLocations, std::ceil(_occupiedDreadflameIndexes.size() / 2));
+                Firelands::Containers::RandomResize(availableSpreadLocations, std::ceil(_occupiedDreadflameIndexes.size() / 2));
 
                 _newlyStoredDreadflameIndexes.clear();
                 for (uint16 index : availableSpreadLocations)
@@ -1398,7 +1398,7 @@ struct npc_ragnaros_dreadflame : public NullCreatureAI
             case DATA_DREADFLAME_POSTION_INFO_INDEX:
             {
                 bool noIndexesAvailable = true;
-                DreadflamePositionInfoArray::const_iterator itr = Trinity::Containers::SelectRandomWeightedContainerElement(DreadflamePositionInfoData, [&](DreadflamePositionInfo const& info)
+                DreadflamePositionInfoArray::const_iterator itr = Firelands::Containers::SelectRandomWeightedContainerElement(DreadflamePositionInfoData, [&](DreadflamePositionInfo const& info)
                 {
                     if (!info.OnPlatform || _occupiedDreadflameIndexes.find(info.Index) != _occupiedDreadflameIndexes.end())
                         return 0.f;
@@ -1767,7 +1767,7 @@ class spell_ragnaros_molten_seed: public SpellScript
             return;
 
         Unit const* caster = GetCaster();
-        targets.sort(Trinity::ObjectDistanceOrderPred(caster, true));
+        targets.sort(Firelands::ObjectDistanceOrderPred(caster, true));
         targets.resize(1);
     }
 

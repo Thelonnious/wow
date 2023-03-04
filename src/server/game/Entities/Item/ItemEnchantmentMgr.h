@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,9 +35,9 @@ struct ItemRandomEnchantmentId
     uint32 Id = 0;
 };
 
-TC_GAME_API void LoadRandomEnchantmentsTable();
-TC_GAME_API ItemRandomEnchantmentId GenerateItemRandomPropertyId(uint32 item_id);
-TC_GAME_API uint32 GenerateEnchSuffixFactor(uint32 item_id);
-TC_GAME_API uint32 GetRandomPropertyPoints(uint32 itemLevel, uint32 quality, uint32 inventoryType, uint32 subclass);
+FC_GAME_API void LoadRandomEnchantmentsTable();
+FC_GAME_API ItemRandomEnchantmentId GenerateItemRandomPropertyId(uint32 item_id);
+FC_GAME_API uint32 GenerateEnchSuffixFactor(uint32 item_id);
+FC_GAME_API uint32 GetRandomPropertyPoints(uint32 itemLevel, uint32 quality, uint32 inventoryType, uint32 subclass);
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_CALENDARMGR_H
-#define TRINITY_CALENDARMGR_H
+#ifndef FIRELANDS_CALENDARMGR_H
+#define FIRELANDS_CALENDARMGR_H
 
 #include "Common.h"
 #include "DatabaseEnvFwd.h"
@@ -133,7 +133,7 @@ enum CalendarError
 #define CALENDAR_MAX_GUILD_EVENTS   100
 #define CALENDAR_MAX_INVITES        100
 
-struct TC_GAME_API CalendarInvite
+struct FC_GAME_API CalendarInvite
 {
     public:
         CalendarInvite(CalendarInvite const& calendarInvite, uint64 inviteId, uint64 eventId)
@@ -193,7 +193,7 @@ struct TC_GAME_API CalendarInvite
         std::string _text;
 };
 
-struct TC_GAME_API CalendarEvent
+struct FC_GAME_API CalendarEvent
 {
     public:
         CalendarEvent(CalendarEvent const& calendarEvent, uint64 eventId)
@@ -273,7 +273,7 @@ typedef std::vector<CalendarInvite*> CalendarInviteStore;
 typedef std::set<CalendarEvent*> CalendarEventStore;
 typedef std::map<uint64 /* eventId */, CalendarInviteStore > CalendarEventInviteStore;
 
-class TC_GAME_API CalendarMgr
+class FC_GAME_API CalendarMgr
 {
     private:
         CalendarMgr();

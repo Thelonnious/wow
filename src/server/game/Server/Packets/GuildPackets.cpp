@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -882,29 +882,6 @@ WorldPacket const* WorldPackets::Guild::GuildBankLogQueryResults::Write()
 
     if (WeeklyBonusMoney.has_value())
         _worldPacket << uint64(*WeeklyBonusMoney);
-
-    return &_worldPacket;
-}
-
-WorldPacket const* WorldPackets::Guild::GuildReputationReactionChanged::Write()
-{
-    _worldPacket.WriteBit(MemberGUID[1]);
-    _worldPacket.WriteBit(MemberGUID[6]);
-    _worldPacket.WriteBit(MemberGUID[2]);
-    _worldPacket.WriteBit(MemberGUID[4]);
-    _worldPacket.WriteBit(MemberGUID[0]);
-    _worldPacket.WriteBit(MemberGUID[3]);
-    _worldPacket.WriteBit(MemberGUID[7]);
-    _worldPacket.WriteBit(MemberGUID[5]);
-
-    _worldPacket.WriteByteSeq(MemberGUID[4]);
-    _worldPacket.WriteByteSeq(MemberGUID[6]);
-    _worldPacket.WriteByteSeq(MemberGUID[5]);
-    _worldPacket.WriteByteSeq(MemberGUID[7]);
-    _worldPacket.WriteByteSeq(MemberGUID[2]);
-    _worldPacket.WriteByteSeq(MemberGUID[0]);
-    _worldPacket.WriteByteSeq(MemberGUID[3]);
-    _worldPacket.WriteByteSeq(MemberGUID[1]);
 
     return &_worldPacket;
 }

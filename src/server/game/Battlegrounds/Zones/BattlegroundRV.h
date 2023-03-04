@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -92,7 +92,9 @@ enum BattlegroundRVData
     BG_RV_PILLAR_SWITCH_TIMER                    = 25000,
     BG_RV_FIRE_TO_PILLAR_TIMER                   = 20000,
     BG_RV_CLOSE_FIRE_TIMER                       =  5000,
-    BG_RV_FIRST_TIMER                            = 20133
+    BG_RV_FIRST_TIMER                            = 20133,
+
+    BG_RV_WORLD_STATE                            = 0xe1a
 };
 
 class BattlegroundRV : public Arena
@@ -102,6 +104,7 @@ class BattlegroundRV : public Arena
 
         /* inherited from BattlegroundClass */
         void StartingEventOpenDoors() override;
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& d) override;
 
         void HandleAreaTrigger(Player* Source, uint32 Trigger) override;
         bool SetupBattleground() override;

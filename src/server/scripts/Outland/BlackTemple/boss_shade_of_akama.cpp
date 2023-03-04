@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -236,7 +236,7 @@ struct boss_shade_of_akama : public BossAI
         _DespawnAtEvade();
     }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_AKAMA_SOUL_CHANNEL)
         {
@@ -381,7 +381,7 @@ struct npc_akama_shade : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override { }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_THREAT && !_isInCombat)
         {

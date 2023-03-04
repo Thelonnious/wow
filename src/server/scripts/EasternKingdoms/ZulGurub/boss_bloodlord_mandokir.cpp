@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -211,9 +211,9 @@ struct boss_bloodlord_mandokir : public BossAI
             {
                 std::list<Creature*> creatures;
                 GetCreatureListWithEntryInGrid(creatures, me, NPC_CHAINED_SPIRIT, 200.0f);
-                creatures.remove_if(Trinity::AnyDeadUnitCheck());
-                creatures.remove_if(Trinity::UnitAuraCheck(true, SPELL_OHGAN_ORDERS_TRIGGER));
-                Trinity::Containers::RandomResize(creatures, 1);
+                creatures.remove_if(Firelands::AnyDeadUnitCheck());
+                creatures.remove_if(Firelands::UnitAuraCheck(true, SPELL_OHGAN_ORDERS_TRIGGER));
+                Firelands::Containers::RandomResize(creatures, 1);
                 if (creatures.empty())
                     return;
 
@@ -351,7 +351,7 @@ struct npc_mandokir_ohgan : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         if (target && spell->Id == SPELL_OHGAN_ORDERS)
             _events.CancelEvent(EVENT_ATTACK_PLAYERS);
@@ -484,7 +484,7 @@ class spell_mandokir_decapitate : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
@@ -558,7 +558,7 @@ class spell_mandokir_devastating_slam : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleSummon(SpellEffIndex effIndex)
@@ -581,7 +581,7 @@ class spell_mandokir_ohgan_orders : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)

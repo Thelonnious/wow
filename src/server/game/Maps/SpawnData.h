@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_SPAWNDATA_H
-#define TRINITY_SPAWNDATA_H
+#ifndef FIRELANDS_SPAWNDATA_H
+#define FIRELANDS_SPAWNDATA_H
 
 #include "Position.h"
 #include "PhaseShift.h"
@@ -45,16 +45,14 @@ enum SpawnObjectTypeMask
 
 enum SpawnGroupFlags
 {
-    SPAWNGROUP_FLAG_NONE                            = 0x00,
-    SPAWNGROUP_FLAG_SYSTEM                          = 0x01,
-    SPAWNGROUP_FLAG_COMPATIBILITY_MODE              = 0x02,
-    SPAWNGROUP_FLAG_MANUAL_SPAWN                    = 0x04,
-    SPAWNGROUP_FLAG_DYNAMIC_SPAWN_RATE              = 0x08,
-    SPAWNGROUP_FLAG_ESCORTQUESTNPC                  = 0x10,
-    SPAWNGROUP_FLAG_DESPAWN_ON_CONDITION_FAILURE    = 0x20,
+    SPAWNGROUP_FLAG_NONE                = 0x00,
+    SPAWNGROUP_FLAG_SYSTEM              = 0x01,
+    SPAWNGROUP_FLAG_COMPATIBILITY_MODE  = 0x02,
+    SPAWNGROUP_FLAG_MANUAL_SPAWN        = 0x04,
+    SPAWNGROUP_FLAG_DYNAMIC_SPAWN_RATE  = 0x08,
+    SPAWNGROUP_FLAG_ESCORTQUESTNPC      = 0x10,
 
-    SPAWNGROUP_FLAGS_ALL = (SPAWNGROUP_FLAG_SYSTEM | SPAWNGROUP_FLAG_COMPATIBILITY_MODE | SPAWNGROUP_FLAG_MANUAL_SPAWN
-                            | SPAWNGROUP_FLAG_DYNAMIC_SPAWN_RATE | SPAWNGROUP_FLAG_ESCORTQUESTNPC | SPAWNGROUP_FLAG_DESPAWN_ON_CONDITION_FAILURE)
+    SPAWNGROUP_FLAGS_ALL = (SPAWNGROUP_FLAG_SYSTEM | SPAWNGROUP_FLAG_COMPATIBILITY_MODE | SPAWNGROUP_FLAG_MANUAL_SPAWN | SPAWNGROUP_FLAG_DYNAMIC_SPAWN_RATE | SPAWNGROUP_FLAG_ESCORTQUESTNPC)
 };
 
 struct SpawnGroupTemplateData
@@ -65,7 +63,7 @@ struct SpawnGroupTemplateData
     SpawnGroupFlags flags;
 };
 
-namespace Trinity { namespace Impl {
+namespace Firelands { namespace Impl {
     template <typename T>
     struct SpawnObjectTypeForImpl { static_assert(!std::is_same<T,T>::value, "This type does not have an associated spawn type!"); };
     template <> struct SpawnObjectTypeForImpl<Creature> { static constexpr SpawnObjectType value = SPAWN_TYPE_CREATURE; };
@@ -79,7 +77,7 @@ struct SpawnMetadata
     static constexpr bool TypeHasData(SpawnObjectType type) { return (type < NUM_SPAWN_TYPES_WITH_DATA); }
     static constexpr bool TypeIsValid(SpawnObjectType type) { return (type < NUM_SPAWN_TYPES); }
     template <typename T>
-    static constexpr SpawnObjectType TypeFor = Trinity::Impl::SpawnObjectTypeForImpl<T>::value;
+    static constexpr SpawnObjectType TypeFor = Firelands::Impl::SpawnObjectTypeForImpl<T>::value;
 
     SpawnData const* ToSpawnData() const { return TypeHasData(type) ? reinterpret_cast<SpawnData const*>(this) : nullptr; }
 
@@ -97,7 +95,6 @@ struct SpawnData : public SpawnMetadata
 {
     uint32 id = 0; // entry in respective _template table
     Position spawnPoint;
-    uint32 poolId = 0;
     int32 spawntimesecs = 0;
     uint8 spawnMask = 0;
     uint8 phaseUseFlags = 0;

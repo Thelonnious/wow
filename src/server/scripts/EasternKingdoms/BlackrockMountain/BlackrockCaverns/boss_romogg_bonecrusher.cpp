@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,7 +24,7 @@
 #include "SpellScript.h"
 #include "Map.h"
 #include "SpellInfo.h"
-
+ 
 enum Texts
 {
     SAY_AGGRO                   = 0,
@@ -62,7 +62,7 @@ enum Data
 {
     DATA_CRUSHING_BONES_AND_CRACKING_SKULLS = 0
 };
-
+ 
 class AttackStartEvent : public BasicEvent
 {
     public:
@@ -114,7 +114,7 @@ struct boss_romogg_bonecrusher : public BossAI
         if (who->GetEntry() == NPC_ANGERED_EARTH)
             _killedElementals++;
     }
-
+ 
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
@@ -202,9 +202,17 @@ private:
     uint8 _killedElementals;
 };
 
-struct npc_romogg_chains_of_woe : public NullCreatureAI
+struct npc_romogg_chains_of_woe : public ScriptedAI
 {
-    npc_romogg_chains_of_woe(Creature* creature) : NullCreatureAI(creature) { }
+    npc_romogg_chains_of_woe(Creature* creature) : ScriptedAI(creature)
+    {
+        Initialize();
+    }
+
+    void Initialize()
+    {
+        me->SetReactState(REACT_PASSIVE);
+    }
 
     void IsSummonedBy(Unit* /*summoner*/) override
     {
@@ -212,6 +220,8 @@ struct npc_romogg_chains_of_woe : public NullCreatureAI
         DoCastSelf(SPELL_CHAINS_OF_WOE_TELEPORT);
         DoCastSelf(SPELL_CHAINS_OF_WOE_CHANNELED);
     }
+
+    void EnterEvadeMode(EvadeReason why) override { }
 
 private:
     EventMap _events;

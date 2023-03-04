@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,10 +22,10 @@
 #include <string>
 
 class ChatHandler;
+class Map;
 class PhaseShift;
 class Player;
 class WorldObject;
-class TerrainInfo;
 class WorldPacket;
 namespace WorldPackets
 {
@@ -35,7 +35,7 @@ namespace WorldPackets
     }
 }
 
-class TC_GAME_API PhasingHandler
+class FC_GAME_API PhasingHandler
 {
 public:
     static void AddPhase(WorldObject* object, uint32 phaseId, bool updateVisibility);
@@ -62,7 +62,7 @@ public:
     static void InitDbVisibleMapId(PhaseShift& phaseShift, int32 visibleMapId);
     static bool InDbPhaseShift(WorldObject const* object, uint8 phaseUseFlags, uint16 phaseId, uint32 phaseGroupId);
 
-    static uint32 GetTerrainMapId(PhaseShift const& phaseShift, uint32 mapId, TerrainInfo const* terrain, float x, float y);
+    static uint32 GetTerrainMapId(PhaseShift const& phaseShift, Map const* map, float x, float y);
 
     static void SetAlwaysVisible(PhaseShift& phaseShift, bool apply);
     static void SetInversed(PhaseShift& phaseShift, bool apply);

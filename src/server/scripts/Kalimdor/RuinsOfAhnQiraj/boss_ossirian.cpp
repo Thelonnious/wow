@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -117,16 +117,14 @@ class boss_ossirian : public CreatureScript
                 Initialize();
             }
 
-            void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+            void SpellHit(Unit* caster, SpellInfo const* spell) override
             {
-                if (!caster || !caster->IsCreature() || !caster->ToCreature()->IsSummon())
-
                 for (uint8 i = 0; i < NUM_WEAKNESS; ++i)
                 {
                     if (spell->Id == SpellWeakness[i])
                     {
                         me->RemoveAurasDueToSpell(SPELL_SUPREME);
-                        caster->ToCreature()->ToTempSummon()->UnSummon();
+                        caster->ToTempSummon()->UnSummon();
                         SpawnNextCrystal();
                     }
                 }

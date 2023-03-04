@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,7 +19,14 @@
 #define OUTDOOR_PVP_HP_
 
 #include "OutdoorPvP.h"
-#include <array>
+
+namespace WorldPackets
+{
+    namespace WorldState
+    {
+        class InitWorldStates;
+    }
+}
 
 enum DefenseMessages
 {
@@ -59,27 +66,29 @@ enum OutdoorPvPHPWorldStates
 class OPvPCapturePointHP : public OPvPCapturePoint
 {
     public:
-        OPvPCapturePointHP(OutdoorPvP* pvp, OutdoorPvPHPTowerType type, GameObject* go, ObjectGuid::LowType const& flagSpawnId);
+        OPvPCapturePointHP(OutdoorPvP* pvp, OutdoorPvPHPTowerType type);
 
         void ChangeState() override;
 
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*data*/) override;
+
     private:
         OutdoorPvPHPTowerType m_TowerType;
-        ObjectGuid::LowType const& m_flagSpawnId;
 };
 
 class OutdoorPvPHP : public OutdoorPvP
 {
     public:
-        OutdoorPvPHP(Map* map);
+        OutdoorPvPHP();
 
         bool SetupOutdoorPvP() override;
-        void OnGameObjectCreate(GameObject* go) override;
 
         void HandlePlayerEnterZone(Player* player, uint32 zone) override;
         void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
 
         bool Update(uint32 diff) override;
+
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*data*/) override;
 
         void SendRemoveWorldStates(Player* player) override;
 
@@ -95,7 +104,6 @@ class OutdoorPvPHP : public OutdoorPvP
         // how many towers are controlled
         uint32 m_AllianceTowersControlled;
         uint32 m_HordeTowersControlled;
-        std::array<ObjectGuid::LowType, HP_TOWER_NUM> m_towerFlagSpawnIds;
 };
 
 #endif

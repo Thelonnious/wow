@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -48,7 +48,7 @@ enum LfgOptions
 {
     LFG_OPTION_ENABLE_DUNGEON_FINDER            = 0x1,
     LFG_OPTION_ENABLE_RAID_BROWSER              = 0x2,
-    LFG_OPTION_ENABLE_SHORTAGE_REWARDS          = 0x4 
+    LFG_OPTION_ENABLE_SHORTAGE_REWARDS          = 0x4
 };
 
 enum LFGMgrEnum
@@ -316,7 +316,7 @@ struct LFGDungeonData
     bool IsRaid() const;
 };
 
-class TC_GAME_API LFGMgr
+class FC_GAME_API LFGMgr
 {
     private:
         LFGMgr();

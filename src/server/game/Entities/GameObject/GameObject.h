@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_GAMEOBJECT_H
-#define TRINITYCORE_GAMEOBJECT_H
+#ifndef _FIRELANDS_GAMEOBJECT_H
+#define _FIRELANDS_GAMEOBJECT_H
 
 #include "Object.h"
 #include "DatabaseEnvFwd.h"
@@ -41,7 +41,7 @@ enum TriggerCastFlags : uint32;
 class GameObjectTypeBase
 {
 public:
-    class TC_GAME_API CustomCommand
+    class FC_GAME_API CustomCommand
     {
     public:
         virtual ~CustomCommand();
@@ -61,7 +61,7 @@ protected:
 
 namespace GameObjectType
 {
-class TC_GAME_API SetTransportAutoCycleBetweenStopFrames : public GameObjectTypeBase::CustomCommand
+class FC_GAME_API SetTransportAutoCycleBetweenStopFrames : public GameObjectTypeBase::CustomCommand
 {
 public:
     explicit SetTransportAutoCycleBetweenStopFrames(bool on);
@@ -108,7 +108,7 @@ enum LootState
 // 5 sec for bobber catch
 #define FISHING_BOBBER_READY_TIME 5
 
-class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>, public MapObject
+class FC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>, public MapObject
 {
     public:
         explicit GameObject();
@@ -160,7 +160,8 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
             m_spawnedByDefault = false;                     // all object with owner is despawned after delay
             SetGuidValue(OBJECT_FIELD_CREATED_BY, owner);
         }
-        ObjectGuid GetOwnerGUID() const override { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
+        ObjectGuid GetOwnerGUID() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
+        Unit* GetOwner() const;
 
         void SetSpellId(uint32 id)
         {
@@ -221,8 +222,16 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         void SetLootGenerationTime();
         uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
-        bool IsTappedByPlayer(ObjectGuid playerGuid) const { return std::find(_tappingPlayers.begin(), _tappingPlayers.end(), playerGuid) != _tappingPlayers.end(); }
-        void AddPlayerToTapperList(ObjectGuid playerGuid) { _tappingPlayers.emplace_back(playerGuid); }
+        void AddToSkillupList(ObjectGuid::LowType PlayerGuidLow) { m_SkillupList.push_back(PlayerGuidLow); }
+        bool IsInSkillupList(ObjectGuid::LowType PlayerGuidLow) const
+        {
+            for (std::list<ObjectGuid::LowType>::const_iterator i = m_SkillupList.begin(); i != m_SkillupList.end(); ++i)
+                if (*i == PlayerGuidLow)
+                    return true;
+
+            return false;
+        }
+        void ClearSkillupList() { m_SkillupList.clear(); }
 
         void AddUniqueUse(Player* player);
         void AddUse() { ++m_usetimes; }
@@ -264,12 +273,14 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
 
         GameObject* LookupFishingHoleAround(float range);
 
+        void CastSpell(Unit* target, uint32 spell, bool triggered = true);
+        void CastSpell(Unit* target, uint32 spell, TriggerCastFlags triggered);
         void SendCustomAnim(uint32 anim);
         bool IsInRange(float x, float y, float z, float radius) const;
 
-        void ModifyHealth(int32 change, WorldObject* attackerOrHealer = nullptr, uint32 spellId = 0);
+        void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
         // sets GameObject type 33 destruction flags and optionally default health for that state
-        void SetDestructibleState(GameObjectDestructibleState state, WorldObject* attackerOrHealer = nullptr, bool setHealth = false);
+        void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = nullptr, bool setHealth = false);
         GameObjectDestructibleState GetDestructibleState() const
         {
             if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED))
@@ -290,8 +301,8 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         void SetDisplayId(uint32 displayid);
         uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
 
-        uint32 GetFaction() const override { return GetUInt32Value(GAMEOBJECT_FACTION); }
-        void SetFaction(uint32 faction) override { SetUInt32Value(GAMEOBJECT_FACTION, faction); }
+        uint32 GetFaction() const { return GetUInt32Value(GAMEOBJECT_FACTION); }
+        void SetFaction(uint32 faction) { SetUInt32Value(GAMEOBJECT_FACTION, faction); }
 
         GameObjectModel* m_model;
         void GetRespawnPosition(float &x, float &y, float &z, float* ori = nullptr) const;
@@ -345,7 +356,7 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
                                                             // For traps this: spell casting cooldown, for doors/buttons: reset time.
         GOState     m_prevGoState;                          // What state to set whenever resetting
 
-        std::vector<ObjectGuid> _tappingPlayers;
+        std::list<ObjectGuid::LowType> m_SkillupList;
 
         ObjectGuid m_ritualOwnerGUID;                       // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
         GuidSet m_unique_users;

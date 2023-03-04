@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_CHAT_H
-#define TRINITYCORE_CHAT_H
+#ifndef _FIRELANDS_CHAT_H
+#define _FIRELANDS_CHAT_H
 
 #include "Common.h"
 #include "ChatCommand.h"
@@ -37,7 +37,7 @@ class WorldPacket;
 
 struct GameTele;
 
-class TC_GAME_API ChatHandler
+class FC_GAME_API ChatHandler
 {
     public:
         WorldSession* GetSession() { return m_session; }
@@ -56,7 +56,7 @@ class TC_GAME_API ChatHandler
         static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
 
         // function with different implementation for chat/console
-        virtual char const* GetTrinityString(uint32 entry) const;
+        virtual char const* GetFirelandsString(uint32 entry) const;
         virtual void SendSysMessage(char const* str, bool escapeCharacters = false);
 
         void SendSysMessage(uint32 entry);
@@ -64,7 +64,7 @@ class TC_GAME_API ChatHandler
         template<typename... Args>
         void PSendSysMessage(char const* fmt, Args&&... args)
         {
-            SendSysMessage(Trinity::StringFormat(fmt, std::forward<Args>(args)...).c_str());
+            SendSysMessage(Firelands::StringFormat(fmt, std::forward<Args>(args)...).c_str());
         }
 
         template<typename... Args>
@@ -76,7 +76,7 @@ class TC_GAME_API ChatHandler
         template<typename... Args>
         std::string PGetParseString(uint32 entry, Args&&... args) const
         {
-            return Trinity::StringFormat(GetTrinityString(entry), std::forward<Args>(args)...);
+            return Firelands::StringFormat(GetFirelandsString(entry), std::forward<Args>(args)...);
         }
 
         bool _ParseCommands(char const* text);
@@ -149,14 +149,14 @@ class TC_GAME_API ChatHandler
         bool sentErrorMessage;
 };
 
-class TC_GAME_API CliHandler : public ChatHandler
+class FC_GAME_API CliHandler : public ChatHandler
 {
     public:
         typedef void Print(void*, char const*);
         explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) { }
 
         // overwrite functions
-        char const* GetTrinityString(uint32 entry) const override;
+        char const* GetFirelandsString(uint32 entry) const override;
         bool isAvailable(ChatCommand const& cmd) const override;
         bool HasPermission(uint32 /*permission*/) const override { return true; }
         void SendSysMessage(const char *str, bool escapeCharacters) override;
@@ -171,7 +171,7 @@ class TC_GAME_API CliHandler : public ChatHandler
         Print* m_print;
 };
 
-class TC_GAME_API AddonChannelCommandHandler : public ChatHandler
+class FC_GAME_API AddonChannelCommandHandler : public ChatHandler
 {
     public:
         using ChatHandler::ChatHandler;

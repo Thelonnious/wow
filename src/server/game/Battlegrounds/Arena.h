@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_ARENA_H
-#define TRINITY_ARENA_H
+#ifndef FIRELANDS_ARENA_H
+#define FIRELANDS_ARENA_H
 
 #include "Battleground.h"
 
@@ -49,11 +49,10 @@ enum ArenaSpellIds
 enum ArenaWorldStates
 {
     ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN   = 3600,
-    ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD    = 3601,
-    ARENA_WORLD_STATE_SHOW_ALIVE_PLAYERS    = 3610
+    ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD    = 3601
 };
 
-class TC_GAME_API Arena : public Battleground
+class FC_GAME_API Arena : public Battleground
 {
     protected:
         Arena();
@@ -61,6 +60,7 @@ class TC_GAME_API Arena : public Battleground
         void AddPlayer(Player* player) override;
         void RemovePlayer(Player* /*player*/, ObjectGuid /*guid*/, uint32 /*team*/) override;
 
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& data) override;
         void UpdateArenaWorldState();
 
         void HandleKillPlayer(Player* player, Player* killer) override;
@@ -71,4 +71,4 @@ class TC_GAME_API Arena : public Battleground
         void EndBattleground(uint32 winner) override;
 };
 
-#endif // TRINITY_ARENA_H
+#endif // FIRELANDS_ARENA_H

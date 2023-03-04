@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -255,16 +255,6 @@ namespace WorldPackets
 
             int32 MapID = -1;
             bool Showing = false;
-        };
-
-        class FailedPlayerCondition final : public ServerPacket
-        {
-        public:
-            FailedPlayerCondition() : ServerPacket(SMSG_FAILED_PLAYER_CONDITION, 4) { }
-
-            WorldPacket const* Write() override;
-
-            int32 ConditionID = 0;
         };
     }
 }

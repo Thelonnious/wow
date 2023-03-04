@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -25,7 +25,7 @@
 
 class InstanceScript;
 
-class TC_GAME_API SummonList
+class FC_GAME_API SummonList
 {
 public:
     typedef GuidList StorageType;
@@ -98,7 +98,7 @@ public:
     {
         // We need to use a copy of SummonList here, otherwise original SummonList would be modified
         StorageType listCopy = storage_;
-        Trinity::Containers::RandomResize<StorageType, Predicate>(listCopy, std::forward<Predicate>(predicate), max);
+        Firelands::Containers::RandomResize<StorageType, Predicate>(listCopy, std::forward<Predicate>(predicate), max);
         DoActionImpl(info, listCopy);
     }
 
@@ -113,7 +113,7 @@ private:
     StorageType storage_;
 };
 
-class TC_GAME_API EntryCheckPredicate
+class FC_GAME_API EntryCheckPredicate
 {
     public:
         EntryCheckPredicate(uint32 entry) : _entry(entry) { }
@@ -123,13 +123,13 @@ class TC_GAME_API EntryCheckPredicate
         uint32 _entry;
 };
 
-class TC_GAME_API DummyEntryCheckPredicate
+class FC_GAME_API DummyEntryCheckPredicate
 {
     public:
         bool operator()(ObjectGuid) { return true; }
 };
 
-struct TC_GAME_API ScriptedAI : public CreatureAI
+struct FC_GAME_API ScriptedAI : public CreatureAI
 {
     explicit ScriptedAI(Creature* creature);
     virtual ~ScriptedAI() { }
@@ -140,8 +140,35 @@ struct TC_GAME_API ScriptedAI : public CreatureAI
 
     void AttackStartNoMove(Unit* target);
 
+    // Called at any Damage from any attacker (before damage apply)
+    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/) override { }
+
     //Called at World update tick
     virtual void UpdateAI(uint32 diff) override;
+
+    //Called at creature death
+    void JustDied(Unit* /*killer*/) override { }
+
+    //Called at creature killing another unit
+    void KilledUnit(Unit* /*victim*/) override { }
+
+    // Called when the creature summon successfully other creature
+    void JustSummoned(Creature* /*summon*/) override { }
+
+    // Called when a summoned creature is despawned
+    void SummonedCreatureDespawn(Creature* /*summon*/) override { }
+
+    // Called when hit by a spell
+    void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/) override { }
+
+    // Called when spell hits a target
+    void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) override { }
+
+    //Called at waypoint reached or PointMovement end
+    void MovementInform(uint32 /*type*/, uint32 /*id*/) override { }
+
+    // Called when AI is temporarily replaced or put back when possess is applied or removed
+    void OnPossess(bool /*apply*/) { }
 
     // *************
     // Variables
@@ -153,6 +180,12 @@ struct TC_GAME_API ScriptedAI : public CreatureAI
     // *************
     //Pure virtual functions
     // *************
+
+    //Called at creature reset either by death or evade
+    void Reset() override { }
+
+    //Called at creature aggro either by MoveInLOS or Attack Start
+    void JustEngagedWith(Unit* /*who*/) override { }
 
     // Called before JustEngagedWith even before the creature is in combat.
     void AttackStart(Unit* /*target*/) override;
@@ -228,6 +261,8 @@ struct TC_GAME_API ScriptedAI : public CreatureAI
     void SetCombatMovement(bool allowMovement);
     bool IsCombatMovementAllowed() const { return _isCombatMovementAllowed; }
 
+    bool CheckHomeDistToEvade(uint32 diff, float dist = 0.0f, float x = 0.0f, float y = 0.0f, float z = 0.0f, bool onlyZ = false);
+
     // return true for heroic mode. i.e.
     //   - for dungeon in mode 10-heroic,
     //   - for raid in mode 10-Heroic
@@ -241,8 +276,8 @@ struct TC_GAME_API ScriptedAI : public CreatureAI
     // return true for 25 man or 25 man heroic mode
     bool Is25ManRaid() const { return _difficulty & RAID_DIFFICULTY_MASK_25MAN; }
 
-    template <class T>
-    inline T const& DUNGEON_MODE(T const& normal5, T const& heroic10) const
+    template<class T> inline
+    const T& DUNGEON_MODE(const T& normal5, const T& heroic10) const
     {
         switch (_difficulty)
         {
@@ -257,8 +292,8 @@ struct TC_GAME_API ScriptedAI : public CreatureAI
         return heroic10;
     }
 
-    template <class T>
-    inline T const& RAID_MODE(T const& normal10, T const& normal25) const
+    template<class T> inline
+    const T& RAID_MODE(const T& normal10, const T& normal25) const
     {
         switch (_difficulty)
         {
@@ -273,8 +308,8 @@ struct TC_GAME_API ScriptedAI : public CreatureAI
         return normal25;
     }
 
-    template <class T>
-    inline T const& RAID_MODE(T const& normal10, T const& normal25, T const& heroic10, T const& heroic25) const
+    template<class T> inline
+    const T& RAID_MODE(const T& normal10, const T& normal25, const T& heroic10, const T& heroic25) const
     {
         switch (_difficulty)
         {
@@ -297,9 +332,10 @@ struct TC_GAME_API ScriptedAI : public CreatureAI
         Difficulty _difficulty;
         bool _isCombatMovementAllowed;
         bool _isHeroic;
+        uint32 _checkHomeTimer;
 };
 
-class TC_GAME_API BossAI : public ScriptedAI
+class FC_GAME_API BossAI : public ScriptedAI
 {
     public:
         BossAI(Creature* creature, uint32 bossId);
@@ -345,7 +381,7 @@ class TC_GAME_API BossAI : public ScriptedAI
         uint32 const _bossId;
 };
 
-class TC_GAME_API WorldBossAI : public ScriptedAI
+class FC_GAME_API WorldBossAI : public ScriptedAI
 {
     public:
         WorldBossAI(Creature* creature);
@@ -403,5 +439,15 @@ inline void GetPlayerListInGrid(Container& container, WorldObject* source, float
 {
     source->GetPlayerListInGrid(container, maxSearchRange);
 }
+
+Player* GetFarthestPlayerInArea(WorldObject* owner, float range);
+
+FC_GAME_API void GetPositionWithDistInOrientation(Position* pUnit, float dist, float orientation, float& x, float& y);
+FC_GAME_API void GetPositionWithDistInOrientation(Position* fromPos, float dist, float orientation, Position& movePosition);
+
+FC_GAME_API void GetRandPosFromCenterInDist(float centerX, float centerY, float dist, float& x, float& y);
+FC_GAME_API void GetRandPosFromCenterInDist(Position* centerPos, float dist, Position& movePosition);
+
+FC_GAME_API void GetPositionWithDistInFront(Position* centerPos, float dist, Position& movePosition);
 
 #endif // SCRIPTEDCREATURE_H_

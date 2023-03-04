@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_CHATCOMMANDARGS_H
-#define TRINITY_CHATCOMMANDARGS_H
+#ifndef FIRELANDS_CHATCOMMANDARGS_H
+#define FIRELANDS_CHATCOMMANDARGS_H
 
 #include "ChatCommandHelpers.h"
 #include "ChatCommandTags.h"
@@ -24,7 +24,7 @@
 
 struct GameTele;
 
-namespace Trinity {
+namespace Firelands {
 namespace ChatCommands {
 
 /************************** ARGUMENT HANDLERS *******************************************\
@@ -110,21 +110,21 @@ struct ArgInfo<T, std::enable_if_t<advstd::is_base_of_v<ContainerTag, T>>>
 
 // AchievementEntry* from numeric id or link
 template <>
-struct TC_GAME_API ArgInfo<AchievementEntry const*>
+struct FC_GAME_API ArgInfo<AchievementEntry const*>
 {
     static char const* TryConsume(AchievementEntry const*&, char const*);
 };
 
 // GameTele* from string name or link
 template <>
-struct TC_GAME_API ArgInfo<GameTele const*>
+struct FC_GAME_API ArgInfo<GameTele const*>
 {
     static char const* TryConsume(GameTele const*&, char const*);
 };
 
 // bool from 1/0 or on/off
 template <>
-struct TC_GAME_API ArgInfo<bool>
+struct FC_GAME_API ArgInfo<bool>
 {
     static char const* TryConsume(bool&, char const*);
 };

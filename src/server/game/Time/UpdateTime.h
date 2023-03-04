@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,7 +24,7 @@
 
 #define AVG_DIFF_COUNT 500
 
-class TC_GAME_API UpdateTime
+class FC_GAME_API UpdateTime
 {
     using DiffTableArray = std::array<uint32, AVG_DIFF_COUNT>;
 
@@ -56,7 +56,7 @@ class TC_GAME_API UpdateTime
         uint32 _recordedTime;
 };
 
-class TC_GAME_API WorldUpdateTime : public UpdateTime
+class FC_GAME_API WorldUpdateTime : public UpdateTime
 {
     public:
         WorldUpdateTime() : UpdateTime(), _recordUpdateTimeInverval(0), _recordUpdateTimeMin(0), _lastRecordTime(0) { }
@@ -71,6 +71,6 @@ class TC_GAME_API WorldUpdateTime : public UpdateTime
         uint32 _lastRecordTime;
 };
 
-TC_GAME_API extern WorldUpdateTime sWorldUpdateTime;
+FC_GAME_API extern WorldUpdateTime sWorldUpdateTime;
 
 #endif

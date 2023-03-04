@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -101,7 +101,7 @@ void UpdateTime::_RecordUpdateTimeDuration(std::string const& text, uint32 minUp
     uint32 diff = getMSTimeDiff(_recordedTime, thisTime);
 
     if (diff > minUpdateTime)
-        TC_LOG_INFO("misc", "Recored Update Time of %s: %u.", text.c_str(), diff);
+        LOG_INFO("misc", "Recored Update Time of %s: %u.", text.c_str(), diff);
 
     _recordedTime = thisTime;
 }
@@ -123,7 +123,7 @@ void WorldUpdateTime::RecordUpdateTime(uint32 gameTimeMs, uint32 diff, uint32 se
     {
         if (getMSTimeDiff(_lastRecordTime, gameTimeMs) > _recordUpdateTimeInverval)
         {
-            TC_LOG_DEBUG("misc", "Update time diff: %u. Players online: %u.", GetAverageUpdateTime(), sessionCount);
+            LOG_DEBUG("misc", "Update time diff: %u. Players online: %u.", GetAverageUpdateTime(), sessionCount);
             _lastRecordTime = gameTimeMs;
         }
     }

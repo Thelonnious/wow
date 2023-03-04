@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,7 +21,7 @@
 #include "ChatCommandHyperlinks.h"
 #include "ObjectMgr.h"
 
-using namespace Trinity::ChatCommands;
+using namespace Firelands::ChatCommands;
 
 struct AchievementVisitor
 {
@@ -29,7 +29,7 @@ struct AchievementVisitor
     value_type operator()(Hyperlink<achievement> achData) const { return achData->achievement; }
     value_type operator()(uint32 achId) const { return sAchievementMgr->GetAchievement(achId); }
 };
-char const* Trinity::ChatCommands::ArgInfo<AchievementEntry const*>::TryConsume(AchievementEntry const*& data, char const* args)
+char const* Firelands::ChatCommands::ArgInfo<AchievementEntry const*>::TryConsume(AchievementEntry const*& data, char const* args)
 {
     Variant <Hyperlink<achievement>, uint32> val;
     if ((args = CommandArgsConsumerSingle<decltype(val)>::TryConsumeTo(val, args)))
@@ -43,7 +43,7 @@ struct GameTeleVisitor
     value_type operator()(Hyperlink<tele> tele) const { return sObjectMgr->GetGameTele(tele); }
     value_type operator()(std::string const& tele) const { return sObjectMgr->GetGameTele(tele); }
 };
-char const* Trinity::ChatCommands::ArgInfo<GameTele const*>::TryConsume(GameTele const*& data, char const* args)
+char const* Firelands::ChatCommands::ArgInfo<GameTele const*>::TryConsume(GameTele const*& data, char const* args)
 {
     Variant<Hyperlink<tele>, std::string> val;
     if ((args = CommandArgsConsumerSingle<decltype(val)>::TryConsumeTo(val, args)))
@@ -58,7 +58,7 @@ struct BoolVisitor
     value_type operator()(ExactSequence<'o', 'n'>) const { return true; }
     value_type operator()(ExactSequence<'o', 'f', 'f'>) const { return false; }
 };
-char const* Trinity::ChatCommands::ArgInfo<bool>::TryConsume(bool& data, char const* args)
+char const* Firelands::ChatCommands::ArgInfo<bool>::TryConsume(bool& data, char const* args)
 {
     Variant<uint32, ExactSequence<'o', 'n'>, ExactSequence<'o', 'f', 'f'>> val;
     if ((args = CommandArgsConsumerSingle<decltype(val)>::TryConsumeTo(val, args)))

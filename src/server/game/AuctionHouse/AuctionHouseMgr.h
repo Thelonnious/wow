@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -72,7 +72,7 @@ enum AuctionHouses
     AUCTIONHOUSE_NEUTRAL        = 7
 };
 
-struct TC_GAME_API AuctionEntry
+struct FC_GAME_API AuctionEntry
 {
     uint32 Id;
     uint8 houseId;
@@ -104,7 +104,7 @@ struct TC_GAME_API AuctionEntry
 };
 
 //this class is used as auctionhouse instance
-class TC_GAME_API AuctionHouseObject
+class FC_GAME_API AuctionHouseObject
 {
   public:
     ~AuctionHouseObject()
@@ -149,7 +149,7 @@ class TC_GAME_API AuctionHouseObject
 
 };
 
-class TC_GAME_API AuctionHouseMgr
+class FC_GAME_API AuctionHouseMgr
 {
     private:
         AuctionHouseMgr();

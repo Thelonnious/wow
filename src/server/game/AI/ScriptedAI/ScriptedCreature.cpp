@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -124,7 +124,8 @@ void SummonList::DoActionImpl(int32 action, StorageType const& summons)
 
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
     IsFleeing(false),
-    _isCombatMovementAllowed(true)
+    _isCombatMovementAllowed(true),
+    _checkHomeTimer(5000)
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
@@ -192,7 +193,7 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* source, uint32 soundId)
 
     if (!sSoundEntriesStore.LookupEntry(soundId))
     {
-        TC_LOG_ERROR("scripts", "Invalid soundId %u used in DoPlaySoundToSet (Source: TypeId %u, GUID %u)", soundId, source->GetTypeId(), source->GetGUID().GetCounter());
+        LOG_ERROR("scripts", "Invalid soundId %u used in DoPlaySoundToSet (Source: TypeId %u, GUID %u)", soundId, source->GetTypeId(), source->GetGUID().GetCounter());
         return;
     }
 
@@ -354,7 +355,7 @@ void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o
     if (Player* player = unit->ToPlayer())
         player->TeleportTo(unit->GetMapId(), x, y, z, o, TELE_TO_NOT_LEAVE_COMBAT);
     else
-        TC_LOG_ERROR("scripts", "Creature %s Tried to teleport non-player unit (%s) to x: %f y:%f z: %f o: %f. Aborted.",
+        LOG_ERROR("scripts", "Creature %s Tried to teleport non-player unit (%s) to x: %f y:%f z: %f o: %f. Aborted.",
             me->GetGUID().ToString().c_str(), unit->GetGUID().ToString().c_str(), x, y, z, o);
 }
 
@@ -374,8 +375,8 @@ void ScriptedAI::DoTeleportAll(float x, float y, float z, float o)
 Unit* ScriptedAI::DoSelectLowestHpFriendly(float range, uint32 minHPDiff)
 {
     Unit* unit = nullptr;
-    Trinity::FriendlyMostHPMissingInRange u_check(me, range, minHPDiff);
-    Trinity::UnitLastSearcher<Trinity::FriendlyMostHPMissingInRange> searcher(me, unit, u_check);
+    Firelands::FriendlyMostHPMissingInRange u_check(me, range, minHPDiff);
+    Firelands::UnitLastSearcher<Firelands::FriendlyMostHPMissingInRange> searcher(me, unit, u_check);
     Cell::VisitAllObjects(me, searcher, range);
 
     return unit;
@@ -384,8 +385,8 @@ Unit* ScriptedAI::DoSelectLowestHpFriendly(float range, uint32 minHPDiff)
 Unit* ScriptedAI::DoSelectBelowHpPctFriendlyWithEntry(uint32 entry, float range, uint8 minHPDiff, bool excludeSelf)
 {
     Unit* unit = nullptr;
-    Trinity::FriendlyBelowHpPctEntryInRange u_check(me, entry, range, minHPDiff, excludeSelf);
-    Trinity::UnitLastSearcher<Trinity::FriendlyBelowHpPctEntryInRange> searcher(me, unit, u_check);
+    Firelands::FriendlyBelowHpPctEntryInRange u_check(me, entry, range, minHPDiff, excludeSelf);
+    Firelands::UnitLastSearcher<Firelands::FriendlyBelowHpPctEntryInRange> searcher(me, unit, u_check);
     Cell::VisitAllObjects(me, searcher, range);
 
     return unit;
@@ -394,8 +395,8 @@ Unit* ScriptedAI::DoSelectBelowHpPctFriendlyWithEntry(uint32 entry, float range,
 std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
 {
     std::list<Creature*> list;
-    Trinity::FriendlyCCedInRange u_check(me, range);
-    Trinity::CreatureListSearcher<Trinity::FriendlyCCedInRange> searcher(me, list, u_check);
+    Firelands::FriendlyCCedInRange u_check(me, range);
+    Firelands::CreatureListSearcher<Firelands::FriendlyCCedInRange> searcher(me, list, u_check);
     Cell::VisitAllObjects(me, searcher, range);
 
     return list;
@@ -404,8 +405,8 @@ std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
 std::list<Creature*> ScriptedAI::DoFindFriendlyMissingBuff(float range, uint32 uiSpellid)
 {
     std::list<Creature*> list;
-    Trinity::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
-    Trinity::CreatureListSearcher<Trinity::FriendlyMissingBuffInRange> searcher(me, list, u_check);
+    Firelands::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
+    Firelands::CreatureListSearcher<Firelands::FriendlyMissingBuffInRange> searcher(me, list, u_check);
     Cell::VisitAllObjects(me, searcher, range);
 
     return list;
@@ -415,8 +416,8 @@ Player* ScriptedAI::GetPlayerAtMinimumRange(float minimumRange)
 {
     Player* player = nullptr;
 
-    Trinity::PlayerAtMinimumRangeAway check(me, minimumRange);
-    Trinity::PlayerSearcher<Trinity::PlayerAtMinimumRangeAway> searcher(me, player, check);
+    Firelands::PlayerAtMinimumRangeAway check(me, minimumRange);
+    Firelands::PlayerSearcher<Firelands::PlayerAtMinimumRangeAway> searcher(me, player, check);
     Cell::VisitWorldObjects(me, searcher, minimumRange);
 
     return player;
@@ -443,6 +444,44 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
 void ScriptedAI::SetCombatMovement(bool allowMovement)
 {
     _isCombatMovementAllowed = allowMovement;
+}
+
+bool ScriptedAI::CheckHomeDistToEvade(uint32 diff, float dist, float x, float y, float z, bool onlyZ)
+{
+    if (!me->IsInCombat())
+        return false;
+
+    bool evade = false;
+
+    if (_checkHomeTimer <= diff)
+    {
+        _checkHomeTimer = 1500;
+
+        if (onlyZ)
+        {
+            if ((me->GetPositionZ() > z + dist) || (me->GetPositionZ() < z - dist))
+                evade = true;
+        }
+        else if (x != 0.0f || y != 0.0f || z != 0.0f)
+        {
+            if (me->GetDistance(x, y, z) >= dist)
+                evade = true;
+        }
+        else if (me->GetDistance(me->GetHomePosition()) >= dist)
+            evade = true;
+
+        if (evade)
+        {
+            EnterEvadeMode();
+            return true;
+        }
+    }
+    else
+    {
+        _checkHomeTimer -= diff;
+    }
+
+    return false;
 }
 
 // BossAI - for instanced bosses
@@ -560,7 +599,7 @@ void BossAI::_DespawnAtEvade(Seconds delayToRespawn, Creature* who)
 {
     if (delayToRespawn < Seconds(2))
     {
-        TC_LOG_ERROR("scripts", "_DespawnAtEvade called with delay of %ld seconds, defaulting to 2.", delayToRespawn.count());
+        LOG_ERROR("scripts", "_DespawnAtEvade called with delay of %ld seconds, defaulting to 2.", delayToRespawn.count());
         delayToRespawn = Seconds(2);
     }
 
@@ -569,7 +608,7 @@ void BossAI::_DespawnAtEvade(Seconds delayToRespawn, Creature* who)
 
     if (TempSummon* whoSummon = who->ToTempSummon())
     {
-        TC_LOG_WARN("scripts", "_DespawnAtEvade called on a temporary summon.");
+        LOG_WARN("scripts", "_DespawnAtEvade called on a temporary summon.");
         whoSummon->UnSummon();
         return;
     }
@@ -639,4 +678,62 @@ void WorldBossAI::UpdateAI(uint32 diff)
     }
 
     DoMeleeAttackIfReady();
+}
+
+Player* GetFarthestPlayerInArea(WorldObject* owner, float range)
+{
+    Player* farth = nullptr;
+    float dist = 0.0f;
+    std::list<Player*> PlayersInArea;
+    GetPlayerListInGrid(PlayersInArea, owner, range);
+
+    for (auto&& itr : PlayersInArea)
+    {
+        if (itr->IsGameMaster())
+            continue;
+
+        if (itr->GetDistance2d(owner) > dist)
+        {
+            dist = itr->GetDistance2d(owner);
+            farth = itr;
+        }
+    }
+
+    return farth;
+}
+
+void GetPositionWithDistInOrientation(Position* pUnit, float dist, float orientation, float& x, float& y)
+{
+    x = pUnit->GetPositionX() + (dist * cos(orientation));
+    y = pUnit->GetPositionY() + (dist * sin(orientation));
+}
+
+void GetPositionWithDistInOrientation(Position* fromPos, float dist, float orientation, Position& movePosition)
+{
+    float x = 0.0f;
+    float y = 0.0f;
+
+    GetPositionWithDistInOrientation(fromPos, dist, orientation, x, y);
+
+    movePosition.m_positionX = x;
+    movePosition.m_positionY = y;
+    movePosition.m_positionZ = fromPos->GetPositionZ();
+}
+
+void GetRandPosFromCenterInDist(float centerX, float centerY, float dist, float& x, float& y)
+{
+    float randOrientation = frand(0.0f, 2.0f * (float)M_PI);
+
+    x = centerX + (dist * cos(randOrientation));
+    y = centerY + (dist * sin(randOrientation));
+}
+
+void GetRandPosFromCenterInDist(Position* centerPos, float dist, Position& movePosition)
+{
+    GetPositionWithDistInOrientation(centerPos, dist, frand(0, 2 * float(M_PI)), movePosition);
+}
+
+void GetPositionWithDistInFront(Position* centerPos, float dist, Position& movePosition)
+{
+    GetPositionWithDistInOrientation(centerPos, dist, centerPos->GetOrientation(), movePosition);
 }

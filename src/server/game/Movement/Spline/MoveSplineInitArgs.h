@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYSERVER_MOVESPLINEINIT_ARGS_H
-#define TRINITYSERVER_MOVESPLINEINIT_ARGS_H
+#ifndef FIRELANDSSERVER_MOVESPLINEINIT_ARGS_H
+#define FIRELANDSSERVER_MOVESPLINEINIT_ARGS_H
 
 #include "MoveSplineFlag.h"
 #include "ObjectGuid.h"
@@ -68,4 +68,4 @@ namespace Movement
     };
 }
 
-#endif // TRINITYSERVER_MOVESPLINEINIT_ARGS_H
+#endif // FIRELANDSSERVER_MOVESPLINEINIT_ARGS_H

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -66,7 +66,7 @@ struct DumpTable;
 struct TableStruct;
 class StringTransaction;
 
-class TC_GAME_API PlayerDump
+class FC_GAME_API PlayerDump
 {
     public:
         static void InitializeTables();
@@ -75,7 +75,7 @@ class TC_GAME_API PlayerDump
         PlayerDump() { }
 };
 
-class TC_GAME_API PlayerDumpWriter : public PlayerDump
+class FC_GAME_API PlayerDumpWriter : public PlayerDump
 {
     public:
         PlayerDumpWriter() { }
@@ -94,7 +94,7 @@ class TC_GAME_API PlayerDumpWriter : public PlayerDump
         std::set<uint64> _itemSets;
 };
 
-class TC_GAME_API PlayerDumpReader : public PlayerDump
+class FC_GAME_API PlayerDumpReader : public PlayerDump
 {
     public:
         PlayerDumpReader() { }

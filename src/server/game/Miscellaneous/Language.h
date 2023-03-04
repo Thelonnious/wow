@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TRINITY_LANGUAGE_H
-#define __TRINITY_LANGUAGE_H
+#ifndef __FIRELANDS_LANGUAGE_H
+#define __FIRELANDS_LANGUAGE_H
 
 enum BroadcastTextIds
 {
@@ -25,7 +25,7 @@ enum BroadcastTextIds
     BROADCAST_TEXT_FLEE_FOR_ASSIST      = 1150
 };
 
-enum TrinityStrings
+enum FirelandsStrings
 {
     // for chat commands
     LANG_SELECT_CHAR_OR_CREATURE        = 1,
@@ -331,7 +331,7 @@ enum TrinityStrings
       // 296 free
 
       // END
-    LANG_COMMAND_WANDER_DISTANCE        = 297,
+    LANG_COMMAND_SPAWNDIST              = 297,
     LANG_COMMAND_SPAWNTIME              = 298,
     LANG_COMMAND_MODIFY_HONOR           = 299,
 
@@ -829,18 +829,7 @@ enum TrinityStrings
     LANG_CHARACTER_DELETED_LIST_LINE_CHAT = 1026,
     LANG_SQLDRIVER_QUERY_LOGGING_ENABLED  = 1027,
     LANG_SQLDRIVER_QUERY_LOGGING_DISABLED = 1028,
-    LANG_ACCOUNT_INVALID_BNET_NAME      = 1029,
-    LANG_ACCOUNT_USE_BNET_COMMANDS      = 1030,
     LANG_ACCOUNT_PASS_TOO_LONG          = 1031,
-    LANG_ACCOUNT_CREATED_BNET_WITH_GAME = 1032,
-    LANG_ACCOUNT_CREATED_BNET           = 1033,
-    LANG_ACCOUNT_BNET_LIST_HEADER       = 1034,
-    LANG_ACCOUNT_BNET_LIST_NO_ACCOUNTS  = 1035,
-    LANG_ACCOUNT_BNET_LINKED            = 1036,
-    LANG_ACCOUNT_OR_BNET_DOES_NOT_EXIST = 1037,
-    LANG_ACCOUNT_ALREADY_LINKED         = 1038,
-    LANG_ACCOUNT_BNET_UNLINKED          = 1039,
-    LANG_ACCOUNT_BNET_NOT_LINKED        = 1040,
     // Room for more level 4              1041-1099 not used
 
     // Level 3 (continue)
@@ -986,7 +975,7 @@ enum TrinityStrings
     LANG_COMMAND_TICKETLISTRESPONSE     = 2029,
     LANG_COMMAND_TICKETCOMPLETED        = 2030,
 
-    // Trinity strings                    5000-9999
+    // Firelands strings                    5000-9999
     LANG_COMMAND_FREEZE                 = 5000,
     LANG_COMMAND_FREEZE_ERROR           = 5001,
     LANG_COMMAND_FREEZE_WRONG           = 5002,
@@ -1081,7 +1070,7 @@ enum TrinityStrings
     LANG_LIST_RESPAWNS_CREATURES        = 5081,
     LANG_LIST_RESPAWNS_GAMEOBJECTS      = 5082,
 
-    // Room for more Trinity strings      5084-6603
+    // Room for more Firelands strings      5084-6603
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1166,6 +1155,10 @@ enum TrinityStrings
     LANG_CREATURE_NOT_AI_ENABLED                  = 11015,
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
     LANG_SHUTDOWN_DELAYED                         = 11017,
-    LANG_SHUTDOWN_CANCELLED                       = 11018
+    LANG_SHUTDOWN_CANCELLED                       = 11018,
+
+    // For NPC reload command
+    LANG_NPC_RELOADED                             = 11020,
+    LANG_NPCS_RELOADED                            = 11021,
 };
 #endif

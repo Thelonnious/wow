@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -21,12 +21,12 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 
-void WorldSession::HandleRequestHonorStatsOpcode(WorldPackets::Inspect::RequestHonorStats& packet) 
+void WorldSession::HandleRequestHonorStatsOpcode(WorldPackets::Inspect::RequestHonorStats& packet)
 {
     Player* player = ObjectAccessor::GetPlayer(*_player, packet.TargetGUID);
     if (!player)
     {
-        TC_LOG_DEBUG("network", "CMSG_REQUEST_HONOR_STATS: No player found from %s", packet.TargetGUID.ToString().c_str());
+        LOG_DEBUG("network", "CMSG_REQUEST_HONOR_STATS: No player found from %s", packet.TargetGUID.ToString().c_str());
         return;
     }
 
@@ -51,7 +51,7 @@ void WorldSession::HandleRequestInspectRatedBgStatsOpcode(WorldPackets::Inspect:
     Player* player = ObjectAccessor::GetPlayer(*_player, packet.TargetGUID);
     if (!player)
     {
-        TC_LOG_DEBUG("network", "CMSG_REQUEST_INSPECT_RATED_BG_STATS: No player found from %s", packet.TargetGUID.ToString().c_str());
+        LOG_DEBUG("network", "CMSG_REQUEST_INSPECT_RATED_BG_STATS: No player found from %s", packet.TargetGUID.ToString().c_str());
         return;
     }
 

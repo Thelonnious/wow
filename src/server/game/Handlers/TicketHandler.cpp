@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,7 +26,6 @@
 #include "Player.h"
 #include "Random.h"
 #include "TicketMgr.h"
-#include "TicketPackets.h"
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
@@ -40,7 +39,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
 
     if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_TICKET_LEVEL_REQ))
     {
-        SendNotification(GetTrinityString(LANG_TICKET_REQ), sWorld->getIntConfig(CONFIG_TICKET_LEVEL_REQ));
+        SendNotification(GetFirelandsString(LANG_TICKET_REQ), sWorld->getIntConfig(CONFIG_TICKET_LEVEL_REQ));
         return;
     }
 
@@ -94,7 +93,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
             }
             else
             {
-                TC_LOG_ERROR("network", "CMSG_GMTICKET_CREATE possibly corrupt. Uncompression failed.");
+                LOG_ERROR("network", "CMSG_GMTICKET_CREATE possibly corrupt. Uncompression failed.");
                 recvData.rfinish();
                 return;
             }
@@ -276,14 +275,4 @@ void WorldSession::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
         sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
         sTicketMgr->SendTicket(this, nullptr);
     }
-}
-
-void WorldSession::HandleComplaintOpcode(WorldPackets::Ticket::Complaint& /*packet*/)
-{
-    // Complaint Received message
-    WorldPackets::Ticket::ComplaintResult complaintResult;
-    complaintResult.Result = 0; // unknown what to send
-    complaintResult.ComplaintType = 5; // common value found in sniffs. Unrelated to complaint type of the cmsg packet
-
-    SendPacket(complaintResult.Write());
 }

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -133,7 +133,7 @@ class OrbsDespawner : public BasicEvent
 
         bool Execute(uint64 /*currTime*/, uint32 /*diff*/) override
         {
-            Trinity::CreatureWorker<OrbsDespawner> worker(_creature, *this);
+            Firelands::CreatureWorker<OrbsDespawner> worker(_creature, *this);
             Cell::VisitGridObjects(_creature, worker, SIZE_OF_GRIDS);
             return true;
         }
@@ -264,11 +264,11 @@ struct boss_twin_baseAI : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        DoZoneInCombat();
+        me->SetInCombatWithZone();
         if (Creature* pSister = GetSister())
         {
             me->AddAura(MyEmphatySpellId, pSister);
-            DoZoneInCombat(pSister);
+            pSister->SetInCombatWithZone();
         }
         instance->SetBossState(BOSS_VALKIRIES, IN_PROGRESS);
 

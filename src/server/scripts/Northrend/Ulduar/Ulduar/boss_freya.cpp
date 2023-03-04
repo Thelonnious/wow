@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -834,10 +834,9 @@ class boss_elder_stonebark : public CreatureScript
 
             void DamageTaken(Unit* who, uint32& damage) override
             {
-                if (!who || who == me)
+                if (who == me)
                     return;
 
-                ///HACK: should be handled by proc
                 if (me->HasAura(SPELL_PETRIFIED_BARK))
                 {
                     int32 reflect = damage;
@@ -1499,12 +1498,12 @@ class npc_unstable_sun_beam : public CreatureScript
                     despawnTimer -= diff;
             }
 
-            void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+            void SpellHitTarget(Unit* target, SpellInfo const* spell) override
             {
-                if (target->IsUnit() && spell->Id == SPELL_UNSTABLE_ENERGY)
+                if (target && spell->Id == SPELL_UNSTABLE_ENERGY)
                 {
-                    target->ToUnit()->RemoveAurasDueToSpell(SPELL_UNSTABLE_SUN_BEAM);
-                    target->ToUnit()->RemoveAurasDueToSpell(SPELL_UNSTABLE_SUN_BEAM_TRIGGERED);
+                    target->RemoveAurasDueToSpell(SPELL_UNSTABLE_SUN_BEAM);
+                    target->RemoveAurasDueToSpell(SPELL_UNSTABLE_SUN_BEAM_TRIGGERED);
                 }
             }
 

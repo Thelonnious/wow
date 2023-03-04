@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -145,16 +145,11 @@ void Totem::UnSummon(uint32 msTime)
     AddObjectToRemoveList();
 }
 
-bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, WorldObject const* caster,
-    bool requireImmunityPurgesEffectAttribute /*= false*/) const
+bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit* caster) const
 {
-    // immune to all positive spells, except of stoneclaw totem absorb and sentry totem bind sight
-    // totems positive spells have unit_caster target
-    if (spellInfo->Effects[index].Effect != SPELL_EFFECT_DUMMY &&
-        spellInfo->Effects[index].Effect != SPELL_EFFECT_SCRIPT_EFFECT &&
-        spellInfo->IsPositive() && spellInfo->Effects[index].TargetA.GetTarget() != TARGET_UNIT_CASTER &&
-        spellInfo->Effects[index].TargetA.GetCheckType() != TARGET_CHECK_ENTRY && spellInfo->Id != SENTRY_STONECLAW_SPELLID && spellInfo->Id != SENTRY_BIND_SIGHT_SPELLID)
-        return true;
+    /// @todo possibly all negative auras immune?
+    if (GetEntry() == 5925)
+        return false;
 
     switch (spellInfo->Effects[index].ApplyAuraName)
     {
@@ -167,5 +162,5 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Wor
             break;
     }
 
-    return Creature::IsImmunedToSpellEffect(spellInfo, index, caster, requireImmunityPurgesEffectAttribute);
+    return Creature::IsImmunedToSpellEffect(spellInfo, index, caster);
 }

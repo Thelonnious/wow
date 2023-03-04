@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_PASSIVEAI_H
-#define TRINITY_PASSIVEAI_H
+#ifndef FIRELANDS_PASSIVEAI_H
+#define FIRELANDS_PASSIVEAI_H
 
 #include "CreatureAI.h"
 
-class TC_GAME_API PassiveAI : public CreatureAI
+class FC_GAME_API PassiveAI : public CreatureAI
 {
     public:
         explicit PassiveAI(Creature* c);
@@ -32,7 +32,7 @@ class TC_GAME_API PassiveAI : public CreatureAI
         static int32 Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
 };
 
-class TC_GAME_API PossessedAI : public CreatureAI
+class FC_GAME_API PossessedAI : public CreatureAI
 {
     public:
         explicit PossessedAI(Creature* c);
@@ -51,7 +51,7 @@ class TC_GAME_API PossessedAI : public CreatureAI
         static int32 Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
 };
 
-class TC_GAME_API NullCreatureAI : public CreatureAI
+class FC_GAME_API NullCreatureAI : public CreatureAI
 {
     public:
         explicit NullCreatureAI(Creature* c);
@@ -68,7 +68,7 @@ class TC_GAME_API NullCreatureAI : public CreatureAI
         static int32 Permissible(Creature const* creature);
 };
 
-class TC_GAME_API CritterAI : public PassiveAI
+class FC_GAME_API CritterAI : public PassiveAI
 {
     public:
         explicit CritterAI(Creature* c) : PassiveAI(c) { }
@@ -81,7 +81,7 @@ class TC_GAME_API CritterAI : public PassiveAI
         static int32 Permissible(Creature const* creature);
 };
 
-class TC_GAME_API TriggerAI : public NullCreatureAI
+class FC_GAME_API TriggerAI : public NullCreatureAI
 {
     public:
         explicit TriggerAI(Creature* c) : NullCreatureAI(c) { }

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -23,7 +23,7 @@
 
 namespace WorldPackets
 {
-    class TC_GAME_API Packet
+    class FC_GAME_API Packet
     {
     public:
         Packet(WorldPacket&& worldPacket);
@@ -38,16 +38,15 @@ namespace WorldPackets
 
         WorldPacket const* GetRawPacket() const { return &_worldPacket; }
         size_t GetSize() const { return _worldPacket.size(); }
-        ConnectionType GetConnection() const { return _worldPacket.GetConnection(); }
 
     protected:
         WorldPacket _worldPacket;
     };
 
-    class TC_GAME_API ServerPacket : public Packet
+    class FC_GAME_API ServerPacket : public Packet
     {
     public:
-        ServerPacket(OpcodeServer opcode, size_t initialSize = 200, ConnectionType connection = CONNECTION_TYPE_DEFAULT) : Packet(WorldPacket(opcode, initialSize, connection)) { }
+        ServerPacket(OpcodeServer opcode, size_t initialSize = 200) : Packet(WorldPacket(opcode, initialSize)) { }
 
         void Read() override final;
 
@@ -58,7 +57,7 @@ namespace WorldPackets
         OpcodeServer GetOpcode() const { return OpcodeServer(_worldPacket.GetOpcode()); }
     };
 
-    class TC_GAME_API ClientPacket : public Packet
+    class FC_GAME_API ClientPacket : public Packet
     {
     public:
         ClientPacket(WorldPacket&& packet);

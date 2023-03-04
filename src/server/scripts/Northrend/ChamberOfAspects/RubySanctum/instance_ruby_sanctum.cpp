@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ruby_sanctum.h"
 #include "ScriptMgr.h"
 #include "AreaBoundary.h"
 #include "Creature.h"
@@ -23,6 +22,8 @@
 #include "GameObject.h"
 #include "InstanceScript.h"
 #include "Map.h"
+#include "WorldStatePackets.h"
+#include "ruby_sanctum.h"
 
 Position const HalionControllerSpawnPos = { 3156.037f, 533.2656f, 72.97205f, 0.0f };
 
@@ -194,6 +195,13 @@ class instance_ruby_sanctum : public InstanceMapScript
                     return 0;
 
                 return BaltharusSharedHealth;
+            }
+
+            void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& data) override
+            {
+                data.Worldstates.emplace_back(uint32(WORLDSTATE_CORPOREALITY_MATERIAL), uint32(50));
+                data.Worldstates.emplace_back(uint32(WORLDSTATE_CORPOREALITY_TWILIGHT), uint32(50));
+                data.Worldstates.emplace_back(uint32(WORLDSTATE_CORPOREALITY_TOGGLE), uint32(0));
             }
 
         protected:

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -205,7 +205,6 @@ enum ItemFlags2 : uint32
     ITEM_FLAG2_OVERRIDE_GOLD_COST                       = 0x00004000,
     ITEM_FLAG2_IGNORE_DEFAULT_RATED_BG_RESTRICTIONS     = 0x00008000,
     ITEM_FLAG2_NOT_USABLE_IN_RATED_BG                   = 0x00010000,
-    ITEM_FLAG2_BNET_ACCOUNT_TRADE_OK                    = 0x00020000,
     ITEM_FLAG2_CONFIRM_BEFORE_USE                       = 0x00040000,
     ITEM_FLAG2_REEVALUATE_BONDING_ON_TRANSFORM          = 0x00080000,
     ITEM_FLAG2_NO_TRANSFORM_ON_CHARGE_DEPLETION         = 0x00100000,
@@ -227,6 +226,15 @@ enum ItemFlagsCustom
     ITEM_FLAGS_CU_UNUSED                = 0x0001,
     ITEM_FLAGS_CU_IGNORE_QUEST_STATUS   = 0x0002,   // No quest status will be checked when this item drops
     ITEM_FLAGS_CU_FOLLOW_LOOT_RULES     = 0x0004    // Item will always follow group/master/need before greed looting rules
+};
+
+enum CurrencyFlags
+{
+    CURRENCY_FLAG_TRADEABLE          = 0x01,
+    // ...
+    CURRENCY_FLAG_HIGH_PRECISION     = 0x08,
+    // ...
+    CURRENCY_FLAG_COUNT_SEASON_TOTAL = 0x80,
 };
 
 enum CurrencyCategory
@@ -620,7 +628,7 @@ struct ItemEffect
 
 class Player;
 
-struct TC_GAME_API ItemTemplate
+struct FC_GAME_API ItemTemplate
 {
     ItemEntry const* BasicData;
     ItemSparseEntry const* ExtendedData;

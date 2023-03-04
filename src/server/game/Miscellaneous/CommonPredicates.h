@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_COMMONPREDICATES_H
-#define TRINITY_COMMONPREDICATES_H
+#ifndef FIRELANDS_COMMONPREDICATES_H
+#define FIRELANDS_COMMONPREDICATES_H
 
 #include "Define.h"
 #include <utility>
@@ -24,12 +24,12 @@
 class WorldObject;
 class Unit;
 
-namespace Trinity
+namespace Firelands
 {
     namespace Predicates
     {
         /// Only returns true for the given attacker's current victim, if any
-        class TC_GAME_API IsVictimOf
+        class FC_GAME_API IsVictimOf
         {
             public:
                 IsVictimOf(Unit const* attacker);
@@ -39,7 +39,7 @@ namespace Trinity
         };
 
         /// Only returns true when the object is in the given phase ID
-        class TC_GAME_API HasPhaseId
+        class FC_GAME_API HasPhaseId
         {
             public:
                 HasPhaseId(uint32 const phaseId) : _phaseId(phaseId) { }
@@ -49,7 +49,7 @@ namespace Trinity
         };
 
         template <typename PRED>
-        class TC_GAME_API Inverter
+        class FC_GAME_API Inverter
         {
             public:
                 Inverter(PRED&& p) : _child(std::move(p)) { }
@@ -76,4 +76,4 @@ namespace Trinity
     }
 }
 
-#endif //TRINITY_COMMONPREDICATES_H
+#endif //FIRELANDS_COMMONPREDICATES_H

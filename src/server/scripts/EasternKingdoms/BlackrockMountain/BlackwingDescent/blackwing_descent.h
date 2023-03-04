@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -52,9 +52,9 @@ enum BWDDataTypes
     DATA_NEFARIAN_MAGMAW,
 
     /*Omnotron Defense System*/
-    DATA_ELECTRON, 
-    DATA_MAGMATRON, 
-    DATA_TOXITRON, 
+    DATA_ELECTRON,
+    DATA_MAGMATRON,
+    DATA_TOXITRON,
     DATA_ARCANOTRON,
     DATA_LORD_VICTOR_NEFARIUS_OMNOTRON,
 

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_GROUP_H
-#define TRINITYCORE_GROUP_H
+#ifndef _FIRELANDS_GROUP_H
+#define _FIRELANDS_GROUP_H
 
 #include "DBCEnums.h"
 #include "DatabaseEnvFwd.h"
@@ -185,7 +185,7 @@ typedef std::list<RaidMarkerInfo> RaidMarkerList;
 
 /** request member stats checken **/
 /// @todo uninvite people that not accepted invite
-class TC_GAME_API Group
+class FC_GAME_API Group
 {
     public:
         struct MemberSlot
@@ -362,7 +362,7 @@ class TC_GAME_API Group
         bool isRollLootActive() const;
         void SendLootStartRoll(uint32 CountDown, uint32 mapid, Roll const& r);
         void SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p, bool canNeed, Roll const& r);
-        void SendLootRoll(ObjectGuid SourceGuid, ObjectGuid TargetGuid, int32 RollNumber, uint8 RollType, Roll const& r, bool autoPass = false);
+        void SendLootRoll(ObjectGuid SourceGuid, ObjectGuid TargetGuid, int32 RollNumber, uint8 RollType, Roll const& r);
         void SendLootRollWon(ObjectGuid SourceGuid, ObjectGuid TargetGuid, int32 RollNumber, uint8 RollType, Roll const& r);
         void SendLootAllPassed(Roll const& roll);
         void SendLooter(Creature* creature, Player* pLooter);

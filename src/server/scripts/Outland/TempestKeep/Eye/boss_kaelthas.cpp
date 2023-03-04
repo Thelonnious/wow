@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -358,7 +358,7 @@ struct advisorbase_ai : public ScriptedAI
         ScriptedAI::AttackStart(who);
     }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_RESSURECTION)
         {
@@ -369,7 +369,7 @@ struct advisorbase_ai : public ScriptedAI
         }
     }
 
-    void DamageTaken(Unit* /*killer*/, uint32 &damage) override
+    void DamageTaken(Unit* killer, uint32 &damage) override
     {
         if (damage >= me->GetHealth() && !_inFakeDeath && !_hasRessurrected)
         {
@@ -387,7 +387,7 @@ struct advisorbase_ai : public ScriptedAI
             me->SetTarget(ObjectGuid::Empty);
             me->SetStandState(UNIT_STAND_STATE_DEAD);
             me->GetMotionMaster()->Clear();
-            JustDied(nullptr);
+            JustDied(killer);
         }
     }
 
@@ -572,9 +572,7 @@ class boss_kaelthas : public CreatureScript
                 if (_phase == PHASE_NONE)
                 {
                     DoAction(ACTION_START_ENCOUNTER);
-
-                    if (attacker)
-                        me->SetTarget(attacker->GetGUID());
+                    me->SetTarget(attacker->GetGUID());
                 }
 
                 if (!_hasFullPower && me->HealthBelowPctDamaged(50, damage))

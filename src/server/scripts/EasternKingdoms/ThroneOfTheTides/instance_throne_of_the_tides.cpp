@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -340,6 +340,9 @@ class instance_throne_of_the_tides : public InstanceMapScript
 
                 switch (go->GetEntry())
                 {
+                    case GO_TEMP_FALLING_ROCKS:
+                        go->SendCustomAnim(0);
+                        break;
                     case GO_DOODAD_ABYSSAL_MAW_DOOR_1:
                         if (_eventIndex >= EVENT_INDEX_LADY_NAZJAR_GAUNTLET)
                             go->SetGoState(GO_STATE_ACTIVE);
@@ -541,7 +544,6 @@ class instance_throne_of_the_tides : public InstanceMapScript
                         break;
                     default:
                         break;
- 
                 }
             }
 

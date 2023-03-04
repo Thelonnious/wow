@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_DB2STORES_H
-#define TRINITY_DB2STORES_H
+#ifndef FIRELANDS_DB2STORES_H
+#define FIRELANDS_DB2STORES_H
 
 #include "DB2Store.h"
 #include "DB2Structure.h"
@@ -24,11 +24,11 @@
 #include <map>
 #include <string>
 
-TC_GAME_API extern DB2Storage<ItemEntry>                sItemStore;
-TC_GAME_API extern DB2Storage<ItemCurrencyCostEntry>    sItemCurrencyCostStore;
-TC_GAME_API extern DB2Storage<ItemExtendedCostEntry>    sItemExtendedCostStore;
-TC_GAME_API extern DB2Storage<ItemSparseEntry>          sItemSparseStore;
-TC_GAME_API extern DB2Storage<KeyChainEntry>            sKeyChainStore;
+FC_GAME_API extern DB2Storage<ItemEntry>                sItemStore;
+FC_GAME_API extern DB2Storage<ItemCurrencyCostEntry>    sItemCurrencyCostStore;
+FC_GAME_API extern DB2Storage<ItemExtendedCostEntry>    sItemExtendedCostStore;
+FC_GAME_API extern DB2Storage<ItemSparseEntry>          sItemSparseStore;
+FC_GAME_API extern DB2Storage<KeyChainEntry>            sKeyChainStore;
 
 struct HotfixNotify
 {
@@ -39,7 +39,7 @@ struct HotfixNotify
 
 typedef std::vector<HotfixNotify> HotfixData;
 
-class TC_GAME_API DB2Manager
+class FC_GAME_API DB2Manager
 {
 public:
     typedef std::map<uint32 /*hash*/, DB2StorageBase*> StorageMap;

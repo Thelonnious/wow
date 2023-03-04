@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -77,7 +77,7 @@ HashMapHolder<Player>::MapType const& ObjectAccessor::GetPlayers()
     return HashMapHolder<Player>::GetContainer();
 }
 
-template class TC_GAME_API HashMapHolder<Player>;
+template class FC_GAME_API HashMapHolder<Player>;
 
 namespace PlayerNameMapHolder
 {

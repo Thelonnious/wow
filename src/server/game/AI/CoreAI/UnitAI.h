@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_UNITAI_H
-#define TRINITY_UNITAI_H
+#ifndef FIRELANDS_UNITAI_H
+#define FIRELANDS_UNITAI_H
 
 #include "Containers.h"
 #include "Errors.h"
@@ -56,7 +56,7 @@ enum SelectAggroTarget
 };
 
 // default predicate function to select target based on distance, player and/or aura criteria
-struct TC_GAME_API DefaultTargetSelector
+struct FC_GAME_API DefaultTargetSelector
 {
     Unit const* me;
     float m_dist;
@@ -75,7 +75,7 @@ struct TC_GAME_API DefaultTargetSelector
 
 // Target selector for spell casts checking range, auras and attributes
 /// @todo Add more checks from Spell::CheckCast
-struct TC_GAME_API SpellTargetSelector
+struct FC_GAME_API SpellTargetSelector
 {
     public:
         SpellTargetSelector(Unit* caster, uint32 spellId);
@@ -89,7 +89,7 @@ struct TC_GAME_API SpellTargetSelector
 // Very simple target selector, will just skip main target
 // NOTE: When passing to UnitAI::SelectTarget remember to use 0 as position for random selection
 //       because tank will not be in the temporary list
-struct TC_GAME_API NonTankTargetSelector
+struct FC_GAME_API NonTankTargetSelector
 {
     public:
         NonTankTargetSelector(Unit* source, bool playerOnly = true) : _source(source), _playerOnly(playerOnly) { }
@@ -101,7 +101,7 @@ struct TC_GAME_API NonTankTargetSelector
 };
 
 // Simple selector for units using mana
-struct TC_GAME_API PowerUsersSelector
+struct FC_GAME_API PowerUsersSelector
 {
     public:
         PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
@@ -114,7 +114,7 @@ struct TC_GAME_API PowerUsersSelector
         bool const _playerOnly;
 };
 
-struct TC_GAME_API FarthestTargetSelector
+struct FC_GAME_API FarthestTargetSelector
 {
     public:
         FarthestTargetSelector(Unit const* unit, float dist, bool playerOnly, bool inLos) : _me(unit), _dist(dist), _playerOnly(playerOnly), _inLos(inLos) {}
@@ -127,7 +127,7 @@ struct TC_GAME_API FarthestTargetSelector
         bool _inLos;
 };
 
-class TC_GAME_API UnitAI
+class FC_GAME_API UnitAI
 {
     protected:
         Unit* const me;
@@ -190,7 +190,7 @@ class TC_GAME_API UnitAI
                 case SELECT_TARGET_MINDISTANCE:
                     return targetList.front();
                 case SELECT_TARGET_RANDOM:
-                    return Trinity::Containers::SelectRandomContainerElement(targetList);
+                    return Firelands::Containers::SelectRandomContainerElement(targetList);
                 default:
                     return nullptr;
             }
@@ -274,7 +274,7 @@ class TC_GAME_API UnitAI
                 return;
 
             if (targetType == SELECT_TARGET_RANDOM)
-                Trinity::Containers::RandomResize(targetList, num);
+                Firelands::Containers::RandomResize(targetList, num);
             else
                 targetList.resize(num);
         }
@@ -308,11 +308,12 @@ class TC_GAME_API UnitAI
 
         void AttackStartCaster(Unit* victim, float dist);
 
-        SpellCastResult DoCast(uint32 spellId);
-        SpellCastResult DoCast(Unit* victim, uint32 spellId, CastSpellExtraArgs const& args = {});
-        SpellCastResult DoCastSelf(uint32 spellId, CastSpellExtraArgs const& args = {}) { return DoCast(me, spellId, args); }
-        SpellCastResult DoCastVictim(uint32 spellId, CastSpellExtraArgs const& args = {});
-        SpellCastResult DoCastAOE(uint32 spellId, CastSpellExtraArgs const& args = {}) { return DoCast(nullptr, spellId, args); }
+        void DoCast(uint32 spellId);
+        void DoCast(Unit* victim, uint32 spellId, CastSpellExtraArgs const& args = {});
+        void DoCastSelf(uint32 spellId, CastSpellExtraArgs const& args = {}) { DoCast(me, spellId, args); }
+        void DoCastVictim(uint32 spellId, CastSpellExtraArgs const& args = {});
+        void DoCastAOE(uint32 spellId, CastSpellExtraArgs const& args = {}) { DoCast(nullptr, spellId, args); }
+        void DoCastRandom(uint32 spellId, float dist, CastSpellExtraArgs const& args = {}, int32 aura = 0, uint32 position = 0);
 
         float DoGetSpellMaxRange(uint32 spellId, bool positive = false);
         void DoMeleeAttackIfReady();

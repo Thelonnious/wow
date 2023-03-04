@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_CREATUREAI_H
-#define TRINITY_CREATUREAI_H
+#ifndef FIRELANDS_CREATUREAI_H
+#define FIRELANDS_CREATUREAI_H
 
 #include "UnitAI.h"
 #include "Common.h"
@@ -69,7 +69,7 @@ enum SCEquip
     EQUIP_UNEQUIP   = 0
 };
 
-class TC_GAME_API CreatureAI : public UnitAI
+class FC_GAME_API CreatureAI : public UnitAI
 {
     protected:
         Creature* const me;
@@ -142,10 +142,10 @@ class TC_GAME_API CreatureAI : public UnitAI
         virtual void JustUnregisteredDynObject(DynamicObject* /*dynObject*/) { }
 
         // Called when hit by a spell
-        virtual void SpellHit(WorldObject* /*caster*/, SpellInfo const* /*spellInfo*/) { }
+        virtual void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/) { }
 
         // Called when spell hits a target
-        virtual void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* /*spellInfo*/) { }
+        virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) { }
 
         // Should return true if the NPC is currently being escorted
         virtual bool IsEscorted() const { return false; }

@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -141,7 +141,7 @@ struct boss_erudax : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, 1);
-        instance->DoUpdateWorldState(WORLD_STATE_ID_DONT_NEED_TO_BREAK_EGGS, 0);
+        instance->instance->SetWorldState(WORLD_STATE_ID_DONT_NEED_TO_BREAK_EGGS, 0);
         events.ScheduleEvent(EVENT_BINDING_SHADOWS, 10s + 500ms);
         events.ScheduleEvent(EVENT_ENFEEBLING_BLOW, 19s);
         events.ScheduleEvent(EVENT_SHADOW_GALE, 26s);
@@ -367,7 +367,7 @@ struct npc_erudax_faceless_corruptor : public ScriptedAI
                     break;
                 case EVENT_TWILIGHT_CORRUPTION:
                     // Fail achievement by setting the required world state to 1 (0 is required for successful achievement)
-                    _instance->DoUpdateWorldState(WORLD_STATE_ID_DONT_NEED_TO_BREAK_EGGS, 1);
+                    _instance->instance->SetWorldState(WORLD_STATE_ID_DONT_NEED_TO_BREAK_EGGS, 1);
                     DoCastAOE(SPELL_TWILIGHT_CORRUPTION);
                     break;
                 case EVENT_UMBRAL_MENDING:
@@ -471,7 +471,7 @@ class spell_erudax_twilight_corruption : public SpellScript
         if (targets.empty())
             return;
 
-        targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster(), true));
+        targets.sort(Firelands::ObjectDistanceOrderPred(GetCaster(), true));
 
         if (targets.size() > 1)
             targets.resize(1);

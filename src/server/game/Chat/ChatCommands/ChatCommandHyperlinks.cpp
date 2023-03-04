@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -40,7 +40,7 @@ class AchievementLinkTokenizer
             else
                 _empty = true;
 
-            return Trinity::ChatCommands::base_tag::StoreTo(val, firstPos, thisLen);
+            return Firelands::ChatCommands::base_tag::StoreTo(val, firstPos, thisLen);
         }
 
         bool IsEmpty() { return _empty; }
@@ -51,7 +51,7 @@ class AchievementLinkTokenizer
         bool _empty;
 };
 
-bool Trinity::ChatCommands::achievement::StoreTo(AchievementLinkData& val, char const* pos, size_t len)
+bool Firelands::ChatCommands::achievement::StoreTo(AchievementLinkData& val, char const* pos, size_t len)
 {
     AchievementLinkTokenizer t(pos, len);
     uint32 achievementId;

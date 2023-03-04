@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -103,7 +103,7 @@ enum class CreatureRandomMovementType : uint8
     Max
 };
 
-struct TC_GAME_API CreatureMovementData
+struct FC_GAME_API CreatureMovementData
 {
     CreatureMovementData();
 
@@ -137,7 +137,7 @@ static uint32 const MAX_CREATURE_QUEST_ITEMS = 6;
 static uint32 const MAX_CREATURE_SPELLS = 8;
 
 // from `creature_template` table
-struct TC_GAME_API CreatureTemplate
+struct FC_GAME_API CreatureTemplate
 {
     uint32  Entry;
     uint32  DifficultyEntry[MAX_DIFFICULTY - 1];
@@ -242,7 +242,7 @@ struct TC_GAME_API CreatureTemplate
 #pragma pack(push, 1)
 
 // Defines base stats for creatures (used to calculate HP/mana/armor/attackpower/rangedattackpower/all damage).
-struct TC_GAME_API CreatureBaseStats
+struct FC_GAME_API CreatureBaseStats
 {
     uint32 BaseHealth[MAX_EXPANSIONS];
     uint32 BaseMana;
@@ -300,7 +300,7 @@ struct CreatureData : public SpawnData
     CreatureData() : SpawnData(SPAWN_TYPE_CREATURE) { }
     uint32 displayid = 0;
     int8 equipmentId = 0;
-    float wanderDistance = 0.0f;
+    float spawndist = 0.0f;
     uint32 currentwaypoint = 0;
     uint32 curhealth = 0;
     uint32 curmana = 0;
@@ -336,11 +336,8 @@ struct CreatureAddon
     uint32 waypointPathId;
     uint32 cyclicSplinePathId;
     uint32 mount;
-    uint8 standState;
-    uint8 animTier;
-    uint8 sheathState;
-    uint8 pvpFlags;
-    uint8 visFlags;
+    uint32 bytes1;
+    uint32 bytes2;
     uint32 emote;
     uint16 aiAnimKit;
     uint16 movementAnimKit;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2022 Firelands <https://github.com/FirelandsProject/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -27,7 +27,7 @@
 struct CreatureData;
 struct SummonPropertiesEntry;
 
-class TC_GAME_API Transport : public GameObject, public TransportBase
+class FC_GAME_API Transport : public GameObject, public TransportBase
 {
         friend Transport* TransportMgr::CreateTransport(uint32, Map*, ObjectGuid::LowType, uint8, uint32, uint32);
 

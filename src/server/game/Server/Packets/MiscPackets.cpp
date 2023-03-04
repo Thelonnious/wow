@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -497,25 +497,6 @@ WorldPacket const* WorldPackets::Misc::MapObjEvents::Write()
     _worldPacket << uint32(Events.size());
     for (uint8 const& eventData : Events)
         _worldPacket << uint8(eventData);
-
-    return &_worldPacket;
-}
-
-WorldPacket const* WorldPackets::Misc::SetCurrency::Write()
-{
-    _worldPacket.WriteBit(WeeklyQuantity.has_value());
-    _worldPacket.WriteBit(TrackedQuantity.has_value());
-    _worldPacket.WriteBit(SuppressChatLog);
-    _worldPacket.FlushBits();
-
-    if (TrackedQuantity.has_value())
-        _worldPacket << int32(*TrackedQuantity);
-
-    _worldPacket << int32(Quantity);
-    _worldPacket << int32(Type);
-
-    if (WeeklyQuantity.has_value())
-        _worldPacket << int32(*WeeklyQuantity);
 
     return &_worldPacket;
 }

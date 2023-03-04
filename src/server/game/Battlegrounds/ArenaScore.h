@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_ARENA_SCORE_H
-#define TRINITY_ARENA_SCORE_H
+#ifndef FIRELANDS_ARENA_SCORE_H
+#define FIRELANDS_ARENA_SCORE_H
 
 #include "BattlegroundScore.h"
 #include <sstream>
 
-struct TC_GAME_API ArenaScore : public BattlegroundScore
+struct FC_GAME_API ArenaScore : public BattlegroundScore
 {
     friend class Arena;
 
@@ -42,7 +42,7 @@ struct TC_GAME_API ArenaScore : public BattlegroundScore
         uint8 TeamId; // BattlegroundTeamId
 };
 
-struct TC_GAME_API ArenaTeamScore
+struct FC_GAME_API ArenaTeamScore
 {
     friend class Arena;
     friend class Battleground;
@@ -75,4 +75,4 @@ struct TC_GAME_API ArenaTeamScore
         std::string TeamName;
 };
 
-#endif // TRINITY_ARENA_SCORE_H
+#endif // FIRELANDS_ARENA_SCORE_H

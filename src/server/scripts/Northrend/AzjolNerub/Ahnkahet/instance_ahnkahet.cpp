@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -219,7 +219,7 @@ class instance_ahnkahet : public InstanceMapScript
                         if (vInitiands.empty())
                             return ObjectGuid::Empty;
 
-                        return Trinity::Containers::SelectRandomContainerElement(vInitiands);
+                        return Firelands::Containers::SelectRandomContainerElement(vInitiands);
                     }
                     case DATA_ADD_JEDOGA_OPFER:
                         return JedogaSacrifices;

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -84,25 +84,25 @@ void LoadRandomEnchantmentsTable()
                 case ItemRandomEnchantmentType::Property:
                     if (!sItemRandomPropertiesStore.LookupEntry(ench))
                     {
-                        TC_LOG_ERROR("sql.sql", "Property %u used in `item_enchantment_template` by entry %u doesn't have exist in ItemRandomProperties.db2", ench, entry);
+                        LOG_ERROR("sql.sql", "Property %u used in `item_enchantment_template` by entry %u doesn't have exist in ItemRandomProperties.db2", ench, entry);
                         continue;
                     }
                     break;
                 case ItemRandomEnchantmentType::Suffix:
                     if (!sItemRandomSuffixStore.LookupEntry(ench))
                     {
-                        TC_LOG_ERROR("sql.sql", "Suffix %u used in `item_enchantment_template` by entry %u doesn't have exist in ItemRandomSuffix.db2", ench, entry);
+                        LOG_ERROR("sql.sql", "Suffix %u used in `item_enchantment_template` by entry %u doesn't have exist in ItemRandomSuffix.db2", ench, entry);
                         continue;
                     }
                     break;
                 default:
-                    TC_LOG_ERROR("sql.sql", "Invalid random enchantment type specified in `item_enchantment_template` table for `entry` %u `ench` %u", entry, ench);
+                    LOG_ERROR("sql.sql", "Invalid random enchantment type specified in `item_enchantment_template` table for `entry` %u `ench` %u", entry, ench);
                     break;
             }
 
             if (chance < 0.000001f || chance > 100.0f)
             {
-                TC_LOG_ERROR("sql.sql", "Random item enchantment for entry %u type %u ench %u has invalid chance %f", entry, uint32(type), ench, chance);
+                LOG_ERROR("sql.sql", "Random item enchantment for entry %u type %u ench %u has invalid chance %f", entry, uint32(type), ench, chance);
                 continue;
             }
 
@@ -121,10 +121,10 @@ void LoadRandomEnchantmentsTable()
             ++count;
         } while (result->NextRow());
 
-        TC_LOG_INFO("server.loading", ">> Loaded %u Item Enchantment definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded %u Item Enchantment definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     }
     else
-        TC_LOG_ERROR("server.loading", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
+        LOG_ERROR("server.loading", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
 }
 
 ItemRandomEnchantmentId GetItemEnchantMod(int32 entry, ItemRandomEnchantmentType type)
@@ -138,11 +138,11 @@ ItemRandomEnchantmentId GetItemEnchantMod(int32 entry, ItemRandomEnchantmentType
     auto tab = RandomItemEnch[type].find(entry);
     if (tab == RandomItemEnch[type].end())
     {
-        TC_LOG_ERROR("sql.sql", "Item RandomProperty / RandomSuffix id #%u used in `item_template` but it does not have records in `item_enchantment_template` table.", entry);
+        LOG_ERROR("sql.sql", "Item RandomProperty / RandomSuffix id #%u used in `item_template` but it does not have records in `item_enchantment_template` table.", entry);
         return{};
     }
 
-    auto selectedItr = Trinity::Containers::SelectRandomWeightedContainerElement(tab->second, [](EnchStoreItem const& enchant)
+    auto selectedItr = Firelands::Containers::SelectRandomWeightedContainerElement(tab->second, [](EnchStoreItem const& enchant)
     {
         return enchant.chance;
     });
@@ -163,7 +163,7 @@ ItemRandomEnchantmentId GenerateItemRandomPropertyId(uint32 item_id)
     // item can have not null only one from field values
     if (itemProto->GetRandomProperty() && itemProto->GetRandomSuffix())
     {
-        TC_LOG_ERROR("sql.sql", "Item template %u have RandomProperty == %u and RandomSuffix == %u, but must have one from field =0", itemProto->GetId(), itemProto->GetRandomProperty(), itemProto->GetRandomSuffix());
+        LOG_ERROR("sql.sql", "Item template %u have RandomProperty == %u and RandomSuffix == %u, but must have one from field =0", itemProto->GetId(), itemProto->GetRandomProperty(), itemProto->GetRandomSuffix());
         return{};
     }
 
@@ -187,7 +187,7 @@ uint32 GenerateEnchSuffixFactor(uint32 item_id)
     return GetRandomPropertyPoints(itemProto->GetBaseItemLevel(), itemProto->GetQuality(), itemProto->GetInventoryType(), itemProto->GetSubClass());
 }
 
-TC_GAME_API uint32 GetRandomPropertyPoints(uint32 itemLevel, uint32 quality, uint32 inventoryType, uint32 subClass)
+FC_GAME_API uint32 GetRandomPropertyPoints(uint32 itemLevel, uint32 quality, uint32 inventoryType, uint32 subClass)
 {
     uint32 propIndex;
 

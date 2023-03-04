@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_GAMEOBJECTAI_H
-#define TRINITY_GAMEOBJECTAI_H
+#ifndef FIRELANDS_GAMEOBJECTAI_H
+#define FIRELANDS_GAMEOBJECTAI_H
 
 #include "Define.h"
 #include "ObjectGuid.h"
@@ -24,11 +24,10 @@
 #include "QuestDef.h"
 
 class GameObject;
-class SpellInfo;
 class Unit;
-class WorldObject;
+class SpellInfo;
 
-class TC_GAME_API GameObjectAI
+class FC_GAME_API GameObjectAI
 {
     protected:
         GameObject* const me;
@@ -73,9 +72,8 @@ class TC_GAME_API GameObjectAI
         // prevents achievement tracking if returning true
         virtual bool OnReportUse(Player* /*player*/) { return false; }
 
-
-        virtual void Destroyed(WorldObject* /*attacker*/, uint32 /*eventId*/) { }
-        virtual void Damaged(WorldObject* /*attacker*/, uint32 /*eventId*/) { }
+        virtual void Destroyed(Player* /*player*/, uint32 /*eventId*/) { }
+        virtual void Damaged(Player* /*player*/, uint32 /*eventId*/) { }
 
         virtual uint32 GetData(uint32 /*id*/) const { return 0; }
         virtual void SetData64(uint32 /*id*/, uint64 /*value*/) { }
@@ -86,15 +84,10 @@ class TC_GAME_API GameObjectAI
         virtual void OnLootStateChanged(uint32 /*state*/, Unit* /*unit*/) { }
         virtual void OnStateChanged(uint32 /*state*/) { }
         virtual void EventInform(uint32 /*eventId*/) { }
-
-        // Called when hit by a spell
-        virtual void SpellHit(WorldObject* /*caster*/, SpellInfo const* /*spellInfo*/) { }
-
-        // Called when spell hits a target
-        virtual void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* /*spellInfo*/) { }
+        virtual void SpellHit(Unit* /*unit*/, SpellInfo const* /*spellInfo*/) { }
 };
 
-class TC_GAME_API NullGameObjectAI : public GameObjectAI
+class FC_GAME_API NullGameObjectAI : public GameObjectAI
 {
     public:
         explicit NullGameObjectAI(GameObject* g);

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -134,7 +134,7 @@ public:
                 _eruptTiles[section].clear();
                 for (uint8 i = 0; i < numEruptions[section]; ++i)
                 {
-                    auto tileBounds = Trinity::Containers::MapEqualRange(mapGOs, spawnId++);
+                    auto tileBounds = Firelands::Containers::MapEqualRange(mapGOs, spawnId++);
                     for (auto const& spawnPair : tileBounds)
                         _eruptTiles[section].push_back(spawnPair.second->GetGUID());
                 }

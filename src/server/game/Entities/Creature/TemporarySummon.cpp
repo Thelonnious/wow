@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -152,7 +152,7 @@ void TempSummon::Update(uint32 diff)
         }
         default:
             UnSummon();
-            TC_LOG_ERROR("entities.unit", "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
+            LOG_ERROR("entities.unit", "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
             break;
     }
 }
@@ -227,6 +227,8 @@ void TempSummon::InitSummon()
 {
     if (Unit* owner = GetSummoner())
     {
+        owner->AddSummonedCreature(GetGUID(), GetEntry());
+
         if (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled())
             owner->ToCreature()->AI()->JustSummoned(this);
         if (IsAIEnabled())
@@ -265,6 +267,8 @@ void TempSummon::UnSummon(uint32 msTime)
     Unit* owner = GetSummoner();
     if (owner)
     {
+        owner->RemoveSummonedCreature(GetGUID());
+
         if (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled())
             owner->ToCreature()->AI()->SummonedCreatureDespawn(this);
     }
@@ -293,7 +297,7 @@ void TempSummon::RemoveFromWorld()
     }
 
     //if (GetOwnerGUID())
-    //    TC_LOG_ERROR("entities.unit", "Unit %u has owner guid when removed from world", GetEntry());
+    //    LOG_ERROR("entities.unit", "Unit %u has owner guid when removed from world", GetEntry());
 
     Creature::RemoveFromWorld();
 }
@@ -345,7 +349,7 @@ void Minion::RemoveFromWorld()
         if (owner->m_Controlled.find(this) != owner->m_Controlled.end())
             owner->m_Controlled.erase(this);
         else
-            TC_LOG_FATAL("entities.unit", "Minion::RemoveFromWorld: Owner %s tried to remove a non-existing controlled unit %s from controlled unit set.", owner->GetGUID().ToString().c_str(), GetGUID().ToString().c_str());
+            LOG_FATAL("entities.unit", "Minion::RemoveFromWorld: Owner %s tried to remove a non-existing controlled unit %s from controlled unit set.", owner->GetGUID().ToString().c_str(), GetGUID().ToString().c_str());
 
         if (owner->IsTotem())
             if (Unit* totemOwner = owner->GetOwner())

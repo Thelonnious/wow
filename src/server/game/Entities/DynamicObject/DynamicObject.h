@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_DYNAMICOBJECT_H
-#define TRINITYCORE_DYNAMICOBJECT_H
+#ifndef _FIRELANDS_DYNAMICOBJECT_H
+#define _FIRELANDS_DYNAMICOBJECT_H
 
 #include "Object.h"
 #include "MapObject.h"
@@ -33,7 +33,7 @@ enum DynamicObjectType
     DYNAMIC_OBJECT_RAID_MARKER      = 0x3
 };
 
-class TC_GAME_API DynamicObject : public WorldObject, public GridObject<DynamicObject>, public MapObject
+class FC_GAME_API DynamicObject : public WorldObject, public GridObject<DynamicObject>, public MapObject
 {
     public:
         DynamicObject(bool isWorldObject);
@@ -55,13 +55,11 @@ class TC_GAME_API DynamicObject : public WorldObject, public GridObject<DynamicO
         void SetCasterViewpoint();
         void RemoveCasterViewpoint();
         Unit* GetCaster() const { return _caster; }
-        uint32 GetFaction() const override;
         void BindToCaster();
         void UnbindFromCaster();
         uint32 GetSpellId() const { return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
         SpellInfo const* GetSpellInfo() const;
         ObjectGuid GetCasterGUID() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
-        ObjectGuid GetOwnerGUID() const override { return GetCasterGUID(); }
         float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
 
     protected:

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -40,7 +40,7 @@ class Group;
     - player-instance binds for permanent heroic/raid saves
     - group-instance binds (both solo and permanent) cache the player binds for the group leader
 */
-class TC_GAME_API InstanceSave
+class FC_GAME_API InstanceSave
 {
     friend class InstanceSaveManager;
     public:
@@ -74,6 +74,7 @@ class TC_GAME_API InstanceSave
         void SetResetTime(time_t resetTime) { m_resetTime = resetTime; }
         time_t GetResetTimeForDB();
 
+        InstanceTemplate const* GetTemplate();
         MapEntry const* GetMapEntry();
 
         /* online players bound to the instance (perm/solo)
@@ -145,7 +146,7 @@ class TC_GAME_API InstanceSave
 
 typedef std::unordered_map<uint32 /*PAIR32(map, difficulty)*/, time_t /*resetTime*/> ResetTimeByMapDifficultyMap;
 
-class TC_GAME_API InstanceSaveManager
+class FC_GAME_API InstanceSaveManager
 {
     friend class InstanceSave;
 

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -23,13 +23,11 @@
 #include "Language.h"
 #include "Map.h"
 #include "MiscPackets.h"
-#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "PartyPackets.h"
 #include "PhaseShift.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
-#include "TerrainMgr.h"
 
 namespace
 {
@@ -58,7 +56,7 @@ inline void ForAllControlled(Unit* unit, Func&& func)
 
     for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
         if (!unit->m_SummonSlot[i].IsEmpty())
-            if (Creature* summon = ObjectAccessor::GetCreature(*unit, unit->m_SummonSlot[i]))
+            if (Creature* summon = unit->GetMap()->GetCreature(unit->m_SummonSlot[i]))
                 func(summon);
 }
 }
@@ -74,7 +72,7 @@ void PhasingHandler::AddPhase(WorldObject* object, uint32 phaseId, bool updateVi
         {
             AddPhase(controlled, phaseId, updateVisibility);
         });
-        unit->RemoveNotOwnSingleTargetAuras(true);
+        unit->RemoveNotOwnLimitedTargetAuras(true);
     }
 
     UpdateVisibilityIfNeeded(object, updateVisibility, changed);
@@ -91,7 +89,7 @@ void PhasingHandler::RemovePhase(WorldObject* object, uint32 phaseId, bool updat
         {
             RemovePhase(controlled, phaseId, updateVisibility);
         });
-        unit->RemoveNotOwnSingleTargetAuras(true);
+        unit->RemoveNotOwnLimitedTargetAuras(true);
     }
 
     UpdateVisibilityIfNeeded(object, updateVisibility, changed);
@@ -114,7 +112,7 @@ void PhasingHandler::AddPhaseGroup(WorldObject* object, uint32 phaseGroupId, boo
         {
             AddPhaseGroup(controlled, phaseGroupId, updateVisibility);
         });
-        unit->RemoveNotOwnSingleTargetAuras(true);
+        unit->RemoveNotOwnLimitedTargetAuras(true);
     }
 
     UpdateVisibilityIfNeeded(object, updateVisibility, changed);
@@ -137,7 +135,7 @@ void PhasingHandler::RemovePhaseGroup(WorldObject* object, uint32 phaseGroupId, 
         {
             RemovePhaseGroup(controlled, phaseGroupId, updateVisibility);
         });
-        unit->RemoveNotOwnSingleTargetAuras(true);
+        unit->RemoveNotOwnLimitedTargetAuras(true);
     }
 
     UpdateVisibilityIfNeeded(object, updateVisibility, changed);
@@ -216,7 +214,7 @@ void PhasingHandler::OnMapChange(WorldObject* object)
                 for (uint32 uiMapPhaseId : visibleMapInfo->UiMapPhaseIDs)
                     phaseShift.AddUiMapPhaseId(uiMapPhaseId);
             }
-            else if (visibleMapPair.first == object->GetMapId())
+            else
                 suppressedPhaseShift.AddVisibleMapId(visibleMapInfo->Id, visibleMapInfo);
         }
     }
@@ -279,7 +277,7 @@ void PhasingHandler::OnAreaChange(WorldObject* object)
         });
 
         if (changed)
-            unit->RemoveNotOwnSingleTargetAuras(true);
+            unit->RemoveNotOwnLimitedTargetAuras(true);
     }
 
     UpdateVisibilityIfNeeded(object, true, changed);
@@ -390,7 +388,7 @@ void PhasingHandler::OnConditionChange(WorldObject* object)
         });
 
         if (changed)
-            unit->RemoveNotOwnSingleTargetAuras(true);
+            unit->RemoveNotOwnLimitedTargetAuras(true);
     }
 
     UpdateVisibilityIfNeeded(object, true, changed);
@@ -474,23 +472,23 @@ bool PhasingHandler::InDbPhaseShift(WorldObject const* object, uint8 phaseUseFla
     return object->GetPhaseShift().CanSee(phaseShift);
 }
 
-uint32 PhasingHandler::GetTerrainMapId(PhaseShift const& phaseShift, uint32 mapId, TerrainInfo const* terrain, float x, float y)
+uint32 PhasingHandler::GetTerrainMapId(PhaseShift const& phaseShift, Map const* map, float x, float y)
 {
     if (phaseShift.VisibleMapIds.empty())
-        return mapId;
+        return map->GetId();
 
     if (phaseShift.VisibleMapIds.size() == 1)
         return phaseShift.VisibleMapIds.begin()->first;
 
-    GridCoord gridCoord = Trinity::ComputeGridCoord(x, y);
+    GridCoord gridCoord = Firelands::ComputeGridCoord(x, y);
     int32 gx = (MAX_NUMBER_OF_GRIDS - 1) - gridCoord.x_coord;
     int32 gy = (MAX_NUMBER_OF_GRIDS - 1) - gridCoord.y_coord;
 
     for (std::pair<uint32 const, PhaseShift::VisibleMapIdRef> const& visibleMap : phaseShift.VisibleMapIds)
-        if (terrain->HasChildTerrainGridFile(visibleMap.first, gx, gy))
+        if (map->HasChildMapGridFile(visibleMap.first, gx, gy))
             return visibleMap.first;
 
-    return mapId;
+    return map->GetId();
 }
 
 void PhasingHandler::SetAlwaysVisible(PhaseShift& phaseShift, bool apply)
@@ -517,8 +515,8 @@ void PhasingHandler::PrintToChat(ChatHandler* chat, PhaseShift const& phaseShift
     if (!phaseShift.Phases.empty())
     {
         std::ostringstream phases;
-        std::string cosmetic = sObjectMgr->GetTrinityString(LANG_PHASE_FLAG_COSMETIC, chat->GetSessionDbLocaleIndex());
-        std::string personal = sObjectMgr->GetTrinityString(LANG_PHASE_FLAG_PERSONAL, chat->GetSessionDbLocaleIndex());
+        std::string cosmetic = sObjectMgr->GetFirelandsString(LANG_PHASE_FLAG_COSMETIC, chat->GetSessionDbLocaleIndex());
+        std::string personal = sObjectMgr->GetFirelandsString(LANG_PHASE_FLAG_PERSONAL, chat->GetSessionDbLocaleIndex());
         for (PhaseShift::PhaseRef const& phase : phaseShift.Phases)
         {
             phases << phase.Id;

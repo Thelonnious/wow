@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -100,96 +100,6 @@ namespace WorldPackets
             int32 Resisted = 0;
             int32 Absorbed = 0;
             uint8 Type = 0; ///< @see enum EnviromentalDamage
-        };
-
-        class SpellDamageShield final : public ServerPacket
-        {
-        public:
-            SpellDamageShield() : ServerPacket(SMSG_SPELL_DAMAGE_SHIELD, 8 + 8 + 4 + 4 + 4 + 4 + 4) { }
-
-            WorldPacket const* Write() override;
-
-            ObjectGuid Attacker;
-            ObjectGuid Defender;
-            int32 SpellID = 0;
-            int32 TotalDamage = 0;
-            int32 OverKill = 0;
-            int32 SchoolMask = 0;
-            int32 LogAbsorbed = 0;
-        };
-
-        struct SpellLogMissDebug
-        {
-            float HitRoll = 0.0f;
-            float HitRollNeeded = 0.0f;
-        };
-
-        struct SpellLogMissEntry
-        {
-            SpellLogMissEntry(ObjectGuid const& victim, uint8 missReason) : Victim(victim), MissReason(missReason) { }
-
-            ObjectGuid Victim;
-            uint8 MissReason = 0;
-            Optional<SpellLogMissDebug> Debug;
-        };
-
-        class SpellMissLog final : public ServerPacket
-        {
-        public:
-            SpellMissLog() : ServerPacket(SMSG_SPELL_MISS_LOG) { }
-
-            WorldPacket const* Write() override;
-
-            int32 SpellID = 0;
-            ObjectGuid Caster;
-            std::vector<SpellLogMissEntry> Entries;
-        };
-
-        struct PeriodicAuraLogEffect
-        {
-            int32 Effect = 0;
-            int32 Amount = 0;
-            int32 OverHealOrKill = 0;
-            int32 SchoolMaskOrPower = 0;
-            int32 AbsorbedOrAmplitude = 0;
-            int32 Resisted = 0;
-            bool Crit = false;
-        };
-
-        class SpellPeriodicAuraLog final : public ServerPacket
-        {
-        public:
-            SpellPeriodicAuraLog() : ServerPacket(SMSG_PERIODIC_AURA_LOG, 8 + 8 + 4 + 4) { }
-
-            int32 SpellID = 0;
-            ObjectGuid TargetGUID;
-            ObjectGuid CasterGUID;
-            std::vector<PeriodicAuraLogEffect> Entries;
-
-            WorldPacket const* Write() override;
-        };
-
-        struct SpellDispellData
-        {
-            bool Harmful = false;
-            int32 SpellID = 0;
-            int32 Rolled = 0;
-            int32 Needed = 0;
-        };
-
-        // This packet covers SMSG_SPELL_DISPEL_LOG, SMSG_SPELL_BREAK_LOG and SMSG_SPELL_STEAL_LOG
-        class SpellDispellLog final : public ServerPacket
-        {
-        public:
-            SpellDispellLog(OpcodeServer opcode) : ServerPacket(opcode, 8 + 8 + 4 + 1 + 1) { }
-
-            bool Debug = false;
-            int32 DispelledBySpellID = 0;
-            ObjectGuid TargetGUID;
-            ObjectGuid CasterGUID;
-            std::vector<SpellDispellData> DispellData;
-
-            WorldPacket const* Write() override;
         };
     }
 }

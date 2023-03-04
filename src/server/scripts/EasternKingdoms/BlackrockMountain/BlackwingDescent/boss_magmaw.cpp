@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -235,7 +235,7 @@ struct boss_magmaw : public BossAI
 
         BossAI::JustEngagedWith(who);
         instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, FRAME_PRIORITY_MAGMAW);
-        instance->DoUpdateWorldState(WORLD_STATE_ID_PARASITE_EVENING, 0);
+        instance->instance->SetWorldState(WORLD_STATE_ID_PARASITE_EVENING, 0);
         me->SetReactState(REACT_AGGRESSIVE);
 
         events.SetPhase(PHASE_COMBAT);
@@ -694,7 +694,7 @@ struct npc_magmaw_lava_parasite : public ScriptedAI
         me->DespawnOrUnsummon(2s + 500ms);
     }
 
-    void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
+    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_LAVA_PARASITE_RIDE_VEHICLE)
         {
@@ -702,7 +702,7 @@ struct npc_magmaw_lava_parasite : public ScriptedAI
             me->SetReactState(REACT_PASSIVE);
             me->DespawnOrUnsummon(4s);
             if (!_instance->instance->GetWorldStateValue(WORLD_STATE_ID_PARASITE_EVENING))
-                _instance->DoUpdateWorldState(WORLD_STATE_ID_PARASITE_EVENING, 1);
+                _instance->instance->SetWorldState(WORLD_STATE_ID_PARASITE_EVENING, 1);
         }
     }
 
@@ -858,7 +858,7 @@ class spell_magmaw_magma_spit: public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 8 : 3);
+        Firelands::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 8 : 3);
     }
 
     void HandleHit(SpellEffIndex /*effIndex*/)
@@ -980,7 +980,7 @@ class spell_magmaw_pillar_of_flame_forcecast : public SpellScript
         if (!targetsCopy.empty())
             targets = targetsCopy;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override
@@ -1131,7 +1131,7 @@ class spell_magmaw_blazing_inferno_targeting : public SpellScript
         if (!targetsCopy.empty())
             targets = targetsCopy;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
@@ -1164,7 +1164,7 @@ class spell_magmaw_shadow_breath_targeting : public SpellScript
         if (targets.empty() || targets.size() < 2)
             return;
 
-        Trinity::Containers::RandomResize(targets, 2);
+        Firelands::Containers::RandomResize(targets, 2);
     }
 
     void HandleDummyEffect(SpellEffIndex /*effIndex*/)

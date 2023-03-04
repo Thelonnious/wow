@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -287,14 +287,14 @@ enum AchievementCriteriaTypes : uint8
     // ACHIEVEMENT_CRITERIA_TYPE_ANYONE_TRIGGER_GAME_EVENT_SCENATIO       = 92, // unused in DBC 4.3.4.15595 name state TBC Classic
     ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED                                   = 93,
     ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED                                  = 94,
-/*                                                                        
+/*
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEALTH                              = 95,  // unused in DBC 4.3.4.15595
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_POWER                               = 96,  // unused in DBC 4.3.4.15595
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_STAT                                = 97,  // unused in DBC 4.3.4.15595
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_SPELLPOWER                          = 98,  // unused in DBC 4.3.4.15595
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_ARMOR                               = 99,  // unused in DBC 4.3.4.15595
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_RATING                              = 100, // unused in DBC 4.3.4.15595
-*/                                                                        
+*/
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_DEALT                           = 101,
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_RECEIVED                        = 102,
     ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED                       = 103,
@@ -430,34 +430,20 @@ enum SpawnMask
     SPAWNMASK_RAID_ALL          = (SPAWNMASK_RAID_NORMAL_ALL | SPAWNMASK_RAID_HEROIC_ALL)
 };
 
-enum class FactionTemplateFlags : uint32
+enum FactionTemplateFlags
 {
-    None                            = 0x0000,
-    RespondToCallForHelp            = 0x0001,
-    BroadcastToEnemiesLowPriority   = 0x0002,
-    BroadcastToEnemiesMedPriority   = 0x0004,
-    BroadcastToEnemiesHighPriority  = 0x0008,
-    SearchForEnemiesLowPriority     = 0x0010,
-    SearchForEnemiesMedPriority     = 0x0020,
-    SearchForEnemiesHighPriority    = 0x0040,
-    SearchForFriendsLowPriority     = 0x0080,
-    SearchForFriendsMedPriority     = 0x0100,
-    SearchForFriendsHighPriority    = 0x0200,
-    FleeFromCallForHelp             = 0x0400,
-    AssistPlayers                   = 0x0800, // flagged for PvP
-    AttackPvPActivePlayers          = 0x1000, // faction will attack players that were involved in PvP combats
-    HatesAllExceptFriends           = 0x2000
+    FACTION_TEMPLATE_FLAG_PVP               = 0x00000800,   // flagged for PvP
+    FACTION_TEMPLATE_FLAG_CONTESTED_GUARD   = 0x00001000,   // faction will attack players that were involved in PvP combats
+    FACTION_TEMPLATE_FLAG_HOSTILE_BY_DEFAULT= 0x00002000
 };
 
-DEFINE_ENUM_FLAG(FactionTemplateFlags);
-
-enum FactionGroupMasks : uint8
+enum FactionMasks
 {
-    FACTION_GROUP_MASK_NONE     = 0x0,    // none = neutral
-    FACTION_GROUP_MASK_PLAYER   = 0x1,    // any player
-    FACTION_GROUP_MASK_ALLIANCE = 0x2,    // player or creature from alliance team
-    FACTION_GROUP_MASK_HORDE    = 0x4,    // player or creature from horde team
-    FACTION_GROUP_MASK_MONSTER  = 0x8     // aggressive creature from monster team
+    FACTION_MASK_PLAYER   = 1,                              // any player
+    FACTION_MASK_ALLIANCE = 2,                              // player or creature from alliance team
+    FACTION_MASK_HORDE    = 4,                              // player or creature from horde team
+    FACTION_MASK_MONSTER  = 8                               // aggressive creature from monster team
+    // if none flags set then non-aggressive creature
 };
 
 enum MapTypes                                               // Lua_IsInInstance
@@ -469,34 +455,10 @@ enum MapTypes                                               // Lua_IsInInstance
     MAP_ARENA           = 4                                 // arena
 };
 
-enum class MapFlags : uint32
+enum MapFlags
 {
-    Optimize                    = 0x00000001,
-    DevelopmentMap              = 0x00000002,
-    WeightedBlend               = 0x00000004,
-    VertexColoring              = 0x00000008,
-    SortObjects                 = 0x00000010,
-    LimitToPlayersFromOneRealm  = 0x00000020,
-    EnableLighting              = 0x00000040,
-    InvertedTerrain             = 0x00000080,
-    DynamicDifficulty           = 0x00000100,
-    ObjectFile                  = 0x00000200,
-    TextureFile                 = 0x00000400,
-    GenerateNormals             = 0x00000800,
-    FixBorderShadowSeams        = 0x00001000,
-    InfiniteOcean               = 0x00002000,
-    UnderwaterMap               = 0x00004000,
-    FlexibleRaidLocking         = 0x00008000,
-    LimitFarclip                = 0x00010000,
-    UseParentMapFlightBounds    = 0x00020000,
-    NoRaceChangeOnThisMap       = 0x00040000,
-    DisabledForNonGMs           = 0x00080000,
-    WeightedNormals1            = 0x00100000,
-    DisableLowDetailTerrain     = 0x00200000,
-    EnableOrgArenaBlinkRule     = 0x00400000
+    MAP_FLAG_DYNAMIC_DIFFICULTY = 0x100
 };
-
-DEFINE_ENUM_FLAG(MapFlags);
 
 enum AbilytyLearnType
 {
@@ -654,61 +616,6 @@ enum TotemCategoryType
 };
 
 // SummonProperties.dbc, col 1
-enum class SummonPropertiesControl : uint8
-{
-    None                = 0, // Wild
-    Guardian            = 1,
-    Pet                 = 2,
-    Possessed           = 3,
-    PossessedVehicle    = 4,
-    Vehicle             = 5 // Wild, but Ride Spell will be cast
-};
-
-// SummonProperties.dbc, col 4
-enum class SummonPropertiesSlot : int8
-{
-    None                = 0,
-    Totem1              = 1,
-    Totem2              = 2,
-    Totem3              = 3,
-    Totem4              = 4,
-    Critter             = 5,
-    Quest               = 6, // Players Only
-
-    Max,
-    AnyAvailableTotem   = -1
-};
-
-// SummonProperties.dbc, col 5
-enum class SummonPropertiesFlags : uint32
-{
-    None                              = 0x000000,
-    AttackSummoner                    = 0x000001,
-    HelpWhenSummonedInCombat          = 0x000002,
-    UseLevelOffset                    = 0x000004,
-    DespawnOnSummonerDeath            = 0x000008,
-    OnlyVisibleToSummoner             = 0x000010,
-    CannotDismissPet                  = 0x000020,
-    UseDemonTimeout                   = 0x000040,
-    UnlimitedSummons                  = 0x000080,
-    UseCreatureLevel                  = 0x000100,
-    JoinSummonerSpawnGroup            = 0x000200,
-    DoNotToggle                       = 0x000400,
-    DespawnWhenExpired                = 0x000800,
-    UseSummonerFaction                = 0x001000,
-    DoNotFollowMountedSummoner        = 0x002000,
-    SavePetAutocast                   = 0x004000,
-    IgnoreSummonerPhase               = 0x008000,
-    OnlyVisibleToSummonerGroup        = 0x010000,
-    DespawnOnSummonerLogout           = 0x020000,
-    CastRideVehicleSpellOnSummoner    = 0x040000,
-    GuardianActsLikePet               = 0x080000,
-    DontSnapSessileToGround           = 0x100000 
-};
-
-DEFINE_ENUM_FLAG(SummonPropertiesFlags);
-
-// SummonProperties.dbc, col 1
 enum SummonPropGroup
 {
     SUMMON_PROP_GROUP_UNKNOWN1       = 0,                   // 1160 spells in 3.0.3
@@ -837,23 +744,5 @@ enum CurrencyTypes
     CURRENCY_TYPE_NERUBIAN_FRAGMENT     = 400,
     CURRENCY_TYPE_TOLVIR_FRAGMENT       = 401,
 };
-
-enum class CurrencyTypeFlags : uint32
-{
-    None                                            = 0x000,
-    Tradable                                        = 0x001,
-    AppearsInLootWindow                             = 0x002,
-    ComputedWeeklyMaximum                           = 0x004,
-    Uses1To100ScalarForDisplay                      = 0x008,
-    NoLowLevelLoot                                  = 0x010,
-    IgnoreMaxQuantityOnLoad                         = 0x020,
-    LogQuantityWhenChangingWorlds                   = 0x040,
-    TrackQuantity                                   = 0x080,
-    ResetTrackedQuantityWhenUpdatingVersion         = 0x100,
-    GainsFromUpdatingVersionsIgnoresMaximumQuantity = 0x200,
-    SupressGainMessageWhenUpdatingVersions          = 0x400
-};
-
-DEFINE_ENUM_FLAG(CurrencyTypeFlags);
 
 #endif

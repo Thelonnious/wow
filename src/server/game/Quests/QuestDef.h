@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_QUEST_H
-#define TRINITYCORE_QUEST_H
+#ifndef _FIRELANDS_QUEST_H
+#define _FIRELANDS_QUEST_H
 
 #include "Common.h"
 #include "DatabaseEnvFwd.h"
@@ -171,7 +171,7 @@ enum QuestFlags
 enum QuestSpecialFlags
 {
     QUEST_SPECIAL_FLAGS_NONE                 = 0x000,
-    // Trinity flags for set SpecialFlags in DB if required but used only at server
+    // Firelands flags for set SpecialFlags in DB if required but used only at server
     QUEST_SPECIAL_FLAGS_REPEATABLE           = 0x001,   // Set by 1 in SpecialFlags from DB
     QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT = 0x002,   // Set by 2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `FECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script)
     QUEST_SPECIAL_FLAGS_AUTO_ACCEPT          = 0x004,   // Set by 4 in SpecialFlags in DB if the quest is to be auto-accepted.
@@ -225,7 +225,7 @@ struct QuestLocale
 // This Quest class provides a convenient way to access a few pretotaled (cached) quest details,
 // all base quest information, and any utility functions such as generating the amount of
 // xp to give
-class TC_GAME_API Quest
+class FC_GAME_API Quest
 {
     friend class ObjectMgr;
     public:
@@ -237,7 +237,6 @@ class TC_GAME_API Quest
         void LoadQuestMailSender(Field* fields);
 
         uint32 GetXPReward(Player const* player) const;
-        static uint32 CalcXPReward(uint8 playerLevel, int32 targetLevel, uint8 xpDifficulty);
 
         bool HasFlag(uint32 flag) const { return (_flags & flag) != 0; }
         void SetFlag(uint32 flag) { _flags |= flag; }
@@ -317,6 +316,7 @@ class TC_GAME_API Quest
         bool   IsAutoComplete() const;
         uint32 GetFlags() const { return _flags; }
         uint32 GetSpecialFlags() const { return _specialFlags; }
+        uint32 GetScriptId() const { return ScriptId; }
         uint32 GetMinimapTargetMark() const { return _minimapTargetMark; }
         uint32 GetRewardSkillId() const { return _rewardSkillId; }
         uint32 GetRewardSkillPoints() const { return _rewardSkillPoints; }
@@ -372,8 +372,6 @@ class TC_GAME_API Quest
         uint16 GetEventIdForQuest() const { return _eventIdForQuest; }
 
         void BuildQuestRewards(WorldPackets::Quest::QuestRewards& rewards, Player* player) const;
-
-        static uint32 RoundXPValue(uint32 xp);
 
         static void AddQuestLevelToTitle(std::string& title, int32 level);
         void InitializeQueryData();
@@ -471,6 +469,10 @@ class TC_GAME_API Quest
         uint32 _specialFlags            = 0; // custom flags, not sniffed/WDB
         uint32 _allowableRaces          = 0;
         uint32 _timeAllowed             = 0;
+        uint32 ScriptId                 = 0;
+
+        // Helpers
+        static uint32 RoundXPValue(uint32 xp);
 };
 
 struct QuestStatusData

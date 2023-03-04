@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_AREATRIGGER_H
-#define TRINITYCORE_AREATRIGGER_H
+#ifndef _FIRELANDS_AREATRIGGER_H
+#define _FIRELANDS_AREATRIGGER_H
 
 #include "Object.h"
 #include "MapObject.h"
@@ -30,19 +30,16 @@ class AreaTrigger : public WorldObject, public GridObject<AreaTrigger>
         AreaTrigger();
         ~AreaTrigger();
 
-        void AddToWorld() override;
-        void RemoveFromWorld() override;
+        void AddToWorld();
+        void RemoveFromWorld();
 
         bool CreateAreaTrigger(uint32 guidlow, uint32 triggerEntry, Unit* caster, SpellInfo const* spell, Position const& pos);
-        void Update(uint32 p_time) override;
+        void Update(uint32 p_time);
         void Remove();
         uint32 GetSpellId() const { return GetUInt32Value(AREATRIGGER_SPELLID); }
         int32 GetDuration() const { return _duration; }
         void SetDuration(int32 newDuration) { _duration = newDuration; }
         void Delay(int32 delaytime) { SetDuration(GetDuration() - delaytime); }
-
-        ObjectGuid GetOwnerGUID() const override { return ObjectGuid::Empty; }
-        uint32 GetFaction() const override { return 0; }
 
     protected:
         int32 _duration;

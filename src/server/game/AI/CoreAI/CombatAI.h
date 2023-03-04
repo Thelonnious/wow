@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,14 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_COMBATAI_H
-#define TRINITY_COMBATAI_H
+#ifndef FIRELANDS_COMBATAI_H
+#define FIRELANDS_COMBATAI_H
 
 #include "CreatureAI.h"
 
 class Creature;
 
-class TC_GAME_API AggressorAI : public CreatureAI
+class FC_GAME_API AggressorAI : public CreatureAI
 {
     public:
         explicit AggressorAI(Creature* c) : CreatureAI(c) { }
@@ -33,7 +33,7 @@ class TC_GAME_API AggressorAI : public CreatureAI
 
 typedef std::vector<uint32> SpellVct;
 
-class TC_GAME_API CombatAI : public CreatureAI
+class FC_GAME_API CombatAI : public CreatureAI
 {
     public:
         explicit CombatAI(Creature* c) : CreatureAI(c) { }
@@ -52,7 +52,7 @@ class TC_GAME_API CombatAI : public CreatureAI
         SpellVct spells;
 };
 
-class TC_GAME_API CasterAI : public CombatAI
+class FC_GAME_API CasterAI : public CombatAI
 {
     public:
         explicit CasterAI(Creature* c) : CombatAI(c) { m_attackDist = MELEE_RANGE; }
@@ -64,7 +64,7 @@ class TC_GAME_API CasterAI : public CombatAI
         float m_attackDist;
 };
 
-struct TC_GAME_API ArcherAI : public CreatureAI
+struct FC_GAME_API ArcherAI : public CreatureAI
 {
     public:
         explicit ArcherAI(Creature* c);
@@ -77,7 +77,7 @@ struct TC_GAME_API ArcherAI : public CreatureAI
         float m_minRange;
 };
 
-struct TC_GAME_API TurretAI : public CreatureAI
+struct FC_GAME_API TurretAI : public CreatureAI
 {
     public:
         explicit TurretAI(Creature* c);
@@ -94,7 +94,7 @@ struct TC_GAME_API TurretAI : public CreatureAI
 #define VEHICLE_CONDITION_CHECK_TIME 1000
 #define VEHICLE_DISMISS_TIME 5000
 
-struct TC_GAME_API VehicleAI : public CreatureAI
+struct FC_GAME_API VehicleAI : public CreatureAI
 {
     public:
         explicit VehicleAI(Creature* creature);

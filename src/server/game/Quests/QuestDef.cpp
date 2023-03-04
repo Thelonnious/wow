@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -164,7 +164,7 @@ void Quest::LoadQuestDetails(Field* fields)
    {
         if (!sEmotesStore.LookupEntry(fields[1+i].GetUInt16()))
         {
-            TC_LOG_ERROR("sql.sql", "Table `quest_details` has non-existing Emote%i (%u) set for quest %u. Skipped.", 1+i, fields[1+i].GetUInt16(), fields[0].GetUInt32());
+            LOG_ERROR("sql.sql", "Table `quest_details` has non-existing Emote%i (%u) set for quest %u. Skipped.", 1+i, fields[1+i].GetUInt16(), fields[0].GetUInt32());
             continue;
         }
 
@@ -181,10 +181,10 @@ void Quest::LoadQuestRequestItems(Field* fields)
     _emoteOnIncomplete = fields[2].GetUInt16();
 
     if (!sEmotesStore.LookupEntry(_emoteOnComplete))
-        TC_LOG_ERROR("sql.sql", "Table `quest_request_items` has non-existing EmoteOnComplete (%u) set for quest %u.", _emoteOnComplete, fields[0].GetUInt32());
+        LOG_ERROR("sql.sql", "Table `quest_request_items` has non-existing EmoteOnComplete (%u) set for quest %u.", _emoteOnComplete, fields[0].GetUInt32());
 
     if (!sEmotesStore.LookupEntry(_emoteOnIncomplete))
-        TC_LOG_ERROR("sql.sql", "Table `quest_request_items` has non-existing EmoteOnIncomplete (%u) set for quest %u.", _emoteOnIncomplete, fields[0].GetUInt32());
+        LOG_ERROR("sql.sql", "Table `quest_request_items` has non-existing EmoteOnIncomplete (%u) set for quest %u.", _emoteOnIncomplete, fields[0].GetUInt32());
 
     _requestItemsText = fields[3].GetString();
 }
@@ -195,7 +195,7 @@ void Quest::LoadQuestOfferReward(Field* fields)
    {
         if (!sEmotesStore.LookupEntry(fields[1+i].GetUInt16()))
         {
-            TC_LOG_ERROR("sql.sql", "Table `quest_offer_reward` has non-existing Emote%i (%u) set for quest %u. Skipped.", 1+i, fields[1+i].GetUInt16(), fields[0].GetUInt32());
+            LOG_ERROR("sql.sql", "Table `quest_offer_reward` has non-existing Emote%i (%u) set for quest %u. Skipped.", 1+i, fields[1+i].GetUInt16(), fields[0].GetUInt32());
             continue;
         }
 
@@ -233,6 +233,7 @@ void Quest::LoadQuestTemplateAddon(Field* fields)
 
     _allowableRaces = fields[18].GetUInt32();
     _timeAllowed = fields[19].GetInt32();
+    ScriptId = sObjectMgr->GetScriptId(fields[20].GetString());
 }
 
 void Quest::LoadQuestMailSender(Field* fields)
@@ -242,33 +243,30 @@ void Quest::LoadQuestMailSender(Field* fields)
 
 uint32 Quest::GetXPReward(Player const* player) const
 {
-    if (!player)
-        return 0;
-
-    return Quest::CalcXPReward(player->getLevel(), _level, _rewardXPDifficulty);
-}
-
-/*static*/ uint32 Quest::CalcXPReward(uint8 playerLevel, int32 targetLevel, uint8 xpDifficulty)
-{
-    int32 effectiveLevel = (targetLevel == -1 ? playerLevel : targetLevel);
-    const QuestXPEntry* xpentry = sQuestXPStore.LookupEntry(effectiveLevel);
-    if (!xpentry)
-        return 0;
-
-    int32 diffFactor = 2 * (effectiveLevel - playerLevel) + 20;
-    if (diffFactor < 1)
-        diffFactor = 1;
-    else if (diffFactor > 10)
-        diffFactor = 10;
-
-    uint32 xp = RoundXPValue(diffFactor * xpentry->Difficulty[xpDifficulty] / 10);
-    if (sWorld->getIntConfig(CONFIG_MIN_QUEST_SCALED_XP_RATIO))
+    if (player)
     {
-        uint32 minScaledXP = RoundXPValue(xpentry->Difficulty[xpDifficulty]) * sWorld->getIntConfig(CONFIG_MIN_QUEST_SCALED_XP_RATIO) / 100;
-        xp = std::max(minScaledXP, xp);
+        int32 quest_level = (_level == -1 ? player->getLevel() : _level);
+        const QuestXPEntry* xpentry = sQuestXPStore.LookupEntry(quest_level);
+        if (!xpentry)
+            return 0;
+
+        int32 diffFactor = 2 * (quest_level - player->getLevel()) + 20;
+        if (diffFactor < 1)
+            diffFactor = 1;
+        else if (diffFactor > 10)
+            diffFactor = 10;
+
+        uint32 xp = RoundXPValue(diffFactor * xpentry->Difficulty[_rewardXPDifficulty] / 10);
+        if (sWorld->getIntConfig(CONFIG_MIN_QUEST_SCALED_XP_RATIO))
+        {
+            uint32 minScaledXP = RoundXPValue(xpentry->Difficulty[_rewardXPDifficulty]) * sWorld->getIntConfig(CONFIG_MIN_QUEST_SCALED_XP_RATIO) / 100;
+            xp = std::max(minScaledXP, xp);
+        }
+
+        return xp;
     }
 
-    return xp;
+    return 0;
 }
 
 /*static*/ bool Quest::IsTakingQuestEnabled(uint32 questId)
@@ -412,7 +410,7 @@ bool Quest::CanIncreaseRewardedQuestCounters() const
     return (!IsDFQuest() && !IsDaily() && (!IsRepeatable() || IsWeekly() || IsMonthly() || IsSeasonal()));
 }
 
-/*static*/ uint32 Quest::RoundXPValue(uint32 xp)
+uint32 Quest::RoundXPValue(uint32 xp)
 {
     if (xp <= 100)
         return 5 * ((xp + 2) / 5);

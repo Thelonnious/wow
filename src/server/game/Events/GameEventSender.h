@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,9 +26,9 @@ class WorldObject;
 
 namespace GameEvents
 {
-    TC_GAME_API void Trigger(uint32 gameEventId, WorldObject* source, WorldObject* target);
-    TC_GAME_API void TriggerForPlayer(uint32 gameEventId, Player* source);
-    TC_GAME_API void TriggerForMap(uint32 gameEventId, Map* map, WorldObject* source = nullptr, WorldObject* target = nullptr);
+    FC_GAME_API void Trigger(uint32 gameEventId, WorldObject* source, WorldObject* target);
+    FC_GAME_API void TriggerForPlayer(uint32 gameEventId, Player* source);
+    FC_GAME_API void TriggerForMap(uint32 gameEventId, Map* map, WorldObject* source = nullptr, WorldObject* target = nullptr);
 }
 
 #endif // GameEventSender_h__

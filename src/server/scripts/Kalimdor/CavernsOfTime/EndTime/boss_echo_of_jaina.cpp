@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -379,7 +379,7 @@ class spell_echo_of_jaina_blink : public SpellScript
 
         if (blinkTargets.size() > 1)
         {
-            blinkTargets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+            blinkTargets.sort(Firelands::ObjectDistanceOrderPred(GetCaster()));
             blinkTargets.resize(1);
             target = *blinkTargets.front();
         }

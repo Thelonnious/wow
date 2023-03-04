@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -25,22 +25,22 @@
 namespace GameTime
 {
     // Server start time
-    TC_GAME_API time_t GetStartTime();
+    FC_GAME_API time_t GetStartTime();
 
     // Current server time (unix) in seconds
-    TC_GAME_API time_t GetGameTime();
+    FC_GAME_API time_t GetGameTime();
 
     // Milliseconds since server start
-    TC_GAME_API uint32 GetGameTimeMS();
+    FC_GAME_API uint32 GetGameTimeMS();
 
     /// Current chrono system_clock time point
-    TC_GAME_API std::chrono::system_clock::time_point GetGameTimeSystemPoint();
+    FC_GAME_API std::chrono::system_clock::time_point GetGameTimeSystemPoint();
 
     /// Current chrono steady_clock time point
-    TC_GAME_API std::chrono::steady_clock::time_point GetGameTimeSteadyPoint();
+    FC_GAME_API std::chrono::steady_clock::time_point GetGameTimeSteadyPoint();
 
     /// Uptime (in secs)
-    TC_GAME_API uint32 GetUptime();
+    FC_GAME_API uint32 GetUptime();
 
     void UpdateGameTimers();
 };

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -216,7 +216,7 @@ class boss_apothecary_hummel : public CreatureScript
                         case EVENT_START_FIGHT:
                         {
                             me->SetImmuneToAll(false);
-                            DoZoneInCombat();
+                            me->SetInCombatWithZone();
                             events.ScheduleEvent(EVENT_CALL_BAXTER, Seconds(6));
                             events.ScheduleEvent(EVENT_CALL_FRYE, Seconds(14));
                             events.ScheduleEvent(EVENT_PERFUME_SPRAY, Milliseconds(3640));
@@ -296,7 +296,7 @@ struct npc_apothecary_genericAI : public ScriptedAI
         else if (action == ACTION_START_FIGHT)
         {
             me->SetImmuneToAll(false);
-            DoZoneInCombat();
+            me->SetInCombatWithZone();
         }
     }
 
@@ -410,7 +410,7 @@ class spell_apothecary_lingering_fumes : public SpellScriptLoader
 
                 std::list<Creature*> triggers;
                 caster->GetCreatureListWithEntryInGrid(triggers, NPC_VIAL_BUNNY, 100.0f);
-                Creature* trigger = Trinity::Containers::SelectRandomContainerElement(triggers);
+                Creature* trigger = Firelands::Containers::SelectRandomContainerElement(triggers);
                 caster->GetMotionMaster()->MovePoint(0, trigger->GetPosition());
 
             }
@@ -444,11 +444,11 @@ class spell_apothecary_validate_area : public SpellScriptLoader
         {
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_BUNNY_LOCKDOWN));
+                targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_BUNNY_LOCKDOWN));
                 if (targets.empty())
                     return;
 
-                WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }

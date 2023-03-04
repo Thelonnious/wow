@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -134,7 +134,24 @@ enum LootSlotType
     LOOT_SLOT_TYPE_OWNER        = 4                         // ignore binding confirmation and etc, for single player looting
 };
 
-struct TC_GAME_API LootItem
+enum LootTypeId
+{
+    LOOT_TYPE_NONE            = -1,
+    LOOT_TYPE_CREATURE        = 1,
+    LOOT_TYPE_DISENCHANT      = 2,
+    LOOT_TYPE_FISHING         = 3,
+    LOOT_TYPE_GAMEOBJECT      = 4,
+    LOOT_TYPE_ITEM            = 5,
+    LOOT_TYPE_MAIL            = 6,
+    LOOT_TYPE_MILLING         = 7,
+    LOOT_TYPE_PICKPOCKETING   = 8,
+    LOOT_TYPE_PROSPECTING     = 9,
+    LOOT_TYPE_REFERENCE       = 10,
+    LOOT_TYPE_SKINNING        = 11,
+    LOOT_TYPE_SPELL           = 12
+};
+
+struct FC_GAME_API LootItem
 {
     uint32  itemid;
     uint32  randomSuffix;
@@ -209,8 +226,15 @@ class LootValidatorRefManager : public RefManager<Loot, LootValidatorRef>
 
 //=====================================================
 
-struct TC_GAME_API Loot
+struct LootView;
+
+ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li);
+ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv);
+
+struct FC_GAME_API Loot
 {
+    friend ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv);
+
     NotNormalLootItemMap const& GetPlayerQuestItems() const { return PlayerQuestItems; }
     NotNormalLootItemMap const& GetPlayerFFAItems() const { return PlayerFFAItems; }
     NotNormalLootItemMap const& GetPlayerNonQuestNonFFAConditionalItems() const { return PlayerNonQuestNonFFAConditionalItems; }

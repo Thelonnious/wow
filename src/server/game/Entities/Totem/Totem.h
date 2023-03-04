@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_TOTEM_H
-#define TRINITYCORE_TOTEM_H
+#ifndef _FIRELANDS_TOTEM_H
+#define _FIRELANDS_TOTEM_H
 
 #include "TemporarySummon.h"
 
@@ -34,11 +34,7 @@ enum TotemSpells
     SPELL_TOTEMIC_WRATH         = 77747
 };
 
-// Totems spells
-#define SENTRY_STONECLAW_SPELLID  55277
-#define SENTRY_BIND_SIGHT_SPELLID  6277
-
-class TC_GAME_API Totem : public Minion
+class FC_GAME_API Totem : public Minion
 {
     public:
         Totem(SummonPropertiesEntry const* properties, Unit* owner);
@@ -61,7 +57,7 @@ class TC_GAME_API Totem : public Minion
         void UpdateAttackPowerAndDamage(bool /*ranged*/) override { }
         void UpdateDamagePhysical(WeaponAttackType /*attType*/) override { }
 
-        bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, WorldObject const* caster, bool requireImmunityPurgesEffectAttribute = false) const override;
+        bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit* caster) const override;
 
     protected:
         TotemType m_type;

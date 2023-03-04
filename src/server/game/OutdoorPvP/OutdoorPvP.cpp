@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,15 +18,16 @@
 #include "OutdoorPvP.h"
 #include "CellImpl.h"
 #include "DatabaseEnv.h"
+#include "DBCStores.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Log.h"
 #include "Map.h"
+#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "WorldPacket.h"
-#include "WorldStateMgr.h"
 
 class DefenseMessageBuilder
 {
@@ -86,29 +87,165 @@ void OPvPCapturePoint::SendChangePhase()
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
 }
 
-bool OPvPCapturePoint::SetCapturePointData(uint32 entry)
+void OPvPCapturePoint::AddGO(uint32 type, ObjectGuid::LowType guid, uint32 entry)
 {
-    TC_LOG_DEBUG("outdoorpvp", "Creating capture point %u", entry);
+    if (!entry)
+    {
+        GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
+        if (!data)
+            return;
+        entry = data->id;
+    }
+
+    m_Objects[type] = guid;
+    m_ObjectTypes[m_Objects[type]] = type;
+}
+
+void OPvPCapturePoint::AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entry)
+{
+    if (!entry)
+    {
+        CreatureData const* data = sObjectMgr->GetCreatureData(guid);
+        if (!data)
+            return;
+        entry = data->id;
+    }
+
+    m_Creatures[type] = guid;
+    m_CreatureTypes[m_Creatures[type]] = type;
+}
+
+bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 map, Position const& pos, QuaternionData const& rot)
+{
+    if (ObjectGuid::LowType guid = sObjectMgr->AddGameObjectData(entry, map, pos, rot, 0))
+    {
+        AddGO(type, guid, entry);
+        return true;
+    }
+
+    return false;
+}
+
+bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 map, Position const& pos, TeamId /*teamId = TEAM_NEUTRAL*/, uint32 spawntimedelay /*= 0*/)
+{
+    if (ObjectGuid::LowType guid = sObjectMgr->AddCreatureData(entry, map, pos, spawntimedelay))
+    {
+        AddCre(type, guid, entry);
+        return true;
+    }
+
+    return false;
+}
+
+bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, Position const& pos, QuaternionData const& rot)
+{
+    LOG_DEBUG("outdoorpvp", "Creating capture point %u", entry);
 
     // check info existence
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo || goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
     {
-        TC_LOG_ERROR("outdoorpvp", "OutdoorPvP: GO %u is not capture point!", entry);
+        LOG_ERROR("outdoorpvp", "OutdoorPvP: GO %u is not capture point!", entry);
         return false;
     }
+
+    m_capturePointSpawnId = sObjectMgr->AddGameObjectData(entry, map, pos, rot, 0);
+
+    if (m_capturePointSpawnId == 0)
+        return false;
 
     // get the needed values from goinfo
     m_maxValue = (float)goinfo->capturePoint.maxTime;
     m_maxSpeed = m_maxValue / (goinfo->capturePoint.minTime ? goinfo->capturePoint.minTime : 60);
     m_neutralValuePct = goinfo->capturePoint.neutralPercent;
     m_minValue = CalculatePct(m_maxValue, m_neutralValuePct);
-    return true;;
+
+    return true;
 }
 
-OutdoorPvP::OutdoorPvP(Map* map) : m_TypeId(0), m_map(map) { }
+bool OPvPCapturePoint::DelCreature(uint32 type)
+{
+    ObjectGuid::LowType spawnId = m_Creatures[type];
+    if (!spawnId)
+    {
+        LOG_DEBUG("outdoorpvp", "opvp creature type %u was already deleted", type);
+        return false;
+    }
 
-OutdoorPvP::~OutdoorPvP() = default;
+    LOG_DEBUG("outdoorpvp", "deleting opvp creature type %u", type);
+    m_CreatureTypes[m_Creatures[type]] = 0;
+    m_Creatures[type] = 0;
+
+    return Creature::DeleteFromDB(spawnId);
+}
+
+bool OPvPCapturePoint::DelObject(uint32 type)
+{
+    uint32 spawnId = m_Objects[type];
+    if (!spawnId)
+        return false;
+
+    sObjectMgr->DeleteGameObjectData(spawnId);
+    m_ObjectTypes[m_Objects[type]] = 0;
+    m_Objects[type] = 0;
+
+    return GameObject::DeleteFromDB(spawnId);
+}
+
+bool OPvPCapturePoint::DelCapturePoint()
+{
+    sObjectMgr->DeleteGameObjectData(m_capturePointSpawnId);
+    m_capturePointSpawnId = 0;
+
+    if (m_capturePoint)
+    {
+        m_capturePoint->SetRespawnTime(0);                                 // not save respawn time
+        m_capturePoint->Delete();
+    }
+
+    return true;
+}
+
+void OPvPCapturePoint::DeleteSpawns()
+{
+    for (std::map<uint32, ObjectGuid::LowType>::iterator i = m_Objects.begin(); i != m_Objects.end(); ++i)
+        DelObject(i->first);
+    for (std::map<uint32, ObjectGuid::LowType>::iterator i = m_Creatures.begin(); i != m_Creatures.end(); ++i)
+        DelCreature(i->first);
+    DelCapturePoint();
+}
+
+void OutdoorPvP::DeleteSpawns()
+{
+    // Remove script from any registered gameobjects/creatures
+    for (auto itr = m_GoScriptStore.begin(); itr != m_GoScriptStore.end(); ++itr)
+    {
+        if (GameObject* go = itr->second)
+            go->ClearZoneScript();
+    }
+    m_GoScriptStore.clear();
+
+    for (auto itr = m_CreatureScriptStore.begin(); itr != m_CreatureScriptStore.end(); ++itr)
+    {
+        if (Creature* creature = itr->second)
+            creature->ClearZoneScript();
+    }
+    m_CreatureScriptStore.clear();
+
+    for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    {
+        itr->second->DeleteSpawns();
+        delete itr->second;
+    }
+    m_capturePoints.clear();
+}
+
+OutdoorPvP::OutdoorPvP() : m_TypeId(0), m_sendUpdate(true), m_map(nullptr) { }
+
+OutdoorPvP::~OutdoorPvP()
+{
+    DeleteSpawns();
+}
 
 void OutdoorPvP::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 {
@@ -124,7 +261,7 @@ void OutdoorPvP::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     if (!player->GetSession()->PlayerLogout())
         SendRemoveWorldStates(player);
     m_players[player->GetTeamId()].erase(player->GetGUID());
-    TC_LOG_DEBUG("outdoorpvp", "Player %s left an outdoorpvp zone", player->GetName().c_str());
+    LOG_DEBUG("outdoorpvp", "Player %s left an outdoorpvp zone", player->GetName().c_str());
 }
 
 void OutdoorPvP::HandlePlayerResurrects(Player* /*player*/, uint32 /*zone*/) { }
@@ -161,8 +298,8 @@ bool OPvPCapturePoint::Update(uint32 diff)
     }
 
     std::list<Player*> players;
-    Trinity::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
-    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
+    Firelands::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
+    Firelands::PlayerListSearcher<Firelands::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
     Cell::VisitWorldObjects(m_capturePoint, searcher, radius);
 
     for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -252,7 +389,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     if (m_OldState != m_State)
     {
-        //TC_LOG_ERROR("outdoorpvp", "%u->%u", m_OldState, m_State);
+        //LOG_ERROR("outdoorpvp", "%u->%u", m_OldState, m_State);
         if (oldTeam != m_team)
             ChangeTeam(oldTeam);
         ChangeState();
@@ -262,14 +399,13 @@ bool OPvPCapturePoint::Update(uint32 diff)
     return false;
 }
 
-int32 OutdoorPvP::GetWorldState(int32 worldStateId) const
+void OutdoorPvP::SendUpdateWorldState(uint32 field, uint32 value)
 {
-    return sWorldStateMgr->GetValue(worldStateId, m_map);
-}
-
-void OutdoorPvP::SetWorldState(int32 worldStateId, int32 value)
-{
-    sWorldStateMgr->SetValue(worldStateId, value, false, m_map);
+    if (m_sendUpdate)
+        for (int i = 0; i < 2; ++i)
+            for (GuidSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+                if (Player* const player = ObjectAccessor::FindPlayer(*itr))
+                    player->SendUpdateWorldState(field, value);
 }
 
 void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
@@ -400,38 +536,42 @@ bool OutdoorPvP::HandleDropFlag(Player* player, uint32 id)
     return false;
 }
 
-int32 OPvPCapturePoint::HandleOpenGo(Player* /*player*/, GameObject* /*go*/)
+bool OPvPCapturePoint::HandleGossipOption(Player* /*player*/, Creature* /*creature*/, uint32 /*id*/)
 {
+    return false;
+}
+
+bool OPvPCapturePoint::CanTalkTo(Player* /*player*/, Creature* /*c*/, GossipMenuItems const& /*gso*/)
+{
+    return false;
+}
+
+bool OPvPCapturePoint::HandleDropFlag(Player* /*player*/, uint32 /*id*/)
+{
+    return false;
+}
+
+int32 OPvPCapturePoint::HandleOpenGo(Player* /*player*/, GameObject* go)
+{
+    std::map<ObjectGuid::LowType, uint32>::iterator itr = m_ObjectTypes.find(go->GetSpawnId());
+    if (itr != m_ObjectTypes.end())
+        return itr->second;
+
     return -1;
 }
 
-void OutdoorPvP::BroadcastPacket(WorldPacket const* data) const
+bool OutdoorPvP::HandleAreaTrigger(Player* /*player*/, uint32 /*trigger*/)
+{
+    return false;
+}
+
+void OutdoorPvP::BroadcastPacket(WorldPacket &data) const
 {
     // This is faster than sWorld->SendZoneMessage
     for (uint32 team = 0; team < BG_TEAMS_COUNT; ++team)
         for (GuidSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
             if (Player* const player = ObjectAccessor::FindPlayer(*itr))
-                player->SendDirectMessage(data);
-}
-
-void OutdoorPvP::AddCapturePoint(OPvPCapturePoint* cp)
-{
-    OPvPCapturePointMap::iterator i = m_capturePoints.find(cp->m_capturePointSpawnId);
-    if (i != m_capturePoints.end())
-    {
-        TC_LOG_ERROR("outdoorpvp", "OutdoorPvP::AddCapturePoint: CapturePoint %u already exists!", cp->m_capturePointSpawnId);
-        if (i->second.get() == cp)
-            return;
-    }
-    m_capturePoints[cp->m_capturePointSpawnId].reset(cp);
-}
-
-OPvPCapturePoint* OutdoorPvP::GetCapturePoint(ObjectGuid::LowType guid) const
-{
-    OutdoorPvP::OPvPCapturePointMap::const_iterator itr = m_capturePoints.find(guid);
-    if (itr != m_capturePoints.end())
-        return itr->second.get();
-    return nullptr;
+                player->SendDirectMessage(&data);
 }
 
 void OutdoorPvP::RegisterZone(uint32 zoneId)
@@ -469,26 +609,41 @@ void OutdoorPvP::TeamApplyBuff(TeamId team, uint32 spellId, uint32 spellId2)
 
 void OutdoorPvP::OnGameObjectCreate(GameObject* go)
 {
+    GoScriptPair sp(go->GetGUID().GetCounter(), go);
+    m_GoScriptStore.insert(sp);
     if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
         return;
 
-    if (OPvPCapturePoint* cp = GetCapturePoint(go->GetSpawnId()))
+    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetSpawnId()))
         cp->m_capturePoint = go;
 }
 
 void OutdoorPvP::OnGameObjectRemove(GameObject* go)
 {
+    m_GoScriptStore.erase(go->GetGUID().GetCounter());
+
     if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
         return;
 
-    if (OPvPCapturePoint* cp = GetCapturePoint(go->GetSpawnId()))
+    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetSpawnId()))
         cp->m_capturePoint = nullptr;
+}
+
+void OutdoorPvP::OnCreatureCreate(Creature* creature)
+{
+    CreatureScriptPair sp(creature->GetGUID().GetCounter(), creature);
+    m_CreatureScriptStore.insert(sp);
+}
+
+void OutdoorPvP::OnCreatureRemove(Creature* creature)
+{
+    m_CreatureScriptStore.erase(creature->GetGUID().GetCounter());
 }
 
 void OutdoorPvP::SendDefenseMessage(uint32 zoneId, uint32 id)
 {
     DefenseMessageBuilder builder(zoneId, id);
-    Trinity::LocalizedPacketDo<DefenseMessageBuilder> localizer(builder);
+    Firelands::LocalizedPacketDo<DefenseMessageBuilder> localizer(builder);
     BroadcastWorker(localizer, zoneId);
 }
 
@@ -500,4 +655,13 @@ void OutdoorPvP::BroadcastWorker(Worker& _worker, uint32 zoneId)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 if (player->GetZoneId() == zoneId)
                     _worker(player);
+}
+
+void OutdoorPvP::SetMapFromZone(uint32 zone)
+{
+    AreaTableEntry const* areaTable = sAreaTableStore.LookupEntry(zone);
+    ASSERT(areaTable);
+    Map* map = sMapMgr->CreateBaseMap(areaTable->ContinentID);
+    ASSERT(!map->Instanceable());
+    m_map = map;
 }

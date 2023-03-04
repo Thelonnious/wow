@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -322,8 +322,9 @@ class spell_warr_lambs_to_the_slaughter : public AuraScript
 
     void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
-        if (Aura* rend = eventInfo.GetProcTarget()->GetAura(SPELL_WARRIOR_REND, GetTarget()->GetGUID()))
-            rend->RefreshDuration(false);
+        if (Aura* aur = eventInfo.GetProcTarget()->GetAura(SPELL_WARRIOR_REND, GetTarget()->GetGUID()))
+            aur->SetDuration(aur->GetSpellInfo()->GetMaxDuration(), true);
+
     }
 
     void Register() override
@@ -732,7 +733,7 @@ class spell_warr_victory_rush : public SpellScript
 
                 // Glyph: Victory Rush
                 if (Player* modOwner = caster->GetSpellModOwner())
-                    modOwner->ApplySpellMod(m_scriptSpellId, SpellModOp::PointsIndex2, damage);
+                    modOwner->ApplySpellMod(m_scriptSpellId, SPELLMOD_EFFECT3, damage);
 
                 SetEffectValue(damage);
             }

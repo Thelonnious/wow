@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -609,7 +609,7 @@ void ThreatManager::ProcessAIUpdates()
                 threat *= threatEntry->pctMod;
 
         if (Player* modOwner = victim->GetSpellModOwner())
-            modOwner->ApplySpellMod(spell->Id, SpellModOp::Hate, threat);
+            modOwner->ApplySpellMod(spell->Id, SPELLMOD_THREAT, threat);
     }
 
     // modifiers by effect school
@@ -657,7 +657,7 @@ void ThreatManager::ProcessAIUpdates()
 
 void ThreatManager::ForwardThreatForAssistingMe(Unit* assistant, float baseAmount, SpellInfo const* spell, bool ignoreModifiers)
 {
-    if (spell && (spell->HasAttribute(SPELL_ATTR1_NO_THREAT) || spell->HasAttribute(SPELL_ATTR4_NO_HELPFUL_THREAT))) // shortcut, none of the calls would do anything
+    if (spell && spell->HasAttribute(SPELL_ATTR1_NO_THREAT)) // shortcut, none of the calls would do anything
         return;
     if (_threatenedByMe.empty())
         return;

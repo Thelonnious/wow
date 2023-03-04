@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_SMARTSCRIPT_H
-#define TRINITY_SMARTSCRIPT_H
+#ifndef FIRELANDS_SMARTSCRIPT_H
+#define FIRELANDS_SMARTSCRIPT_H
 
 #include "Define.h"
 #include "SmartScriptMgr.h"
@@ -24,20 +24,21 @@
 class Creature;
 class GameObject;
 class Player;
+class Quest;
 class SpellInfo;
 class Unit;
 class WorldObject;
 struct AreaTriggerEntry;
 
-class TC_GAME_API SmartScript
+class FC_GAME_API SmartScript
 {
     public:
         SmartScript();
         ~SmartScript();
 
-        void OnInitialize(WorldObject* obj, AreaTriggerEntry const* at = nullptr);
+        void OnInitialize(WorldObject* obj, AreaTriggerEntry const* at = nullptr, Quest const* qst = nullptr);
         void GetScript();
-        void FillScript(SmartAIEventList e, WorldObject* obj, AreaTriggerEntry const* at);
+        void FillScript(SmartAIEventList e, WorldObject* obj, AreaTriggerEntry const* at, Quest const* qst = nullptr);
 
         void ProcessEventsFor(SMART_EVENT e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, SpellInfo const* spell = nullptr, GameObject* gob = nullptr);
         void ProcessEvent(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, SpellInfo const* spell = nullptr, GameObject* gob = nullptr);
@@ -87,12 +88,16 @@ class TC_GAME_API SmartScript
         void OnReset();
         void ResetBaseObject();
 
+        uint32 GetPhase() { return mEventPhase; }
+
         //TIMED_ACTIONLIST (script type 9 aka script9)
         void SetScript9(SmartScriptHolder& e, uint32 entry);
         Unit* GetLastInvoker(Unit* invoker = nullptr);
         ObjectGuid mLastInvoker;
         typedef std::unordered_map<uint32, uint32> CounterMap;
         CounterMap mCounterList;
+
+        uint32 GetEventPhaseMask() { return mEventPhase; }
 
     private:
         void IncPhase(uint32 p);
@@ -110,6 +115,7 @@ class TC_GAME_API SmartScript
         GameObject* go;
         ObjectGuid goOrigGUID;
         AreaTriggerEntry const* trigger;
+        Quest const* quest;
         SmartScriptType mScriptType;
         uint32 mEventPhase;
 

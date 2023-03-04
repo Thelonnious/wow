@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,11 +35,11 @@ enum UpdatefieldFlags
     UF_FLAG_DYNAMIC      = 0x100
 };
 
-TC_GAME_API extern uint32 ItemUpdateFieldFlags[CONTAINER_END];
-TC_GAME_API extern uint32 UnitUpdateFieldFlags[PLAYER_END];
-TC_GAME_API extern uint32 GameObjectUpdateFieldFlags[GAMEOBJECT_END];
-TC_GAME_API extern uint32 DynamicObjectUpdateFieldFlags[DYNAMICOBJECT_END];
-TC_GAME_API extern uint32 CorpseUpdateFieldFlags[CORPSE_END];
-TC_GAME_API extern uint32 AreaTriggerUpdateFieldFlags[AREATRIGGER_END];
+FC_GAME_API extern uint32 ItemUpdateFieldFlags[CONTAINER_END];
+FC_GAME_API extern uint32 UnitUpdateFieldFlags[PLAYER_END];
+FC_GAME_API extern uint32 GameObjectUpdateFieldFlags[GAMEOBJECT_END];
+FC_GAME_API extern uint32 DynamicObjectUpdateFieldFlags[DYNAMICOBJECT_END];
+FC_GAME_API extern uint32 CorpseUpdateFieldFlags[CORPSE_END];
+FC_GAME_API extern uint32 AreaTriggerUpdateFieldFlags[AREATRIGGER_END];
 
 #endif // _UPDATEFIELDFLAGS_H

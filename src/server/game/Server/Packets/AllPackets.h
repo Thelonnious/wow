@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,7 +24,6 @@
 #include "AuthenticationPackets.h"
 #include "BattlegroundPackets.h"
 #include "CharacterPackets.h"
-#include "ChatPackets.h"
 #include "CombatLogPackets.h"
 #include "CombatPackets.h"
 #include "GuildPackets.h"
@@ -36,13 +35,10 @@
 #include "MovementPackets.h"
 #include "NPCPackets.h"
 #include "PartyPackets.h"
-#include "PetPackets.h"
 #include "QuestPackets.h"
 #include "QueryPackets.h"
 #include "SpellPackets.h"
 #include "SystemPackets.h"
-#include "TicketPackets.h"
-#include "TotemPackets.h"
 #include "TradePackets.h"
 #include "VehiclePackets.h"
 #include "WhoPackets.h"

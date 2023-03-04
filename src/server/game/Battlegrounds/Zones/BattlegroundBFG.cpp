@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -27,6 +27,7 @@
 #include "Util.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "WorldStatePackets.h"
 
 void BattlegroundBFGScore::BuildObjectivesBlock(WorldPacket& data, ByteBuffer& content)
 {
@@ -279,6 +280,41 @@ void BattlegroundBFG::_DelBanner(uint8 node, uint8 type, uint8 teamIndex)
     SpawnBGObject(obj, RESPAWN_ONE_DAY);
 }
 
+void BattlegroundBFG::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& data)
+{
+    const uint8 plusArray[] = { 0, 1, 2 };
+
+    // Node icons
+    for (uint8 node = 0; node < BG_BFG_DYNAMIC_NODES_COUNT; ++node)
+        data.Worldstates.emplace_back(uint32(BG_BFG_OP_NODEICONS[node]), uint32((m_Nodes[node] == 0) ? 1 : 0));
+
+    // Node occupied states
+    for (uint8 node = 0; node < BG_BFG_DYNAMIC_NODES_COUNT; ++node)
+        for (uint8 i = 1; i < BG_BFG_DYNAMIC_NODES_COUNT; ++i)
+            data.Worldstates.emplace_back(uint32(BG_BFG_OP_NODESTATES[node] + plusArray[i]), uint32((m_Nodes[node] == i) ? 1 : 0));
+
+    // How many bases each team owns
+    uint8 ally = 0, horde = 0;
+    for (uint8 node = 0; node < BG_BFG_DYNAMIC_NODES_COUNT; ++node)
+        if (m_Nodes[node] == BG_BFG_NODE_STATUS_ALLY_OCCUPIED)
+            ++ally;
+        else if (m_Nodes[node] == BG_BFG_NODE_STATUS_HORDE_OCCUPIED)
+            ++horde;
+
+    data.Worldstates.emplace_back(uint32(BG_BFG_OP_OCCUPIED_BASES_ALLY), uint32(ally));
+    data.Worldstates.emplace_back(uint32(BG_BFG_OP_OCCUPIED_BASES_HORDE), uint32(horde));
+
+    // Team scores
+    data.Worldstates.emplace_back(uint32(BG_BFG_OP_RESOURCES_MAX), uint32(BG_BFG_MAX_TEAM_SCORE));
+    data.Worldstates.emplace_back(uint32(BG_BFG_OP_RESOURCES_WARNING), uint32(BG_BFG_WARNING_NEAR_VICTORY_SCORE));
+    data.Worldstates.emplace_back(uint32(BG_BFG_OP_RESOURCES_ALLY), uint32(m_TeamScores[TEAM_ALLIANCE]));
+    data.Worldstates.emplace_back(uint32(BG_BFG_OP_RESOURCES_HORDE), uint32(m_TeamScores[TEAM_HORDE]));
+
+    // other unknown
+    data.Worldstates.emplace_back(uint32(0x745), uint32(0x2));           // 37 1861 unk
+}
+
+
 void BattlegroundBFG::_SendNodeUpdate(uint8 node)
 {
     // Send node owner state update to refresh map icons on client
@@ -306,7 +342,7 @@ void BattlegroundBFG::_SendNodeUpdate(uint8 node)
 void BattlegroundBFG::_NodeOccupied(uint8 node, Team team)
 {
     if (!AddSpiritGuide(node, BG_BFG_SpiritGuidePos[node], GetTeamIndexByTeamId(team)))
-        TC_LOG_ERROR("bg.battleground", "Failed to spawn spirit guide! point: %u, team: %u, ", node, team);
+        LOG_ERROR("bg.battleground", "Failed to spawn spirit guide! point: %u, team: %u, ", node, team);
 
     if (node >= BG_BFG_DYNAMIC_NODES_COUNT)//only dynamic nodes, no start points
         return;
@@ -505,7 +541,7 @@ bool BattlegroundBFG::SetupBattleground()
             || !AddObject(BG_BFG_OBJECT_AURA_HORDE + 8 * i, BG_BFG_OBJECTID_AURA_H, BG_BFG_NodePositions[i], 0, 0, std::sin(BG_BFG_NodePositions[i].GetOrientation() / 2), std::cos(BG_BFG_NodePositions[i].GetOrientation() / 2), RESPAWN_ONE_DAY)
             || !AddObject(BG_BFG_OBJECT_AURA_CONTESTED + 8 * i, BG_BFG_OBJECTID_AURA_C, BG_BFG_NodePositions[i], 0, 0, std::sin(BG_BFG_NodePositions[i].GetOrientation() / 2), std::cos(BG_BFG_NodePositions[i].GetOrientation() / 2), RESPAWN_ONE_DAY))
         {
-            TC_LOG_ERROR("bg.battleground", "BatteGroundBG: Failed to spawn some objects, Battleground not created!");
+            LOG_ERROR("bg.battleground", "BatteGroundBG: Failed to spawn some objects, Battleground not created!");
             return false;
         }
     }
@@ -514,14 +550,14 @@ bool BattlegroundBFG::SetupBattleground()
         || !AddObject(BG_BFG_OBJECT_BANNER_NEUTRAL + 8 * 1, BG_BFG_OBJECTID_NODE_BANNER_1, BG_BFG_NodePositions[1], 0, 0, std::sin(BG_BFG_NodePositions[1].GetOrientation() / 2), std::cos(BG_BFG_NodePositions[1].GetOrientation() / 2), RESPAWN_ONE_DAY)
         || !AddObject(BG_BFG_OBJECT_BANNER_NEUTRAL + 8 * 2, BG_BFG_OBJECTID_NODE_BANNER_2, BG_BFG_NodePositions[2], 0, 0, std::sin(BG_BFG_NodePositions[2].GetOrientation() / 2), std::cos(BG_BFG_NodePositions[2].GetOrientation() / 2), RESPAWN_ONE_DAY))
     {
-        TC_LOG_ERROR("bg.battleground", "BatteGroundBG: Failed to spawn some objects, Battleground not created!");
+        LOG_ERROR("bg.battleground", "BatteGroundBG: Failed to spawn some objects, Battleground not created!");
         return false;
     }
 
     if (!AddObject(BG_BFG_OBJECT_GATE_A, BG_BFG_OBJECTID_GATE_A, BG_BFG_DoorPositions[0][0], BG_BFG_DoorPositions[0][1], BG_BFG_DoorPositions[0][2], BG_BFG_DoorPositions[0][3], BG_BFG_DoorPositions[0][4], BG_BFG_DoorPositions[0][5], BG_BFG_DoorPositions[0][6], BG_BFG_DoorPositions[0][7], RESPAWN_IMMEDIATELY)
         || !AddObject(BG_BFG_OBJECT_GATE_H, BG_BFG_OBJECTID_GATE_H, BG_BFG_DoorPositions[1][0], BG_BFG_DoorPositions[1][1], BG_BFG_DoorPositions[1][2], BG_BFG_DoorPositions[1][3], BG_BFG_DoorPositions[1][4], BG_BFG_DoorPositions[1][5], BG_BFG_DoorPositions[1][6], BG_BFG_DoorPositions[1][7], RESPAWN_IMMEDIATELY))
     {
-        TC_LOG_ERROR("bg.battleground", "BatteGroundBG: Failed to spawn door object, Battleground not created!");
+        LOG_ERROR("bg.battleground", "BatteGroundBG: Failed to spawn door object, Battleground not created!");
         return false;
     }
     //buffs
@@ -529,7 +565,7 @@ bool BattlegroundBFG::SetupBattleground()
     {
         if (!AddObject(BG_BFG_OBJECT_SPEEDBUFF_LIGHTHOUSE + 3 * i, Buff_Entries[0], BG_BFG_BuffPositions[i][0], BG_BFG_BuffPositions[i][1], BG_BFG_BuffPositions[i][2], BG_BFG_BuffPositions[i][3], 0, 0, sin(BG_BFG_BuffPositions[i][3] / 2), cos(BG_BFG_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY)
             || !AddObject(BG_BFG_OBJECT_SPEEDBUFF_LIGHTHOUSE + 3 * i + 1, Buff_Entries[1], BG_BFG_BuffPositions[i][0], BG_BFG_BuffPositions[i][1], BG_BFG_BuffPositions[i][2], BG_BFG_BuffPositions[i][3], 0, 0, sin(BG_BFG_BuffPositions[i][3] / 2), cos(BG_BFG_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY) || !AddObject(BG_BFG_OBJECT_SPEEDBUFF_LIGHTHOUSE + 3 * i + 2, Buff_Entries[2], BG_BFG_BuffPositions[i][0], BG_BFG_BuffPositions[i][1], BG_BFG_BuffPositions[i][2], BG_BFG_BuffPositions[i][3], 0, 0, sin(BG_BFG_BuffPositions[i][3] / 2), cos(BG_BFG_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY))
-            TC_LOG_ERROR("bg.battleground", "BatteGroundBG: Failed to spawn buff object!");
+            LOG_ERROR("bg.battleground", "BatteGroundBG: Failed to spawn buff object!");
     }
 
     return true;
@@ -637,4 +673,26 @@ bool BattlegroundBFG::UpdatePlayerScore(Player* player, uint32 type, uint32 valu
             break;
     }
     return true;
+}
+
+bool BattlegroundBFG::IsAllNodesControlledByTeam(uint32 team) const
+{
+    uint32 count = 0;
+    for (int i = 0; i < BG_BFG_DYNAMIC_NODES_COUNT; ++i)
+        if ((team == ALLIANCE && m_Nodes[i] == BG_BFG_NODE_STATUS_ALLY_OCCUPIED) ||
+            (team == HORDE && m_Nodes[i] == BG_BFG_NODE_STATUS_HORDE_OCCUPIED))
+            ++count;
+
+    return count == BG_BFG_DYNAMIC_NODES_COUNT;
+}
+
+bool BattlegroundBFG::CheckAchievementCriteriaMeet(uint32 criteriaId, Player const* player, Unit const* target, uint32 miscvalue)
+{
+    switch (criteriaId)
+    {
+    case BG_CRITERIA_CHECK_RESILIENT_VICTORY:
+        return m_TeamScores500Disadvantage[GetTeamIndexByTeamId(player->GetTeam())];
+    }
+
+    return Battleground::CheckAchievementCriteriaMeet(criteriaId, player, target, miscvalue);
 }

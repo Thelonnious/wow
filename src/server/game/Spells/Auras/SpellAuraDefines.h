@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -14,17 +14,11 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef TRINITY_SPELLAURADEFINES_H
-#define TRINITY_SPELLAURADEFINES_H
+#ifndef FIRELANDS_SPELLAURADEFINES_H
+#define FIRELANDS_SPELLAURADEFINES_H
 
 #include "Define.h"
-#include "ObjectGuid.h"
 #include "EnumFlag.h"
-
-class Item;
-class SpellInfo;
-class Unit;
-class WorldObject;
 
 #define MAX_AURAS 64                                        // client support up to 255, but it will cause problems with group auras updating
 
@@ -34,10 +28,10 @@ enum AURA_FLAGS
     AFLAG_EFF_INDEX_0            = 0x01,
     AFLAG_EFF_INDEX_1            = 0x02,
     AFLAG_EFF_INDEX_2            = 0x04,
-    AFLAG_NOCASTER               = 0x08,
+    AFLAG_CASTER                 = 0x08,
     AFLAG_POSITIVE               = 0x10,
     AFLAG_DURATION               = 0x20,
-    AFLAG_SCALABLE               = 0x40, // used with AFLAG_EFF_INDEX_0/1/2
+    AFLAG_ANY_EFFECT_AMOUNT_SENT = 0x40, // used with AFLAG_EFF_INDEX_0/1/2
     AFLAG_NEGATIVE               = 0x80
 };
 
@@ -495,39 +489,6 @@ enum ShapeshiftForm
     FORM_STEALTH            = 0x1E,
     FORM_MOONKIN            = 0x1F,
     FORM_SPIRITOFREDEMPTION = 0x20
-};
-
-struct TC_GAME_API AuraCreateInfo
-{
-    friend class Aura;
-    friend class UnitAura;
-    friend class DynObjAura;
-
-    AuraCreateInfo(SpellInfo const* spellInfo, uint8 auraEffMask, WorldObject* owner);
-
-    AuraCreateInfo& SetCasterGUID(ObjectGuid const& guid) { CasterGUID = guid; return *this; }
-    AuraCreateInfo& SetCaster(Unit* caster) { Caster = caster; return *this; }
-    AuraCreateInfo& SetBaseAmount(int32 const* bp) { BaseAmount = bp; return *this; }
-    AuraCreateInfo& SetCastItemGUID(ObjectGuid const& guid) { CastItemGUID = guid; return *this; }
-    AuraCreateInfo& SetPeriodicReset(bool reset) { ResetPeriodicTimer = reset; return *this; }
-    AuraCreateInfo& SetOwnerEffectMask(uint8 effMask) { _targetEffectMask = effMask; return *this; }
-
-    SpellInfo const* GetSpellInfo() const { return _spellInfo; }
-    uint8 GetAuraEffectMask() const { return _auraEffectMask; }
-
-    ObjectGuid CasterGUID;
-    Unit* Caster = nullptr;
-    int32 const* BaseAmount = nullptr;
-    ObjectGuid CastItemGUID;
-    bool* IsRefresh = nullptr;
-    bool ResetPeriodicTimer = true;
-
-    private:
-        SpellInfo const* _spellInfo = nullptr;
-        uint8 _auraEffectMask = 0;
-        WorldObject* _owner = nullptr;
-
-        uint8 _targetEffectMask = 0;
 };
 
 #endif

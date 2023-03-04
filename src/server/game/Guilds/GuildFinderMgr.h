@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TRINITY_GUILDFINDER_H
-#define __TRINITY_GUILDFINDER_H
+#ifndef __FIRELANDS_GUILDFINDER_H
+#define __FIRELANDS_GUILDFINDER_H
 
 #include "Common.h"
 #include "ObjectGuid.h"
@@ -254,4 +254,4 @@ class GuildFinderMgr
 
 #define sGuildFinderMgr GuildFinderMgr::instance()
 
-#endif // __TRINITY_GUILDFINDER_H
+#endif // __FIRELANDS_GUILDFINDER_H

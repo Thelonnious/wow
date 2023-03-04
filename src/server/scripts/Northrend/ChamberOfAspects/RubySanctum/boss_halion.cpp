@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -301,7 +301,7 @@ class boss_halion : public CreatureScript
                 if (events.IsInPhase(PHASE_THREE))
                 {
                     // Don't consider copied damage.
-                    if (!attacker || !me->IsInPhase(attacker))
+                    if (!me->IsInPhase(attacker))
                         return;
 
                     if (Creature* controller = instance->GetCreature(DATA_HALION_CONTROLLER))
@@ -309,7 +309,7 @@ class boss_halion : public CreatureScript
                 }
             }
 
-            void SpellHit(WorldObject* /*who*/, SpellInfo const* spellInfo) override
+            void SpellHit(Unit* /*who*/, SpellInfo const* spellInfo) override
             {
                 if (spellInfo->Id == SPELL_TWILIGHT_MENDING)
                     Talk(SAY_REGENERATE);
@@ -455,7 +455,7 @@ class boss_twilight_halion : public CreatureScript
                         halion->LowerPlayerDamageReq(halion->GetMaxHealth());
 
                     if (halion->IsAlive())
-                        Unit::Kill(killer, halion);
+                        killer->Kill(halion);
                 }
 
                 if (Creature* controller = instance->GetCreature(DATA_HALION_CONTROLLER))
@@ -485,7 +485,7 @@ class boss_twilight_halion : public CreatureScript
                 if (events.IsInPhase(PHASE_THREE))
                 {
                     // Don't consider copied damage.
-                    if (!attacker || !me->IsInPhase(attacker))
+                    if (!me->IsInPhase(attacker))
                         return;
 
                     if (Creature* controller = instance->GetCreature(DATA_HALION_CONTROLLER))
@@ -493,7 +493,7 @@ class boss_twilight_halion : public CreatureScript
                 }
             }
 
-            void SpellHit(WorldObject* /*who*/, SpellInfo const* spell) override
+            void SpellHit(Unit* /*who*/, SpellInfo const* spell) override
             {
                 switch (spell->Id)
                 {
@@ -1273,7 +1273,7 @@ class npc_living_inferno : public CreatureScript
 
             void IsSummonedBy(Unit* /*summoner*/) override
             {
-                DoZoneInCombat();
+                me->SetInCombatWithZone();
                 me->CastSpell(me, SPELL_BLAZING_AURA, true);
 
                 // SMSG_SPELL_GO for the living ember stuff isn't even sent to the client - Blizzard on drugs.
@@ -1354,7 +1354,7 @@ class go_twilight_portal : public GameObjectScript
                 {
                     case GO_HALION_PORTAL_EXIT:
                         PhasingHandler::AddPhase(gameobject, 174, true);
-                        _spellId = gameobject->GetGOInfo()->goober.spell;
+                        _spellId = gameobject->GetGOInfo()->goober.spellId;
                         break;
                     case GO_HALION_PORTAL_1:
                     case GO_HALION_PORTAL_2:
@@ -1830,7 +1830,7 @@ class spell_halion_spawn_living_embers : public SpellScriptLoader
             void SelectMeteorFlames(std::list<WorldObject*>& unitList)
             {
                 if (!unitList.empty())
-                    Trinity::Containers::RandomResize(unitList, 10);
+                    Firelands::Containers::RandomResize(unitList, 10);
             }
 
             void HandleScript(SpellEffIndex /* effIndex */)

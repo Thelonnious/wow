@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -59,12 +59,12 @@ WorldSocketMgr& WorldSocketMgr::Instance()
     return instance;
 }
 
-bool WorldSocketMgr::StartWorldNetwork(Trinity::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int threadCount)
+bool WorldSocketMgr::StartWorldNetwork(Firelands::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int threadCount)
 {
     _tcpNoDelay = sConfigMgr->GetBoolDefault("Network.TcpNodelay", true);
 
-    int const max_connections = TRINITY_MAX_LISTEN_CONNECTIONS;
-    TC_LOG_DEBUG("misc", "Max allowed socket connections %d", max_connections);
+    int const max_connections = FIRELANDS_MAX_LISTEN_CONNECTIONS;
+    LOG_DEBUG("misc", "Max allowed socket connections %d", max_connections);
 
     // -1 means use default
     _socketSystemSendBufferSize = sConfigMgr->GetIntDefault("Network.OutKBuff", -1);
@@ -73,7 +73,7 @@ bool WorldSocketMgr::StartWorldNetwork(Trinity::Asio::IoContext& ioContext, std:
 
     if (_socketApplicationSendBufferSize <= 0)
     {
-        TC_LOG_ERROR("misc", "Network.OutUBuff is wrong in your config file");
+        LOG_ERROR("misc", "Network.OutUBuff is wrong in your config file");
         return false;
     }
 
@@ -87,13 +87,13 @@ bool WorldSocketMgr::StartWorldNetwork(Trinity::Asio::IoContext& ioContext, std:
     }
     catch (boost::system::system_error const& err)
     {
-        TC_LOG_ERROR("network", "Exception caught in WorldSocketMgr::StartNetwork (%s:%u): %s", bindIp.c_str(), port, err.what());
+        LOG_ERROR("network", "Exception caught in WorldSocketMgr::StartNetwork (%s:%u): %s", bindIp.c_str(), port, err.what());
         return false;
     }
 
     if (!instanceAcceptor->Bind())
     {
-        TC_LOG_ERROR("network", "StartNetwork failed to bind instance socket acceptor");
+        LOG_ERROR("network", "StartNetwork failed to bind instance socket acceptor");
         return false;
     }
 
@@ -131,7 +131,7 @@ void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
         sock.set_option(boost::asio::socket_base::send_buffer_size(_socketSystemSendBufferSize), err);
         if (err && err != boost::system::errc::not_supported)
         {
-            TC_LOG_ERROR("misc", "WorldSocketMgr::OnSocketOpen sock.set_option(boost::asio::socket_base::send_buffer_size) err = %s", err.message().c_str());
+            LOG_ERROR("misc", "WorldSocketMgr::OnSocketOpen sock.set_option(boost::asio::socket_base::send_buffer_size) err = %s", err.message().c_str());
             return;
         }
     }
@@ -143,7 +143,7 @@ void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
         sock.set_option(boost::asio::ip::tcp::no_delay(true), err);
         if (err)
         {
-            TC_LOG_ERROR("misc", "WorldSocketMgr::OnSocketOpen sock.set_option(boost::asio::ip::tcp::no_delay) err = %s", err.message().c_str());
+            LOG_ERROR("misc", "WorldSocketMgr::OnSocketOpen sock.set_option(boost::asio::ip::tcp::no_delay) err = %s", err.message().c_str());
             return;
         }
     }

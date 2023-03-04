@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -111,8 +111,8 @@ bool SmartAI::LoadPath(uint32 entry)
     _path.Nodes = path->Nodes;
     for (WaypointNode& waypoint : _path.Nodes)
     {
-        Trinity::NormalizeMapCoord(waypoint.X);
-        Trinity::NormalizeMapCoord(waypoint.Y);
+        Firelands::NormalizeMapCoord(waypoint.X);
+        Firelands::NormalizeMapCoord(waypoint.Y);
         waypoint.MoveType = _run ? WAYPOINT_MOVE_TYPE_RUN : WAYPOINT_MOVE_TYPE_WALK;
     }
 
@@ -135,7 +135,7 @@ void SmartAI::PausePath(uint32 delay, bool forced)
 
     if (HasEscortState(SMART_ESCORT_PAUSED))
     {
-        TC_LOG_ERROR("misc", "SmartAI::PausePath: Creature entry %u wanted to pause waypoint (current waypoint: %u) movement while already paused, ignoring.", me->GetEntry(), _currentWaypointNode);
+        LOG_ERROR("misc", "SmartAI::PausePath: Creature entry %u wanted to pause waypoint (current waypoint: %u) movement while already paused, ignoring.", me->GetEntry(), _currentWaypointNode);
         return;
     }
 
@@ -661,14 +661,14 @@ void SmartAI::AttackStart(Unit* who)
     }
 }
 
-void SmartAI::SpellHit(WorldObject* caster, SpellInfo const* spellInfo)
+void SmartAI::SpellHit(Unit* unit, SpellInfo const* spellInfo)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_SPELLHIT, caster->ToUnit(), 0, 0, false, spellInfo);
+    GetScript()->ProcessEventsFor(SMART_EVENT_SPELLHIT, unit, 0, 0, false, spellInfo);
 }
 
-void SmartAI::SpellHitTarget(WorldObject* target, SpellInfo const* spellInfo)
+void SmartAI::SpellHitTarget(Unit* target, SpellInfo const* spellInfo)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_SPELLHIT_TARGET, target->ToUnit(), 0, 0, false, spellInfo);
+    GetScript()->ProcessEventsFor(SMART_EVENT_SPELLHIT_TARGET, target, 0, 0, false, spellInfo);
 }
 
 void SmartAI::DamageTaken(Unit* doneBy, uint32& damage)
@@ -931,6 +931,21 @@ void SmartAI::StopFollow(bool complete)
     GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
 }
 
+void SmartAI::SetUnfollow()
+{
+    _followGuid.Clear();
+    _followDist = 0;
+    _followAngle = 0;
+    _followCredit = 0;
+    _followArrivedTimer = 0;
+    _followArrivedEntry = 0;
+    _followCreditType = 0;
+
+    me->StopMoving();
+    me->GetMotionMaster()->Clear();
+    me->GetMotionMaster()->MoveIdle();
+}
+
 void SmartAI::SetScript9(SmartScriptHolder& e, uint32 entry, Unit* invoker)
 {
     if (invoker)
@@ -1013,7 +1028,7 @@ bool SmartGameObjectAI::GossipHello(Player* player)
 
 bool SmartGameObjectAI::OnReportUse(Player* player)
 {
-    TC_LOG_DEBUG("scripts.ai", "SmartGameObjectAI::OnReportUse");
+    LOG_DEBUG("scripts.ai", "SmartGameObjectAI::OnReportUse");
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_HELLO, player, 1, 0, false, nullptr, me);
     return false;
 }
@@ -1045,9 +1060,9 @@ void SmartGameObjectAI::QuestReward(Player* player, Quest const* quest, uint32 o
 }
 
 // Called when the gameobject is destroyed (destructible buildings only).
-void SmartGameObjectAI::Destroyed(WorldObject* attacker, uint32 eventId)
+void SmartGameObjectAI::Destroyed(Player* player, uint32 eventId)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_DEATH, attacker ? attacker->ToUnit() : nullptr, eventId, 0, false, nullptr, me);
+    GetScript()->ProcessEventsFor(SMART_EVENT_DEATH, player, eventId, 0, false, nullptr, me);
 }
 
 void SmartGameObjectAI::SetData(uint32 id, uint32 value, Unit* invoker)
@@ -1077,9 +1092,9 @@ void SmartGameObjectAI::EventInform(uint32 eventId)
     GetScript()->ProcessEventsFor(SMART_EVENT_GO_EVENT_INFORM, nullptr, eventId);
 }
 
-void SmartGameObjectAI::SpellHit(WorldObject* caster, SpellInfo const* spellInfo)
+void SmartGameObjectAI::SpellHit(Unit* unit, SpellInfo const* spellInfo)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_SPELLHIT, caster->ToUnit(), 0, 0, false, spellInfo);
+    GetScript()->ProcessEventsFor(SMART_EVENT_SPELLHIT, unit, 0, 0, false, spellInfo);
 }
 
 class SmartTrigger : public AreaTriggerScript
@@ -1093,7 +1108,7 @@ class SmartTrigger : public AreaTriggerScript
             if (!player->IsAlive())
                 return false;
 
-            TC_LOG_DEBUG("scripts.ai", "AreaTrigger %u is using SmartTrigger script", trigger->ID);
+            LOG_DEBUG("scripts.ai", "AreaTrigger %u is using SmartTrigger script", trigger->ID);
             SmartScript script;
             script.OnInitialize(nullptr, trigger);
             script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->ID);
@@ -1101,7 +1116,50 @@ class SmartTrigger : public AreaTriggerScript
         }
 };
 
+class SmartQuest : public QuestScript
+{
+public:
+    SmartQuest() : QuestScript("SmartQuest") { }
+
+    // Called when a quest status change
+    void OnQuestStatusChange(Player* player, Quest const* quest, QuestStatus /*oldStatus*/, QuestStatus newStatus)
+    {
+        SmartScript smartScript;
+        smartScript.OnInitialize(nullptr, nullptr, quest);
+        switch (newStatus)
+        {
+        case QUEST_STATUS_INCOMPLETE:
+            smartScript.ProcessEventsFor(SMART_EVENT_QUEST_ACCEPTED, player);
+            break;
+        case QUEST_STATUS_COMPLETE:
+            smartScript.ProcessEventsFor(SMART_EVENT_QUEST_COMPLETION, player);
+            break;
+        case QUEST_STATUS_FAILED:
+            smartScript.ProcessEventsFor(SMART_EVENT_QUEST_FAIL, player);
+            break;
+        case QUEST_STATUS_REWARDED:
+            smartScript.ProcessEventsFor(SMART_EVENT_QUEST_REWARDED, player);
+            break;
+        case QUEST_STATUS_NONE:
+        default:
+            break;
+        }
+    }
+
+    // Called when a quest objective data change
+    //void OnQuestObjectiveChange(Player* player, Quest const* quest, QuestObjective const& objective, int32 /*oldAmount*/, int32 /*newAmount*/)
+    //{
+    //    if (player->IsQuestObjectiveComplete(objective))
+    //    {
+    //        SmartScript smartScript;
+    //        smartScript.OnInitialize(nullptr, nullptr, nullptr, quest);
+    //        smartScript.ProcessEventsFor(SMART_EVENT_QUEST_OBJ_COPLETETION, player, objective.ID);
+    //    }
+    //}
+};
+
 void AddSC_SmartScripts()
 {
     new SmartTrigger();
+    new SmartQuest();
 }

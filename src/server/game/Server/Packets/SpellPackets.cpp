@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -324,7 +324,7 @@ WorldPacket const* WorldPackets::Spells::PlaySpellVisual::Write()
     _worldPacket << float(TargetPosition.GetPositionZ());
     _worldPacket << int32(SpellVisualID);
     _worldPacket << uint16(MissReason);
-    _worldPacket << float(TravelSpeed);
+    _worldPacket << float(TargetPosition.GetOrientation());
     _worldPacket << float(TargetPosition.GetPositionX());
     _worldPacket << uint16(ReflectStatus);
     _worldPacket << float(TargetPosition.GetPositionY());
@@ -337,7 +337,6 @@ WorldPacket const* WorldPackets::Spells::PlaySpellVisual::Write()
     _worldPacket.WriteBit(Source[2]);
     _worldPacket.WriteBit(Source[4]);
     _worldPacket.WriteBit(Target[6]);
-    _worldPacket.WriteBit(Target[0]);
 
     _worldPacket.WriteBit(SpeedAsTime);
 

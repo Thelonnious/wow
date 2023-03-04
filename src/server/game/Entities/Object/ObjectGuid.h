@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -127,7 +127,7 @@ struct PackedGuidReader
     ObjectGuid& Guid;
 };
 
-class TC_GAME_API ObjectGuid
+class FC_GAME_API ObjectGuid
 {
     public:
         static ObjectGuid const Empty;
@@ -286,9 +286,9 @@ typedef std::unordered_set<ObjectGuid> GuidUnorderedSet;
 // minimum buffer size for packed guid is 9 bytes
 #define PACKED_GUID_MIN_BUFFER_SIZE 9
 
-class TC_GAME_API PackedGuid
+class FC_GAME_API PackedGuid
 {
-    friend TC_GAME_API ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
+    friend FC_GAME_API ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
 
     public:
         explicit PackedGuid() : _packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { _packedGuid.appendPackGUID(0); }
@@ -304,7 +304,7 @@ class TC_GAME_API PackedGuid
         ByteBuffer _packedGuid;
 };
 
-class TC_GAME_API ObjectGuidGeneratorBase
+class FC_GAME_API ObjectGuidGeneratorBase
 {
     public:
         ObjectGuidGeneratorBase(ObjectGuid::LowType start = 1) : _nextGuid(start) { }
@@ -338,11 +338,11 @@ class ObjectGuidGenerator : public ObjectGuidGeneratorBase
         }
 };
 
-TC_GAME_API ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid);
-TC_GAME_API ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid&       guid);
+FC_GAME_API ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid);
+FC_GAME_API ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid&       guid);
 
-TC_GAME_API ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
-TC_GAME_API ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid);
+FC_GAME_API ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
+FC_GAME_API ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid);
 
 inline PackedGuid ObjectGuid::WriteAsPacked() const { return PackedGuid(*this); }
 

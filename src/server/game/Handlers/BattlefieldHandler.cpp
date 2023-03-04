@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -261,9 +261,9 @@ void WorldSession::HandleBfQueueInviteResponse(WorldPacket& recvData)
     recvData.ReadByteSeq(guid[0]);
     recvData.ReadByteSeq(guid[5]);
 
-    TC_LOG_ERROR("misc", "HandleQueueInviteResponse: %s, accepted: %u", guid.ToString().c_str(), accepted);
+    LOG_ERROR("misc", "HandleQueueInviteResponse: %s, accepted: %u", guid.ToString().c_str(), accepted);
 
-    Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetMap(), _player->GetZoneId());
+    Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid);
     if (!bf)
         return;
 
@@ -300,9 +300,9 @@ void WorldSession::HandleBfEntryInviteResponse(WorldPacket& recvData)
     recvData.ReadByteSeq(guid[7]);
     recvData.ReadByteSeq(guid[5]);
 
-    TC_LOG_ERROR("misc", "HandleBattlefieldInviteResponse: GUID: " UI64FMTD ", accepted: %u", uint64(guid), accepted);
+    LOG_ERROR("misc", "HandleBattlefieldInviteResponse: GUID: " UI64FMTD ", accepted: %u", uint64(guid), accepted);
 
-    Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetMap(), _player->GetZoneId());
+    Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid);
     if (!bf)
         return;
 
@@ -345,9 +345,9 @@ void WorldSession::HandleBfExitRequest(WorldPacket& recvData)
     recvData.ReadByteSeq(guid[7]);
     recvData.ReadByteSeq(guid[6]);
 
-    TC_LOG_ERROR("misc", "HandleBfExitRequest: GUID: " UI64FMTD, uint64(guid));
+    LOG_ERROR("misc", "HandleBfExitRequest: GUID: " UI64FMTD, uint64(guid));
 
-    Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetMap(), _player->GetZoneId());
+    Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid);
     if (!bf)
         return;
 
@@ -381,6 +381,6 @@ void WorldSession::HandleBfQueueRequest(WorldPacket & recvData)
     recvData.ReadByteSeq(guid[5]);
     recvData.ReadByteSeq(guid[0]);
 
-    if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetMap(), _player->GetZoneId()))
+    if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid))
         SendBfQueueInviteResponse(guid, bf->GetZoneId(), true, false);
 }

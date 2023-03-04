@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -44,7 +44,6 @@ class Item;
 class Unit;
 class Vehicle;
 class Map;
-enum GossipOptionIcon : uint8;
 struct AccessRequirement;
 struct DeclinedName;
 struct DungeonEncounterEntry;
@@ -127,13 +126,13 @@ enum ScriptCommands
     SCRIPT_COMMAND_CALLSCRIPT_TO_UNIT    = 21,               // source = WorldObject (if present used as a search center), datalong = script id, datalong2 = unit lowguid, dataint = script table to use (see ScriptsType)
     SCRIPT_COMMAND_KILL                  = 22,               // source/target = Creature, dataint = remove corpse attribute
 
-    // TrinityCore only
+    // Firelands only
     SCRIPT_COMMAND_ORIENTATION           = 30,               // source = Unit, target (datalong > 0) = Unit, datalong = > 0 turn source to face target, o = orientation
     SCRIPT_COMMAND_EQUIP                 = 31,               // soucre = Creature, datalong = equipment id
     SCRIPT_COMMAND_MODEL                 = 32,               // source = Creature, datalong = model id
     SCRIPT_COMMAND_CLOSE_GOSSIP          = 33,               // source = Player
     SCRIPT_COMMAND_PLAYMOVIE             = 34,               // source = Player, datalong = movie id
-    SCRIPT_COMMAND_MOVEMENT              = 35,               // source = Creature, datalong = MovementType, datalong2 = MovementDistance (wander_distance f.ex.), dataint = pathid
+    SCRIPT_COMMAND_MOVEMENT              = 35,               // source = Creature, datalong = MovementType, datalong2 = MovementDistance (spawndist f.ex.), dataint = pathid
     SCRIPT_COMMAND_PLAY_ANIMKIT          = 36                // source = Creature, datalong = AnimKit id
 };
 
@@ -154,10 +153,11 @@ typedef std::map<uint32, PageText> PageTextContainer;
 
 struct InstanceTemplate
 {
-    InstanceTemplate() : Parent(0), ScriptId(0) { }
+    InstanceTemplate() : Parent(0), ScriptId(0), AllowMount(false) { }
 
     uint32 Parent;
     uint32 ScriptId;
+    bool AllowMount;
 };
 
 typedef std::unordered_map<uint16, InstanceTemplate> InstanceTemplateContainer;
@@ -424,15 +424,15 @@ typedef std::multimap<uint32, ScriptInfo> ScriptMap;
 typedef std::map<uint32, ScriptMap > ScriptMapMap;
 typedef std::multimap<uint32 /*spell id*/, std::pair<uint32 /*script id*/, bool /*enabled*/>> SpellScriptsContainer;
 typedef std::pair<SpellScriptsContainer::iterator, SpellScriptsContainer::iterator> SpellScriptsBounds;
-TC_GAME_API extern ScriptMapMap sSpellScripts;
-TC_GAME_API extern ScriptMapMap sEventScripts;
-TC_GAME_API extern ScriptMapMap sWaypointScripts;
+FC_GAME_API extern ScriptMapMap sSpellScripts;
+FC_GAME_API extern ScriptMapMap sEventScripts;
+FC_GAME_API extern ScriptMapMap sWaypointScripts;
 
 std::string GetScriptsTableNameByType(ScriptsType type);
 ScriptMapMap* GetScriptsMapByType(ScriptsType type);
 std::string GetScriptCommandName(ScriptCommands command);
 
-struct TC_GAME_API InstanceSpawnGroupInfo
+struct FC_GAME_API InstanceSpawnGroupInfo
 {
     enum
     {
@@ -449,7 +449,7 @@ struct TC_GAME_API InstanceSpawnGroupInfo
     uint8 Flags;
 };
 
-struct TC_GAME_API SpellClickInfo
+struct FC_GAME_API SpellClickInfo
 {
     uint32 spellId;
     uint8 castFlags;
@@ -541,8 +541,8 @@ struct CreatureMovementInfoOverride
     float RunSpeed;
 };
 
-// Trinity Trainer Reference start range
-#define TRINITY_TRAINER_START_REF      200000
+// Firelands Trainer Reference start range
+#define FIRELANDS_TRAINER_START_REF      200000
 
 typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
 typedef std::unordered_map<uint32, CreatureTemplate> CreatureTemplateContainer;
@@ -595,12 +595,12 @@ struct QuestGreetingLocale
 
 typedef std::unordered_map<uint32, QuestGreetingLocale> QuestGreetingLocaleContainer;
 
-struct TrinityString
+struct FirelandsString
 {
     std::vector<std::string> Content;
 };
 
-typedef std::unordered_map<uint32, TrinityString> TrinityStringContainer;
+typedef std::unordered_map<uint32, FirelandsString> FirelandsStringContainer;
 
 typedef std::multimap<uint32, uint32> QuestRelations; // unit/go -> quest
 typedef std::multimap<uint32, uint32> QuestRelationsReverse; // quest -> unit/go
@@ -792,7 +792,7 @@ struct GossipMenuItems
 {
     uint32              MenuID;
     uint32              OptionID;
-    GossipOptionIcon    OptionIcon;
+    uint8               OptionIcon;
     std::string         OptionText;
     uint32              OptionBroadcastTextID;
     uint32              OptionType;
@@ -851,7 +851,7 @@ struct QuestPOIWrapper
 
     void InitializeQueryData();
     ByteBuffer BuildQueryData() const;
-    
+
     QuestPOIWrapper() : QueryDataBuffer(0) { }
 };
 
@@ -899,7 +899,7 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 #define MAX_PET_NAME             12                         // max allowed by client name length
 #define MAX_CHARTER_NAME         24                         // max allowed by client name length
 
-bool TC_GAME_API normalizePlayerName(std::string& name);
+bool FC_GAME_API normalizePlayerName(std::string& name);
 #define SPAWNGROUP_MAP_UNSET            0xFFFFFFFF
 
 struct LanguageDesc
@@ -909,7 +909,7 @@ struct LanguageDesc
     uint32   skill_id;
 };
 
-TC_GAME_API extern LanguageDesc lang_description[LANGUAGES_COUNT];
+FC_GAME_API extern LanguageDesc lang_description[LANGUAGES_COUNT];
 LanguageDesc const* GetLanguageDescByID(uint32 lang);
 
 enum EncounterCreditType : uint8
@@ -967,7 +967,7 @@ enum QueryDataGroup
 
 class PlayerDumpReader;
 
-class TC_GAME_API ObjectMgr
+class FC_GAME_API ObjectMgr
 {
     friend class PlayerDumpReader;
 
@@ -1168,7 +1168,7 @@ class TC_GAME_API ObjectMgr
             return _exclusiveQuestGroups.equal_range(exclusiveGroupId);
         }
 
-        bool LoadTrinityStrings();
+        bool LoadFirelandsStrings();
 
         void LoadEventScripts();
         void LoadSpellScripts();
@@ -1306,8 +1306,7 @@ class TC_GAME_API ObjectMgr
         SpawnGroupTemplateData const* GetSpawnGroupData(SpawnObjectType type, ObjectGuid::LowType spawnId) const { SpawnMetadata const* data = GetSpawnMetadata(type, spawnId); return data ? data->spawnGroupData : nullptr; }
         SpawnGroupTemplateData const* GetDefaultSpawnGroup() const { return &_spawnGroupDataStore.at(0); }
         SpawnGroupTemplateData const* GetLegacySpawnGroup() const { return &_spawnGroupDataStore.at(1); }
-        Trinity::IteratorPair<SpawnGroupLinkContainer::const_iterator> GetSpawnMetadataForGroup(uint32 groupId) const { return Trinity::Containers::MapEqualRange(_spawnGroupMapStore, groupId); }
-        std::vector<uint32> const* GetSpawnGroupsForMap(uint32 mapId) const { auto it = _spawnGroupsByMap.find(mapId); return it != _spawnGroupsByMap.end() ? &it->second : nullptr; }
+        Firelands::IteratorPair<SpawnGroupLinkContainer::const_iterator> GetSpawnMetadataForGroup(uint32 groupId) const { return Firelands::Containers::MapEqualRange(_spawnGroupMapStore, groupId); }
         std::vector<InstanceSpawnGroupInfo> const* GetSpawnGroupsForInstance(uint32 instanceId) const { auto it = _instanceSpawnGroupStore.find(instanceId); return it != _instanceSpawnGroupStore.end() ? &it->second : nullptr; }
 
         MailLevelReward const* GetMailLevelReward(uint32 level, uint32 raceMask) const
@@ -1437,9 +1436,9 @@ class TC_GAME_API ObjectMgr
             if (itr == _pageTextLocaleStore.end()) return nullptr;
             return &itr->second;
         }
-        GossipMenuItemsLocale const* GetGossipMenuItemsLocale(uint32 menuId, uint32 optionId) const
+        GossipMenuItemsLocale const* GetGossipMenuItemsLocale(uint32 menuId, uint32 optionIndex) const
         {
-            auto itr = _gossipMenuItemsLocaleStore.find(std::make_pair(menuId, optionId));
+            GossipMenuItemsLocaleContainer::const_iterator itr = _gossipMenuItemsLocaleStore.find(std::make_pair(menuId, optionIndex));
             if (itr == _gossipMenuItemsLocaleStore.end()) return nullptr;
             return &itr->second;
         }
@@ -1467,15 +1466,15 @@ class TC_GAME_API ObjectMgr
             return 0.0f;
         }
 
-        TrinityString const* GetTrinityString(uint32 entry) const
+        FirelandsString const* GetFirelandsString(uint32 entry) const
         {
-            TrinityStringContainer::const_iterator itr = _trinityStringStore.find(entry);
-            if (itr == _trinityStringStore.end())
+            FirelandsStringContainer::const_iterator itr = _firelandsStringStore.find(entry);
+            if (itr == _firelandsStringStore.end())
                 return nullptr;
             return &itr->second;
         }
-        char const* GetTrinityString(uint32 entry, LocaleConstant locale) const;
-        char const* GetTrinityStringForDBCLocale(uint32 entry) const { return GetTrinityString(entry, DBCLocaleIndex); }
+        char const* GetFirelandsString(uint32 entry, LocaleConstant locale) const;
+        char const* GetFirelandsStringForDBCLocale(uint32 entry) const { return GetFirelandsString(entry, DBCLocaleIndex); }
         LocaleConstant GetDBCLocaleIndex() const { return DBCLocaleIndex; }
         void SetDBCLocaleIndex(LocaleConstant locale) { DBCLocaleIndex = locale; }
 
@@ -1484,6 +1483,8 @@ class TC_GAME_API ObjectMgr
         void RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData const* data);
         void AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data);
         void RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectData const* data);
+        ObjectGuid::LowType AddGameObjectData(uint32 entry, uint32 map, Position const& pos, QuaternionData const& rot, uint32 spawntimedelay = 0);
+        ObjectGuid::LowType AddCreatureData(uint32 entry, uint32 map, Position const& pos, uint32 spawntimedelay = 0);
 
         // reserved names
         void LoadReservedPlayersNames();
@@ -1513,7 +1514,7 @@ class TC_GAME_API ObjectMgr
         {
             return GetCreatureTrainerForGossipOption(creatureId, 0, 0);
         }
-        uint32 GetCreatureTrainerForGossipOption(uint32 creatureId, uint32 gossipMenuId, uint32 gossipOptionId) const;
+        uint32 GetCreatureTrainerForGossipOption(uint32 creatureId, uint32 gossipMenuId, uint32 gossipOptionIndex) const;
 
         VendorItemData const* GetNpcVendorItemList(uint32 entry) const
         {
@@ -1569,7 +1570,7 @@ class TC_GAME_API ObjectMgr
         // for wintergrasp only
         GraveyardContainer GraveyardStore;
 
-        static void AddLocaleString(std::string&& value, LocaleConstant localeConstant, std::vector<std::string>& data);
+        static void AddLocaleString(std::string const& value, LocaleConstant localeConstant, std::vector<std::string>& data);
         static inline void GetLocaleString(std::vector<std::string> const& data, LocaleConstant localeConstant, std::string& value)
         {
             if (data.size() > size_t(localeConstant) && !data[localeConstant].empty())
@@ -1756,7 +1757,6 @@ class TC_GAME_API ObjectMgr
         GameObjectTemplateContainer _gameObjectTemplateStore;
         GameObjectTemplateAddonContainer _gameObjectTemplateAddonStore;
         SpawnGroupDataContainer _spawnGroupDataStore;
-        std::unordered_map<uint32, std::vector<uint32>> _spawnGroupsByMap;
         SpawnGroupLinkContainer _spawnGroupMapStore;
         InstanceSpawnGroupContainer _instanceSpawnGroupStore;
         /// Stores temp summon data grouped by summoner's entry, summoner's type and group id
@@ -1771,7 +1771,7 @@ class TC_GAME_API ObjectMgr
         PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
         QuestGreetingLocaleContainer _questGreetingLocaleStore;
 
-        TrinityStringContainer _trinityStringStore;
+        FirelandsStringContainer _firelandsStringStore;
 
         CacheVendorItemContainer _cacheVendorItemStore;
         std::unordered_map<uint32, Trainer::Trainer> _trainers;

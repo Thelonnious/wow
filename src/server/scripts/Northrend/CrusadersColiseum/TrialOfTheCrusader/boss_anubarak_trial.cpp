@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -458,7 +458,7 @@ class npc_swarm_scarab : public CreatureScript
                 me->SetCorpseDelay(0);
                 Initialize();
                 DoCast(me, SPELL_ACID_MANDIBLE);
-                DoZoneInCombat();
+                me->SetInCombatWithZone();
                 if (me->IsInCombat())
                     if (Creature* Anubarak = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_ANUBARAK)))
                         Anubarak->AI()->JustSummoned(me);
@@ -539,7 +539,7 @@ class npc_nerubian_burrower : public CreatureScript
                 DoCast(me, SPELL_EXPOSE_WEAKNESS);
                 DoCast(me, SPELL_SPIDER_FRENZY);
                 DoCast(me, SPELL_AWAKENED);
-                DoZoneInCombat();
+                me->SetInCombatWithZone();
                 if (me->IsInCombat())
                     if (Creature* Anubarak = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_ANUBARAK)))
                         Anubarak->AI()->JustSummoned(me);
@@ -702,7 +702,7 @@ class npc_anubarak_spike : public CreatureScript
             {
                 Initialize();
                 // make sure the spike has everyone on threat list
-                DoZoneInCombat();
+                me->SetInCombatWithZone();
             }
 
             bool CanAIAttack(Unit const* victim) const override
@@ -815,7 +815,7 @@ class npc_anubarak_spike : public CreatureScript
                 me->SetSpeedRate(MOVE_RUN, 0.5f);
                 // make sure the Spine will really follow the one he should
                 me->GetThreatManager().ResetAllThreat();
-                DoZoneInCombat();
+                me->SetInCombatWithZone();
                 AddThreat(who, 1000000.0f);
                 me->GetMotionMaster()->Clear(true);
                 me->GetMotionMaster()->MoveChase(who);
@@ -846,7 +846,7 @@ class spell_impale : public SpellScriptLoader
 
                 // make sure Impale doesnt do damage if we are standing on permafrost
                 if (target && target->HasAura(permafrost))
-                    PreventHitDamage();
+                    SetHitDamage(0);
             }
 
             void Register() override

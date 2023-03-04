@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -153,6 +153,32 @@ enum WorldBoolConfigs
     CONFIG_DELETE_CHARACTER_TICKET_TRACE,
     CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES,
     CONFIG_PRESERVE_CUSTOM_CHANNELS,
+    CONFIG_ANTICHEAT_ENABLE,
+    CONFIG_ANTICHEAT_ENABLE_ON_GM,
+    CONFIG_ANTICHEAT_JUMPHACK_ENABLE,
+    CONFIG_ANTICHEAT_ADV_JUMPHACK_ENABLE,
+    CONFIG_ANTICHEAT_WATERWALKHACK_ENABLE,
+    CONFIG_ANTICHEAT_FLYHACK_ENABLE,
+    CONFIG_ANTICHEAT_FLYHACKSTRICT_ENABLE,
+    CONFIG_ANTICHEAT_TELEPANEHACK_ENABLE,
+    CONFIG_ANTICHEAT_IGNORECONTROLHACK_ENABLE,
+    CONFIG_ANTICHEAT_ZAXISHACK_ENABLE,
+    CONFIG_ANTICHEAT_TELEPORTHACK_ENABLE,
+    CONFIG_ANTICHEAT_CLIMBHACK_ENABLE,
+    CONFIG_ANTICHEAT_SPEEDHACK_ENABLE,
+    CONFIG_ANTICHEAT_ANTISWIM_ENABLE,
+    CONFIG_ANTICHEAT_GRAVITY_ENABLE,
+    CONFIG_ANTICHEAT_ANTIKNOCKBACK_ENABLE,
+    CONFIG_ANTICHEAT_NO_FALL_DAMAGE_ENABLE,
+    CONFIG_ANTICHEAT_BG_START_HACK_ENABLE,
+    CONFIG_ANTICHEAT_OP_ACK_HACK_ENABLE,
+    CONFIG_ANTICHEAT_WRITELOG_ENABLE,
+    CONFIG_ANTICHEAT_AUTOKICK_ENABLE,
+    CONFIG_ANTICHEAT_ANNOUNCEKICK_ENABLE,
+    CONFIG_ANTICHEAT_AUTOBAN_ENABLE,
+    CONFIG_ANTICHEAT_ANNOUNCEBAN_ENABLE,
+    CONFIG_ANTICHEAT_AUTOJAIL_ENABLE,
+    CONFIG_ANTICHEAT_ANNOUNCEJAIL_ENABLE,
     CONFIG_PDUMP_NO_PATHS,
     CONFIG_PDUMP_NO_OVERWRITE,
     CONFIG_QUEST_IGNORE_AUTO_ACCEPT,
@@ -359,6 +385,15 @@ enum WorldIntConfigs
     CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION,
     CONFIG_PERSISTENT_CHARACTER_CLEAN_FLAGS,
     CONFIG_LFG_OPTIONSMASK,
+    CONFIG_ANTICHEAT_REPORTS_INGAME_NOTIFICATION,
+    CONFIG_ANTICHEAT_MAX_REPORTS_FOR_DAILY_REPORT,
+    CONFIG_ANTICHEAT_REPORT_IN_CHAT_MIN,
+    CONFIG_ANTICHEAT_REPORT_IN_CHAT_MAX,
+    CONFIG_ANTICHEAT_SPEED_LIMIT_TOLERANCE,
+    CONFIG_ANTICHEAT_MAX_REPORTS_FOR_BANS,
+    CONFIG_ANTICHEAT_MAX_REPORTS_FOR_KICKS,
+    CONFIG_ANTICHEAT_MAX_REPORTS_FOR_JAILS,
+    CONFIG_ANTICHEAT_ALERT_FREQUENCY,
     CONFIG_MAX_INSTANCES_PER_HOUR,
     CONFIG_WARDEN_CLIENT_RESPONSE_DELAY,
     CONFIG_WARDEN_CLIENT_CHECK_HOLDOFF,
@@ -552,10 +587,22 @@ enum RealmZone
     REALM_ZONE_CN5_8         = 37                           // basic-Latin at create, any at login
 };
 
-struct PersistentWorldVariable;
+enum WorldStates
+{
+    WS_ARENA_DISTRIBUTION_TIME  = 20001,                     // Next arena distribution time
+    WS_WEEKLY_QUEST_RESET_TIME  = 20002,                     // Next weekly quest reset time
+    WS_BG_DAILY_RESET_TIME      = 20003,                     // Next daily BG reset time
+    WS_CLEANING_FLAGS           = 20004,                     // Cleaning Flags
+    WS_GUILD_DAILY_RESET_TIME   = 20006,                     // Next guild cap reset time
+    WS_MONTHLY_QUEST_RESET_TIME = 20007,                     // Next monthly quest reset time
+    WS_DAILY_QUEST_RESET_TIME   = 20008,                     // Next daily quest reset time
+    // Cata specific custom worldstates
+    WS_GUILD_WEEKLY_RESET_TIME  = 20050,                     // Next guild week reset time
+    WS_CURRENCY_RESET_TIME      = 20051,                     // Custom worldstate
+};
 
 /// Storage class for commands issued for delayed execution
-struct TC_GAME_API CliCommandHolder
+struct FC_GAME_API CliCommandHolder
 {
     typedef void(*Print)(void*, char const*);
     typedef void(*CommandFinished)(void*, bool success);
@@ -588,7 +635,7 @@ struct CharacterInfo
 };
 
 /// The World
-class TC_GAME_API World
+class FC_GAME_API World
 {
     public:
         static World* instance();
@@ -649,11 +696,6 @@ class TC_GAME_API World
         bool getAllowMovement() const { return m_allowMovement; }
         /// Allow/Disallow object movements
         void SetAllowMovement(bool allow) { m_allowMovement = allow; }
-
-        /// Set a new Message of the Day
-        void SetMotd(std::string motd);
-        /// Get the current Message of the Day
-        std::vector<std::string> const& GetMotd() const;
 
         /// Set the string for new characters (first login)
         void SetNewCharString(std::string const& str) { m_newCharString = str; }
@@ -746,19 +788,9 @@ class TC_GAME_API World
             return index < INT_CONFIG_VALUE_COUNT ? m_int_configs[index] : 0;
         }
 
-        static PersistentWorldVariable const NextCurrencyResetTimeVarId;                    // Next arena distribution time
-        static PersistentWorldVariable const NextWeeklyQuestResetTimeVarId;                 // Next weekly quest reset time
-        static PersistentWorldVariable const NextBGRandomDailyResetTimeVarId;               // Next daily BG reset time
-        static PersistentWorldVariable const CharacterDatabaseCleaningFlagsVarId;           // Cleaning Flags
-        static PersistentWorldVariable const NextGuildDailyResetTimeVarId;                  // Next guild cap reset time
-        static PersistentWorldVariable const NextMonthlyQuestResetTimeVarId;                // Next monthly quest reset time
-        static PersistentWorldVariable const NextDailyQuestResetTimeVarId;                  // Next daily quest reset time
-        static PersistentWorldVariable const NextOldCalendarEventDeletionTimeVarId;         // Next daily calendar deletions of old events time
-        static PersistentWorldVariable const NextGuildWeeklyResetTimeVarId;                 // Next guild week reset time
-
-        int32 GetPersistentWorldVariable(PersistentWorldVariable const& var) const;
-        void SetPersistentWorldVariable(PersistentWorldVariable const& var, int32 value);
-        void LoadPersistentWorldVariables();
+        void setWorldState(uint32 index, uint64 value);
+        uint64 getWorldState(uint32 index) const;
+        void LoadWorldStates();
 
         /// Are we on a "Player versus Player" server?
         bool IsPvPRealm() const;
@@ -799,8 +831,8 @@ class TC_GAME_API World
         void UpdateAreaDependentAuras();
 
         uint32 GetCleaningFlags() const { return m_CleaningFlags; }
-        void SetCleaningFlags(uint32 flags) { m_CleaningFlags = flags; }
-        void ResetEventSeasonalQuests(uint16 event_id, time_t eventStartTime);
+        void   SetCleaningFlags(uint32 flags) { m_CleaningFlags = flags; }
+        void   ResetEventSeasonalQuests(uint16 event_id);
 
         void ReloadRBAC();
 
@@ -860,7 +892,8 @@ class TC_GAME_API World
         uint32 m_int_configs[INT_CONFIG_VALUE_COUNT];
         bool m_bool_configs[BOOL_CONFIG_VALUE_COUNT];
         float m_float_configs[FLOAT_CONFIG_VALUE_COUNT];
-        std::unordered_map<std::string, int32> m_worldVariables;
+        typedef std::map<uint32, uint64> WorldStatesMap;
+        WorldStatesMap m_worldstates;
         uint32 m_playerLimit;
         AccountTypes m_allowedSecurityLevel;
         LocaleConstant m_defaultDbcLocale;                     // from config for one from loaded DBC locales
@@ -926,7 +959,7 @@ class TC_GAME_API World
         time_t _warnShutdownTime;
 };
 
-TC_GAME_API extern Realm realm;
+FC_GAME_API extern Realm realm;
 
 #define sWorld World::instance()
 

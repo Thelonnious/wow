@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,6 +18,7 @@
 #include "WaypointManager.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
+#include "MapManager.h"
 #include "Log.h"
 
 void WaypointMgr::Load()
@@ -29,7 +30,7 @@ void WaypointMgr::Load()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 waypoints. DB table `waypoint_data` is empty!");
+        LOG_INFO("server.loading", ">> Loaded 0 waypoints. DB table `waypoint_data` is empty!");
         return;
     }
 
@@ -48,8 +49,8 @@ void WaypointMgr::Load()
 
         float velocity = fields[6].GetFloat();
 
-        Trinity::NormalizeMapCoord(x);
-        Trinity::NormalizeMapCoord(y);
+        Firelands::NormalizeMapCoord(x);
+        Firelands::NormalizeMapCoord(y);
 
         WaypointNode waypoint;
         waypoint.Id = fields[1].GetUInt32();
@@ -63,7 +64,7 @@ void WaypointMgr::Load()
 
         if (waypoint.MoveType >= WAYPOINT_MOVE_TYPE_MAX)
         {
-            TC_LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", waypoint.Id);
+            LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", waypoint.Id);
             continue;
         }
 
@@ -79,7 +80,7 @@ void WaypointMgr::Load()
     }
     while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u waypoints in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded %u waypoints in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void WaypointMgr::LoadWaypointAddons()
@@ -91,7 +92,7 @@ void WaypointMgr::LoadWaypointAddons()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 waypoints. DB table `waypoint_data_addon` is empty!");
+        LOG_INFO("server.loading", ">> Loaded 0 waypoints. DB table `waypoint_data_addon` is empty!");
         return;
     }
 
@@ -105,7 +106,7 @@ void WaypointMgr::LoadWaypointAddons()
         std::unordered_map<uint32, WaypointPath>::iterator it = _waypointStore.find(pathId);
         if (it == _waypointStore.end())
         {
-            TC_LOG_ERROR("sql.sql", "Tried to load waypoint_data_addon data for PathID %u but there is no such path in waypoint_data. Ignoring.", pathId);
+            LOG_ERROR("sql.sql", "Tried to load waypoint_data_addon data for PathID %u but there is no such path in waypoint_data. Ignoring.", pathId);
             continue;
         }
 
@@ -120,7 +121,7 @@ void WaypointMgr::LoadWaypointAddons()
 
         if (itr == path.Nodes.end())
         {
-            TC_LOG_ERROR("sql.sql", "Tried to load waypoint_data_addon data for PointID %u of PathID %u but there is no such point in waypoint_data. Ignoring.", pointId, pathId);
+            LOG_ERROR("sql.sql", "Tried to load waypoint_data_addon data for PointID %u of PathID %u but there is no such point in waypoint_data. Ignoring.", pointId, pathId);
             continue;
         }
 
@@ -128,15 +129,15 @@ void WaypointMgr::LoadWaypointAddons()
         float y = fields[4].GetFloat();
         float z = fields[5].GetFloat();
 
-        Trinity::NormalizeMapCoord(x);
-        Trinity::NormalizeMapCoord(y);
+        Firelands::NormalizeMapCoord(x);
+        Firelands::NormalizeMapCoord(y);
 
         itr->SplinePoints.push_back(G3D::Vector3(x, y, z));
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u waypoint addon data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded %u waypoint addon data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 WaypointMgr* WaypointMgr::instance()
@@ -173,8 +174,8 @@ void WaypointMgr::ReloadPath(uint32 id)
 
         float velocity = fields[5].GetFloat();
 
-        Trinity::NormalizeMapCoord(x);
-        Trinity::NormalizeMapCoord(y);
+        Firelands::NormalizeMapCoord(x);
+        Firelands::NormalizeMapCoord(y);
 
         WaypointNode waypoint;
         waypoint.Id = fields[0].GetUInt32();
@@ -188,7 +189,7 @@ void WaypointMgr::ReloadPath(uint32 id)
 
         if (waypoint.MoveType >= WAYPOINT_MOVE_TYPE_MAX)
         {
-            TC_LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", waypoint.Id);
+            LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", waypoint.Id);
             continue;
         }
 

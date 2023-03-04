@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -184,7 +184,7 @@ class boss_magtheridon : public CreatureScript
                 }
             }
 
-            void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_SHADOW_CAGE)
                     Talk(SAY_BANISHED);
@@ -252,7 +252,7 @@ class boss_magtheridon : public CreatureScript
                         case EVENT_RELEASED:
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             me->SetImmuneToPC(false);
-                            DoZoneInCombat();
+                            me->SetInCombatWithZone();
                             instance->SetData(DATA_MANTICRON_CUBE, ACTION_ENABLE);
                             events.ScheduleEvent(EVENT_CLEAVE, Seconds(10));
                             events.ScheduleEvent(EVENT_BLAST_NOVA, Seconds(60));
@@ -357,7 +357,7 @@ class npc_hellfire_channeler : public CreatureScript
                 if (Creature* magtheridon = _instance->GetCreature(DATA_MAGTHERIDON))
                     magtheridon->AI()->JustSummoned(summon);
 
-                DoZoneInCombat(summon);
+                summon->SetInCombatWithZone();
             }
 
             void EnterEvadeMode(EvadeReason /*why*/) override

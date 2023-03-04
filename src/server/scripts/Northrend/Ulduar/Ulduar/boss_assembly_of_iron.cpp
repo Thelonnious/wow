@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -454,7 +454,7 @@ struct boss_runemaster_molgeim : public ScriptedAI
                         if (brundir->IsAlive())
                             aliveBosses.push_back(brundir);
 
-                    if (Creature* target = Trinity::Containers::SelectRandomContainerElement(aliveBosses))
+                    if (Creature* target = Firelands::Containers::SelectRandomContainerElement(aliveBosses))
                         DoCast(target, SPELL_RUNE_OF_POWER);
 
                     _events.Repeat(32s, 47s);
@@ -538,7 +538,7 @@ struct boss_stormcaller_brundir : public ScriptedAI
         DoCastSelf(SPELL_BERSERK);
 
         _events.SetPhase(PHASE_ONE);
-        _events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 1ms); 
+        _events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 1ms);
         _events.ScheduleEvent(EVENT_OVERLOAD, 42s, 1min);
     }
 
@@ -657,7 +657,7 @@ struct boss_stormcaller_brundir : public ScriptedAI
                     if (_potentialWaypoints.empty())
                     {
                         std::copy(BrundirIntroWaypoints.begin(), BrundirIntroWaypoints.end(), std::back_inserter(_potentialWaypoints));
-                        Trinity::Containers::RandomShuffle(_potentialWaypoints);
+                        Firelands::Containers::RandomShuffle(_potentialWaypoints);
                     }
 
                     Position const dest = _potentialWaypoints.front();

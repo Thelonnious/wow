@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -201,9 +201,9 @@ public:
             instance->DoCastSpellOnPlayers(SPELL_AHUNE_ACHIEVEMENT);
 
             if (Creature* ahuneBunny = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_AHUNE_BUNNY)))
-                Unit::Kill(me, ahuneBunny);
+                me->Kill(ahuneBunny);
             if (Creature* frozenCore = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_FROZEN_CORE)))
-                Unit::Kill(me, frozenCore);
+                me->Kill(frozenCore);
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty())
@@ -315,7 +315,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (Creature* ahune = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_AHUNE)))
-                Unit::Kill(me, ahune);
+                me->Kill(ahune);
 
             DoCast(SPELL_SUMMON_LOOT_MISSILE);
             DoCast(SPELL_MINION_DESPAWNER);
@@ -389,7 +389,7 @@ public:
             if (summon->GetEntry() == NPC_AHUNE)
                 return;
 
-            DoZoneInCombat(summon);
+            summon->SetInCombatWithZone();
             _summons.Summon(summon);
         }
 
@@ -468,7 +468,7 @@ public:
                         if (TempSummon* ahune = me->SummonCreature(NPC_AHUNE, SummonPositions[0], TEMPSUMMON_DEAD_DESPAWN))
                         {
                             ahune->SummonCreature(NPC_FROZEN_CORE, SummonPositions[1], TEMPSUMMON_CORPSE_DESPAWN);
-                            DoZoneInCombat(ahune);
+                            ahune->SetInCombatWithZone();
                             DoCast(ahune, SPELL_RESURFACE);
                         }
                         break;
@@ -567,7 +567,7 @@ public:
             DoCast(me, SPELL_FIND_OPENING_CHANNEL);
         }
 
-        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
         {
             switch (spellInfo->Id)
             {
@@ -669,7 +669,7 @@ public:
             if (Creature* ahuneBunny = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_AHUNE_BUNNY)))
             {
                 ahuneBunny->AI()->DoAction(ACTION_START_EVENT);
-                ahuneBunny->AI()->DoZoneInCombat();
+                ahuneBunny->SetInCombatWithZone();
             }
             if (Creature* luma = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_LUMA_SKYMOTHER)))
                 luma->CastSpell(player, SPELL_SUMMONING_RHYME_AURA, true);
@@ -869,7 +869,7 @@ public:
             if (targets.empty())
                 return;
 
-            WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Firelands::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
         }

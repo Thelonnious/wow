@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -330,7 +330,7 @@ class boss_blood_council_controller : public CreatureScript
                         // Make sure looting is allowed
                         if (me->IsDamageEnoughForLootingAndReward())
                             prince->LowerPlayerDamageReq(prince->GetMaxHealth());
-                        Unit::Kill(killer, prince);
+                        killer->Kill(prince);
                     }
                 }
             }
@@ -540,7 +540,7 @@ struct BloodPrincesBossAI : public BossAI
         }
     }
 
-    void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SelectInvocationSpell())
             DoAction(ACTION_CAST_INVOCATION);
@@ -1473,16 +1473,16 @@ class spell_blood_council_shadow_prison_damage : public SpellScriptLoader
 
         class spell_blood_council_shadow_prison_SpellScript : public SpellScript
         {
-            void AddExtraDamage(SpellEffIndex /*effIndex*/)
+            void AddExtraDamage()
             {
                 if (Aura* aur = GetHitUnit()->GetAura(GetSpellInfo()->Id))
                     if (AuraEffect const* eff = aur->GetEffect(EFFECT_1))
-                        SetEffectValue(GetEffectValue() + eff->GetAmount());
+                        SetHitDamage(GetHitDamage() + eff->GetAmount());
             }
 
             void Register() override
             {
-                OnEffectLaunchTarget.Register(&spell_blood_council_shadow_prison_SpellScript::AddExtraDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnHit.Register(&spell_blood_council_shadow_prison_SpellScript::AddExtraDamage);
             }
         };
 

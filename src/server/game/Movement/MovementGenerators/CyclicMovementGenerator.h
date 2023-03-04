@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
-#ifndef TRINITY_CYCLICMOVEMENTGENERATOR_H
-#define TRINITY_CYCLICMOVEMENTGENERATOR_H
+
+#ifndef FIRELANDS_CYCLICMOVEMENTGENERATOR_H
+#define FIRELANDS_CYCLICMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
 #include "Timer.h"
@@ -58,4 +58,4 @@ class CyclicMovementGenerator<Creature> : public MovementGeneratorMedium<Creatur
         TimeTrackerSmall _moveTimer;
 };
 
-#endif // TRINITY_CYCLICMOVEMENTGENERATOR_H
+#endif // FIRELANDS_CYCLICMOVEMENTGENERATOR_H

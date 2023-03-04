@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -393,7 +393,7 @@ class spell_kilnara_wave_of_agony : public SpellScript
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void HandleHit(SpellEffIndex effIndex)
@@ -451,12 +451,12 @@ class spell_kilnara_gaping_wound : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::UnitAuraCheck(true, GetSpellInfo()->Effects[EFFECT_2].BasePoints));
+        targets.remove_if(Firelands::UnitAuraCheck(true, GetSpellInfo()->Effects[EFFECT_2].BasePoints));
 
         if (targets.empty())
             return;
 
-        Trinity::Containers::RandomResize(targets, 1);
+        Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override

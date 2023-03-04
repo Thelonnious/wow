@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -322,11 +322,4 @@ void WorldPackets::Character::LoadingScreenNotify::Read()
 {
     _worldPacket >> MapID;
     Showing = _worldPacket.ReadBit();
-}
-
-WorldPacket const* WorldPackets::Character::FailedPlayerCondition::Write()
-{
-    _worldPacket << int32(ConditionID);
-
-    return &_worldPacket;
 }

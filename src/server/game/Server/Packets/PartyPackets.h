@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -142,7 +142,7 @@ namespace WorldPackets
             void Initialize(Player* const inviter, int32 proposedRoles, bool canAccept);
 
             bool IsXRealm = false;
-            bool MustBeBNetFriend = false;
+            bool MustBeFriend = false;
             bool CanAccept = false;
             uint32 InviterCfgRealmID = 0;
             uint32 LfgCompletedMask = 0;

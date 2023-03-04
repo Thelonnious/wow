@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -463,7 +463,7 @@ class boss_voice_of_yogg_saron : public CreatureScript
             {
                 // TODO: MoveInLineOfSight doesn't work for such a big distance
                 if (who->GetTypeId() == TYPEID_PLAYER && !who->ToPlayer()->IsGameMaster() && me->GetDistance2d(who) < 99.0f && !me->IsInCombat())
-                    DoZoneInCombat();
+                    me->SetInCombatWithZone();
             }
 
             void EnterEvadeMode(EvadeReason why) override
@@ -500,7 +500,7 @@ class boss_voice_of_yogg_saron : public CreatureScript
                 bool clockwise = false;
                 std::list<TempSummon*> clouds;
                 me->SummonCreatureGroup(CREATURE_GROUP_CLOUDS, &clouds);
-                clouds.sort(Trinity::ObjectDistanceOrderPred(me, true));
+                clouds.sort(Firelands::ObjectDistanceOrderPred(me, true));
                 for (std::list<TempSummon*>::const_iterator itr = clouds.begin(); itr != clouds.end(); ++itr)
                 {
                     (*itr)->AI()->DoAction(int32(clockwise));
@@ -623,7 +623,7 @@ class boss_voice_of_yogg_saron : public CreatureScript
                         events.SetPhase(PHASE_TWO);
                         me->SummonCreature(NPC_YOGG_SARON, YoggSaronSpawnPos);
                         if (Creature* brain = instance->GetCreature(DATA_BRAIN_OF_YOGG_SARON))
-                            DoZoneInCombat(brain);
+                            brain->SetInCombatWithZone();
                         events.ScheduleEvent(EVENT_SUMMON_CORRUPTOR_TENTACLE, 5s, EVENT_GROUP_SUMMON_TENTACLES, PHASE_TWO);
                         events.ScheduleEvent(EVENT_SUMMON_CONSTRICTOR_TENTACLE, 7s, EVENT_GROUP_SUMMON_TENTACLES, PHASE_TWO);
                         events.ScheduleEvent(EVENT_SUMMON_CRUSHER_TENTACLE, 5s, EVENT_GROUP_SUMMON_TENTACLES, PHASE_TWO);
@@ -734,7 +734,7 @@ class boss_sara : public CreatureScript
                 }
             }
 
-            void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* spell) override
+            void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
             {
                 if (!roll_chance_i(30) || _events.IsInPhase(PHASE_TRANSFORM))
                     return;
@@ -937,7 +937,7 @@ class boss_yogg_saron : public CreatureScript
                     me->AddLootMode(LOOT_MODE_HARD_MODE_1);
             }
 
-            void SpellHit(WorldObject* /*caster*/, SpellInfo const* spell) override
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
             {
                 // Val'anyr
                 if (spell->Id == SPELL_IN_THE_MAWS_OF_THE_OLD_GOD)
@@ -949,7 +949,7 @@ class boss_yogg_saron : public CreatureScript
                 Talk(SAY_YOGG_SARON_DEATH);
 
                 if (Creature* creature = _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON))
-                    Unit::Kill(me, creature);
+                    me->Kill(creature);
 
                 for (uint8 i = DATA_SARA; i <= DATA_BRAIN_OF_YOGG_SARON; ++i)
                     if (Creature* creature = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(i)))
@@ -2017,7 +2017,7 @@ class spell_yogg_saron_psychosis : public SpellScriptLoader      // 63795, 65301
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 targets.remove_if(HighSanityTargetSelector());
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_ILLUSION_ROOM));
+                targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_ILLUSION_ROOM));
             }
 
             void Register() override
@@ -2046,7 +2046,7 @@ class spell_yogg_saron_malady_of_the_mind : public SpellScriptLoader    // 63830
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 targets.remove_if(HighSanityTargetSelector());
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_ILLUSION_ROOM));
+                targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_ILLUSION_ROOM));
             }
 
             void Register() override
@@ -2103,7 +2103,7 @@ class spell_yogg_saron_brain_link : public SpellScriptLoader    // 63802
         {
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_ILLUSION_ROOM));
+                targets.remove_if(Firelands::UnitAuraCheck(true, SPELL_ILLUSION_ROOM));
 
                 if (targets.size() != 2)
                 {
@@ -3023,7 +3023,7 @@ class spell_yogg_saron_titanic_storm : public SpellScriptLoader    // 64172
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
-                    Unit::Kill(GetCaster(), target);
+                    GetCaster()->Kill(target);
             }
 
             void Register() override

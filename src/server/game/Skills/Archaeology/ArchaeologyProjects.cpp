@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -69,7 +69,7 @@ void Archaeology::LoadCurrentProjectsFromDB()
 
         if (uint16 old_project = _branches[branch].Project)
         {
-            TC_LOG_ERROR("player.skills", "ERROR - Archaeology: Tried to assign project %u to branch %u, which already holds project %u!", project, branch, old_project);
+            LOG_ERROR("player.skills", "ERROR - Archaeology: Tried to assign project %u to branch %u, which already holds project %u!", project, branch, old_project);
             continue;
         }
 
@@ -186,7 +186,7 @@ void Archaeology::CompleteProject(uint16 projectId)
     ASSERT(_branches[project->branch].Project == projectId);
     ASSERT(_archData);
 
-    _player->ModifyCurrency(_archData->FragId, -int32(_archData->FragCount), false, false);
+    _player->ModifyCurrency(_archData->FragId, -int32(_archData->FragCount), false, true);
     _player->DestroyItemCount(_archData->KeyId, _archData->KeyCount, true, false);
 
     WorldPackets::Archaeology::ResearchComplete packet;
@@ -218,7 +218,7 @@ void Archaeology::CompleteProject(uint16 projectId)
 
 void Archaeology::SetArchData(ArchData const& data)
 {
-    _archData = Trinity::make_unique<ArchData>(std::move(data));
+    _archData = Firelands::make_unique<ArchData>(std::move(data));
 }
 
 void Archaeology::SendResearchHistory()

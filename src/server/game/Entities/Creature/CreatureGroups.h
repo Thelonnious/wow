@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -48,7 +48,7 @@ struct FormationInfo
 
 typedef std::unordered_map<uint32 /*memberDBGUID*/, FormationInfo>   CreatureGroupInfoType;
 
-class TC_GAME_API FormationMgr
+class FC_GAME_API FormationMgr
 {
     private:
         FormationMgr() { }
@@ -65,7 +65,7 @@ class TC_GAME_API FormationMgr
 
 struct Position;
 
-class TC_GAME_API CreatureGroup
+class FC_GAME_API CreatureGroup
 {
     private:
         Creature* m_leader; //Important do not forget sometimes to work with pointers instead synonims :D:D

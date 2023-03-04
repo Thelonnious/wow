@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_TEMPSUMMON_H
-#define TRINITYCORE_TEMPSUMMON_H
+#ifndef _FIRELANDS_TEMPSUMMON_H
+#define _FIRELANDS_TEMPSUMMON_H
 
 #include "Creature.h"
 
@@ -68,7 +68,7 @@ enum PlayerPetSpells
     SPELL_PET_ENERGIZE              = 99289
 };
 
-class TC_GAME_API TempSummon : public Creature
+class FC_GAME_API TempSummon : public Creature
 {
     public:
         explicit TempSummon(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject);
@@ -95,7 +95,7 @@ class TC_GAME_API TempSummon : public Creature
         ObjectGuid m_summonerGUID;
 };
 
-class TC_GAME_API Minion : public TempSummon
+class FC_GAME_API Minion : public TempSummon
 {
     public:
         Minion(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject);
@@ -111,7 +111,7 @@ class TC_GAME_API Minion : public TempSummon
         Unit* const m_owner;
 };
 
-class TC_GAME_API Guardian : public Minion
+class FC_GAME_API Guardian : public Minion
 {
     public:
         Guardian(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject);
@@ -136,7 +136,7 @@ class TC_GAME_API Guardian : public Minion
         float   m_statFromOwner[MAX_STATS];
 };
 
-class TC_GAME_API Puppet : public Minion
+class FC_GAME_API Puppet : public Minion
 {
     public:
         Puppet(SummonPropertiesEntry const* properties, Unit* owner);
@@ -146,7 +146,7 @@ class TC_GAME_API Puppet : public Minion
         void RemoveFromWorld() override;
 };
 
-class TC_GAME_API ForcedUnsummonDelayEvent : public BasicEvent
+class FC_GAME_API ForcedUnsummonDelayEvent : public BasicEvent
 {
 public:
     ForcedUnsummonDelayEvent(TempSummon& owner) : BasicEvent(), m_owner(owner) { }

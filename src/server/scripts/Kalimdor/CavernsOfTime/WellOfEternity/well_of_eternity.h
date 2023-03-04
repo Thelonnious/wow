@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,29 +26,55 @@
 
 uint32 const EncounterCount = 3;
 
-enum WOEDataTypes
+enum DataTypes
 {
     // Bosses
-    BOSS_PEROTHARN              = 0,
-    BOSS_QUEEN_AZSHARA          = 1,
-    BOSS_MANNOROTH_AND_VAROTHEN = 2,
-
-    // Misc
-    DATA_WOE_COURTYARD_DOOR01,
+    DATA_PEROTHARN              = 0,
+    DATA_QUEEN_AZSHARA          = 1,
+    DATA_MANNOROTH_AND_VAROTHEN = 2
 };
 
-enum WOECreatures
+enum Creatures
 {
-    NPC_PEROTHARN = 55085
+    NPC_PEROTHARN   = 55085,
+    NPC_ILLIDAN_1   = 55500,
+    NPC_AZSHARA     = 54853,
+    NPC_TYRANDE     = 55524,
+    NPC_ILLIDAN_2   = 55532,
+    NPC_MALFURION   = 55570,
+    NPC_VAROTHEN    = 55419,
+    NPC_ABYSSAL     = 55510,
+    NPC_DOOMGUARD   = 55519,
+    NPC_MANNOROTH   = 54969,
 };
 
-enum WOEGameObjectIds
+enum GameObjectIds
 {
-    GO_WOE_COURTYARD_DOOR01 = 210084,
-    GO_LARGE_FIREWALL_DOOR  = 210234,
-    GO_SMALL_FIREWALL_DOOR  = 210130,
+    GO_COURTYARD_DOOR_1         = 210084,
+    GO_LARGE_FIREWALL_DOOR      = 210234,
+    GO_SMALL_FIREWALL_DOOR      = 210130,
+    GO_INVISIBLE_FIREWALL_DOOR  = 210097,
+    GO_ROYAL_CACHE              = 210025,
+    GO_MINOR_CACHE              = 209541,
 };
 
+enum QuestIds
+{
+    QUEST_DOCUMENTING_THE_TIMEWAYS      = 30104,
+    QUEST_IN_UNENDING_NUMBERS           = 30099,
+    QUEST_THE_VAINGLORIOUS              = 30100,
+    QUEST_THE_PATH_TO_THE_DRAGON_SOUL   = 30101,
+};
+
+enum QuestSpells
+{
+    SPELL_ARCHIVED_DEMON_1      = 109265,
+    SPELL_ARCHIVED_DEMON_2      = 109266,
+    SPELL_ARCHIVED_HANDMAIDEN_1 = 109270,
+    SPELL_ARCHIVED_HANDMAIDEN_2 = 109271,
+    SPELL_ARCHIVED_VAROTHEN_1   = 109273,
+    SPELL_ARCHIVED_VAROTHEN_2   = 109274,
+};
 template<class AI>
 AI* GetWellOfEternityAI(Creature* creature)
 {

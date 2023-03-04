@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_DBCSTRUCTURE_H
-#define TRINITY_DBCSTRUCTURE_H
+#ifndef FIRELANDS_DBCSTRUCTURE_H
+#define FIRELANDS_DBCSTRUCTURE_H
 
 #include "Define.h"
 #include "DBCEnums.h"
@@ -225,6 +225,8 @@ struct AreaTableEntry
     // helpers
     bool IsSanctuary() const
     {
+        if (ContinentID == 609)
+            return true;
         return (Flags & AREA_FLAG_SANCTUARY) != 0;
     }
 
@@ -399,7 +401,7 @@ struct ChatChannelsEntry
     uint32  Flags;                                          // 1
     //uint32  FactionGroup                                  // 2
     char* Name;                                             // 3
-    //char* Shortcut;                                       // 4 
+    //char* Shortcut;                                       // 4
 };
 
 struct ChrClassesEntry
@@ -440,7 +442,7 @@ struct ChrRacesEntry
     //char* Name_female;                                    // 15
     //char* Name_male;                                      // 16
     // uint32 FacialHairCustomization[2]                    // 17-18
-    // uint32 HairCustomization                             // 19 
+    // uint32 HairCustomization                             // 19
     uint32  Race_related;                                   // 20
     //uint32 UnalteredVisualRaceID                          // 21 (23 for worgens)
     //uint32 UaMaleCreatureSoundDataID                      // 22 4.0.0
@@ -576,7 +578,7 @@ struct CurrencyCategoryEntry
 struct CurrencyTypesEntry
 {
     uint32 ID;                                              // 0
-    uint32 CategoryID;                                      // 1 
+    uint32 CategoryID;                                      // 1
     // char* Name;                                          // 2
     // char* InventoryIcon1;                                // 3
     // uint32 InventoryIcon2;                               // 4
@@ -586,8 +588,6 @@ struct CurrencyTypesEntry
     uint32 MaxEarnablePerWeek;                              // 8
     uint32 Flags;                                           // 9
     //uint32 Description;                                   // 10
-
-    EnumFlag<CurrencyTypeFlags> GetFlags() const { return static_cast<CurrencyTypeFlags>(Flags); }
 };
 
 struct DestructibleModelDataEntry
@@ -622,10 +622,10 @@ struct DungeonEncounterEntry
 {
     uint32 ID;                                              // 0
     uint32 MapID;                                           // 1
-    int32 DifficultyID;                                     // 2 
+    int32 DifficultyID;                                     // 2
     // uint32 OrderIndex;                                   // 3
     uint32 Bit;                                             // 4 used for creating completed masks
-    char* Name;                                             // 5        encounter name
+    char* Name;                                             // 5 encounter name
     //uint32 CreatureDisplayID;                             // 6
     //uint32 SpellIconID;                                   // 7
 };
@@ -698,61 +698,59 @@ struct FactionEntry
 struct FactionTemplateEntry
 {
     uint32      ID;                                         // 0
-    uint32      Faction;                                    // 1 
+    uint32      Faction;                                    // 1
     uint32      Flags;                                      // 2
     uint32      FactionGroup;                               // 3
-    uint32      FriendGroup;                                // 4 
+    uint32      FriendGroup;                                // 4
     uint32      EnemyGroup;                                 // 5
     uint32      Enemies[MAX_FACTION_RELATIONS];             // 6
     uint32      Friend[MAX_FACTION_RELATIONS];              // 10
 
-    EnumFlag<FactionTemplateFlags> GetFlags() const { return static_cast<FactionTemplateFlags>(Flags); }
-
     // helpers
-    bool IsFriendlyTo(FactionTemplateEntry const* entry) const
+    bool IsFriendlyTo(FactionTemplateEntry const& entry) const
     {
-        if (ID == entry->ID)
+        if (ID == entry.ID)
             return true;
 
-        for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-            if (Friend[i] == entry->Faction)
-                return true;
-
-        if (FactionGroup > 0 && (FactionGroup & entry->FriendGroup) != 0)
-            return true;
-
-        return false;
+        if (entry.Faction)
+        {
+            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
+                if (Enemies[i] == entry.Faction)
+                    return false;
+            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
+                if (Friend[i] == entry.Faction)
+                    return true;
+        }
+        return (FriendGroup & entry.FactionGroup) || (FactionGroup & entry.FriendGroup);
     }
-
-    bool IsHostileTo(FactionTemplateEntry const* entry) const
+    bool IsHostileTo(FactionTemplateEntry const& entry) const
     {
-        if (ID == entry->ID)
+        if (ID == entry.ID)
             return false;
 
-        if (GetFlags().HasFlag(FactionTemplateFlags::HatesAllExceptFriends) && !IsFriendlyTo(entry))
-            return true;
+        if (entry.Faction)
+        {
+            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; i++)
+                if (Enemies[i] == entry.Faction)
+                    return true;
 
-        for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-            if (Enemies[i] == entry->Faction)
-                return true;
-
-        if (FactionGroup > 0 && (FactionGroup & entry->EnemyGroup) != 0)
-            return true;
-
-        return false;
+            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; i++)
+                if (Friend[i] == entry.Faction)
+                    return false;
+        }
+        return (EnemyGroup & entry.FactionGroup) != 0;
     }
 
-    bool IsHostileToPlayers() const { return (EnemyGroup & FACTION_GROUP_MASK_PLAYER) != 0; }
-    bool IsHostileToPvpActivePlayers() const { return GetFlags().HasFlag(FactionTemplateFlags::AttackPvPActivePlayers); }
-
+    bool IsHostileToPlayers() const { return (EnemyGroup & FACTION_MASK_PLAYER) != 0; }
     bool IsNeutralToAll() const
     {
         for (uint8 i = 0; i < MAX_FACTION_RELATIONS; i++)
             if (Enemies[i] != 0)
                 return false;
 
-        return EnemyGroup == FACTION_GROUP_MASK_NONE && FriendGroup == FACTION_GROUP_MASK_NONE;
+        return EnemyGroup == 0 && FriendGroup == 0;
     }
+    bool IsContestedGuardFaction() const { return (Flags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD) != 0; }
 };
 
 struct GameObjectArtKitEntry
@@ -918,7 +916,7 @@ struct HolidayNamesEntry
 struct HolidaysEntry
 {
     uint32 ID;                                              // 0
-    uint32 Duration[MAX_HOLIDAY_DURATIONS];                 // 1-10 
+    uint32 Duration[MAX_HOLIDAY_DURATIONS];                 // 1-10
     uint32 Date[MAX_HOLIDAY_DATES];                         // 11-36 (dates in unix time starting at January, 1, 2000)
     uint32 Region;                                          // 37 (wow region)
     uint32 Looping;                                         // 38
@@ -1073,7 +1071,7 @@ struct ItemLimitCategoryEntry
 
 struct ItemRandomPropertiesEntry
 {
-    uint32  ID;                                             // 0 
+    uint32  ID;                                             // 0
     //char* Name                                            // 1
     uint32  Enchantment[5];                                 // 2 - 6
     char*   Name;                                           // 7
@@ -1081,7 +1079,7 @@ struct ItemRandomPropertiesEntry
 
 struct ItemRandomSuffixEntry
 {
-    uint32 ID;                                              // 0 
+    uint32 ID;                                              // 0
     char*  Name;                                            // 1
     // char* InternalName                                   // 2
     uint32  Enchantment[5];                                 // 3 - 7
@@ -1177,7 +1175,7 @@ struct LiquidTypeEntry
 
 struct LockEntry
 {
-    uint32  ID;                                             // 0 
+    uint32  ID;                                             // 0
     uint32  Type[MAX_LOCK_CASE];                            // 1-8
     uint32  Index[MAX_LOCK_CASE];                           // 9-16
     uint32  Skill[MAX_LOCK_CASE];                           // 17-24
@@ -1254,23 +1252,10 @@ struct MapEntry
 
     bool IsContinent() const
     {
-        switch (ID)
-        {
-            case 0:
-            case 1:
-            case 530:
-            case 571:
-                return true;
-            default:
-                return false;
-        }
+        return ID == 0 || ID == 1 || ID == 530 || ID == 571;
     }
 
-    bool IsDynamicDifficultyMap() const { return GetFlags().HasFlag(MapFlags::DynamicDifficulty); }
-    bool IsFlexLocking() const { return GetFlags().HasFlag(MapFlags::FlexibleRaidLocking); }
-    bool IsSplitByFaction() const { return ID == 609; }
-
-    EnumFlag<MapFlags> GetFlags() const { return static_cast<MapFlags>(Flags); }
+    bool IsDynamicDifficultyMap() const { return (Flags & MAP_FLAG_DYNAMIC_DIFFICULTY) != 0; }
 };
 
 struct MapDifficultyEntry
@@ -1509,7 +1494,7 @@ struct SkillLineEntry
     char*   DisplayName;                                    // 3
     //char*  Description;                                   // 4
     uint32  SpellIconID;                                    // 5
-    //char*   AlternateVerb;                                // 6 
+    //char*   AlternateVerb;                                // 6
     uint32  CanLink;                                        // 7 (prof. with recipe)
 };
 
@@ -2007,8 +1992,6 @@ struct SummonPropertiesEntry
     int32   Title;                                          // 3, see enum
     int32   Slot;                                           // 4, 0-6
     uint32  Flags;                                          // 5
-
-    EnumFlag<SummonPropertiesFlags> GetFlags() const { return static_cast<SummonPropertiesFlags>(Flags); }
 };
 
 struct TalentEntry
@@ -2227,7 +2210,7 @@ struct VehicleSeatEntry
     uint32  VehicleEnterAnimKitID;                           // 61
     uint32  VehicleRideAnimKitID;                            // 62
     uint32  VehicleExitAnimKitID;                            // 63
-    uint32  CameraModeID;                                    // 64 
+    uint32  CameraModeID;                                    // 64
     uint32  FlagsC;                                          // 65
 
     inline bool HasFlag(VehicleSeatFlags flag) const { return (Flags & flag); }

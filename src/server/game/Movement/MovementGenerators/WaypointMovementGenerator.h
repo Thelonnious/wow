@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_WAYPOINTMOVEMENTGENERATOR_H
-#define TRINITY_WAYPOINTMOVEMENTGENERATOR_H
+#ifndef FIRELANDS_WAYPOINTMOVEMENTGENERATOR_H
+#define FIRELANDS_WAYPOINTMOVEMENTGENERATOR_H
 
 /**
  * @page PathMovementGenerator is used to generate movements
@@ -60,15 +60,13 @@ class WaypointMovementGenerator<Creature> : public MovementGeneratorMedium<Creat
     private:
         void ProcessWaypointArrival(Creature*, WaypointNode const&);
         void StartMove(Creature*, bool relaunch = false);
-        bool IsAllowedToMove(Creature*) const;
-        void UpdateWaypointState(Creature*, WaypointNode const&);
+        bool IsAllowedToMove(Creature*);
 
         uint32 _lastSplineId;
         uint32 _pathId;
         int32 _waypointDelay;
-        Optional<int32> _pauseTime;
+        int32 _pauseTime;
         bool _waypointReached;
-
         bool _recalculateSpeed;
         bool _repeating;
         bool _loadedFromDB;

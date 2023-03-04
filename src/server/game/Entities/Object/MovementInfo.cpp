@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -133,35 +133,35 @@ float MovementInfo::GetMovementDirection() const
 
 void MovementInfo::OutDebug()
 {
-    TC_LOG_DEBUG("misc", "MOVEMENT INFO");
-    TC_LOG_DEBUG("misc", "%s", guid.ToString().c_str());
-    TC_LOG_DEBUG("misc", "flags %u", flags);
-    TC_LOG_DEBUG("misc", "flags2 %u", flags2);
-    TC_LOG_DEBUG("misc", "time %u current time " UI64FMTD "", flags2, uint64(::GameTime::GetGameTime()));
-    TC_LOG_DEBUG("misc", "position: `%s`", pos.ToString().c_str());
+    LOG_DEBUG("misc", "MOVEMENT INFO");
+    LOG_DEBUG("misc", "%s", guid.ToString().c_str());
+    LOG_DEBUG("misc", "flags %u", flags);
+    LOG_DEBUG("misc", "flags2 %u", flags2);
+    LOG_DEBUG("misc", "time %u current time " UI64FMTD "", flags2, uint64(::GameTime::GetGameTime()));
+    LOG_DEBUG("misc", "position: `%s`", pos.ToString().c_str());
     if (transport.guid)
     {
-        TC_LOG_DEBUG("misc", "TRANSPORT:");
-        TC_LOG_DEBUG("misc", "%s", transport.guid.ToString().c_str());
-        TC_LOG_DEBUG("misc", "position: `%s`", transport.pos.ToString().c_str());
-        TC_LOG_DEBUG("misc", "seat: %i", transport.seat);
-        TC_LOG_DEBUG("misc", "time: %u", transport.time);
+        LOG_DEBUG("misc", "TRANSPORT:");
+        LOG_DEBUG("misc", "%s", transport.guid.ToString().c_str());
+        LOG_DEBUG("misc", "position: `%s`", transport.pos.ToString().c_str());
+        LOG_DEBUG("misc", "seat: %i", transport.seat);
+        LOG_DEBUG("misc", "time: %u", transport.time);
         if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
-            TC_LOG_DEBUG("misc", "time2: %u", transport.time2);
+            LOG_DEBUG("misc", "time2: %u", transport.time2);
         if (transport.vehicleId)
-            TC_LOG_INFO("misc", "vehicleId: %u", transport.vehicleId);
+            LOG_INFO("misc", "vehicleId: %u", transport.vehicleId);
     }
 
     if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        TC_LOG_DEBUG("misc", "pitch: %f", pitch);
+        LOG_DEBUG("misc", "pitch: %f", pitch);
 
     if (flags & MOVEMENTFLAG_FALLING || jump.fallTime)
     {
-        TC_LOG_INFO("misc", "fallTime: %u j_zspeed: %f", jump.fallTime, jump.zspeed);
+        LOG_INFO("misc", "fallTime: %u j_zspeed: %f", jump.fallTime, jump.zspeed);
         if (flags & MOVEMENTFLAG_FALLING)
-            TC_LOG_DEBUG("misc", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
+            LOG_DEBUG("misc", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
     }
 
     if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
-        TC_LOG_DEBUG("misc", "splineElevation: %f", splineElevation);
+        LOG_DEBUG("misc", "splineElevation: %f", splineElevation);
 }

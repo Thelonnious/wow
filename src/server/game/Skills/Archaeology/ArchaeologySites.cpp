@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -177,10 +177,10 @@ Continent Archaeology::GetContinent()
 uint32 Archaeology::GetNearestSite(float &distance)
 {
     uint32 cont = GetContinent();
-    
+
     if (COUNT_CONT == cont)
         return 0;
-    
+
     uint32 position = cont * CONTINENT_SITES;
 
     float pX = _player->GetPositionX();
@@ -239,7 +239,7 @@ void Archaeology::RegenerateContinent(Continent continent)
     }
 
     uint32 position = continent * CONTINENT_SITES;
-    
+
     for (uint32 i = 0; i < CONTINENT_SITES; i++)
         RegeneratePosition(position + i, continent);
 }

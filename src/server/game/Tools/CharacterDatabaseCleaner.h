@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -29,20 +29,20 @@ namespace CharacterDatabaseCleaner
         CLEANING_FLAG_QUESTSTATUS           = 0x10
     };
 
-    TC_GAME_API void CleanDatabase();
+    FC_GAME_API void CleanDatabase();
 
-    TC_GAME_API void CheckUnique(char const* column, char const* table, bool (*check)(uint32));
+    FC_GAME_API void CheckUnique(char const* column, char const* table, bool (*check)(uint32));
 
-    TC_GAME_API bool AchievementProgressCheck(uint32 criteria);
-    TC_GAME_API bool SkillCheck(uint32 skill);
-    TC_GAME_API bool SpellCheck(uint32 spell_id);
-    TC_GAME_API bool TalentCheck(uint32 talent_id);
+    FC_GAME_API bool AchievementProgressCheck(uint32 criteria);
+    FC_GAME_API bool SkillCheck(uint32 skill);
+    FC_GAME_API bool SpellCheck(uint32 spell_id);
+    FC_GAME_API bool TalentCheck(uint32 talent_id);
 
-    TC_GAME_API void CleanCharacterAchievementProgress();
-    TC_GAME_API void CleanCharacterSkills();
-    TC_GAME_API void CleanCharacterSpell();
-    TC_GAME_API void CleanCharacterTalent();
-    TC_GAME_API void CleanCharacterQuestStatus();
+    FC_GAME_API void CleanCharacterAchievementProgress();
+    FC_GAME_API void CleanCharacterSkills();
+    FC_GAME_API void CleanCharacterSpell();
+    FC_GAME_API void CleanCharacterTalent();
+    FC_GAME_API void CleanCharacterQuestStatus();
 }
 
 #endif

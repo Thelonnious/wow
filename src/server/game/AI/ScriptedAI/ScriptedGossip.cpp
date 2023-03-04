@@ -1,5 +1,5 @@
 /*
-* This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+* This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -19,50 +19,14 @@
 #include "Player.h"
 #include "Creature.h"
 
-uint32 GetGossipActionFor(Player* player, uint32 gossipListId)
-{
-    return player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-}
-
-void InitGossipMenuFor(Player* player, uint32 menuId)
-{
-    player->PlayerTalkClass->GetGossipMenu().SetMenuId(menuId);
-}
-
-void ClearGossipMenuFor(Player* player)
-{
-    player->PlayerTalkClass->ClearMenus();
-}
-
+uint32 GetGossipActionFor(Player* player, uint32 gossipListId) { return player->PlayerTalkClass->GetGossipOptionAction(gossipListId); }
+void ClearGossipMenuFor(Player* player) { player->PlayerTalkClass->ClearMenus(); }
 // Using provided text, not from DB
-void AddGossipItemFor(Player* player, GossipOptionIcon icon, std::string const& text, uint32 sender, uint32 action)
-{
-    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, icon, text, sender, action, "", 0);
-}
-
+void AddGossipItemFor(Player* player, uint32 icon, std::string const& text, uint32 sender, uint32 action) { player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, icon, text, sender, action, "", 0); }
 // Using provided texts, not from DB
-void AddGossipItemFor(Player* player, GossipOptionIcon icon, std::string const& text, uint32 sender, uint32 action, std::string const& popupText, uint32 popupMoney, bool coded)
-{
-    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, icon, text, sender, action, popupText, popupMoney, coded);
-}
-
+void AddGossipItemFor(Player* player, uint32 icon, std::string const& text, uint32 sender, uint32 action, std::string const& popupText, uint32 popupMoney, bool coded) { player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, icon, text, sender, action, popupText, popupMoney, coded); }
 // Uses gossip item info from DB
-void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItemID, uint32 sender, uint32 action)
-{
-    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(gossipMenuID, gossipMenuItemID, sender, action);
-}
-
-void SendGossipMenuFor(Player* player, uint32 npcTextID, ObjectGuid const& guid)
-{
-    player->PlayerTalkClass->SendGossipMenu(npcTextID, guid);
-}
-
-void SendGossipMenuFor(Player* player, uint32 npcTextID, Creature const* creature)
-{
-    if (creature) SendGossipMenuFor(player, npcTextID, creature->GetGUID());
-}
-
-void CloseGossipMenuFor(Player* player)
-{
-    player->PlayerTalkClass->SendCloseGossip();
-}
+void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItemID, uint32 sender, uint32 action) { player->PlayerTalkClass->GetGossipMenu().AddMenuItem(gossipMenuID, gossipMenuItemID, sender, action); }
+void SendGossipMenuFor(Player* player, uint32 npcTextID, ObjectGuid const& guid) { player->PlayerTalkClass->SendGossipMenu(npcTextID, guid); }
+void SendGossipMenuFor(Player* player, uint32 npcTextID, Creature const* creature) { if (creature) SendGossipMenuFor(player, npcTextID, creature->GetGUID()); }
+void CloseGossipMenuFor(Player* player) { player->PlayerTalkClass->SendCloseGossip(); }

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYSERVER_TYPEDEFS_H
-#define TRINITYSERVER_TYPEDEFS_H
+#ifndef FIRELANDSSERVER_TYPEDEFS_H
+#define FIRELANDSSERVER_TYPEDEFS_H
 
 #include "Common.h"
 namespace G3D
@@ -76,10 +76,10 @@ namespace Movement
 
     typedef counter<uint32, 0xFFFFFFFF> UInt32Counter;
 
-    TC_GAME_API extern float gravity;
-    TC_GAME_API extern UInt32Counter splineIdGen;
+    FC_GAME_API extern float gravity;
+    FC_GAME_API extern UInt32Counter splineIdGen;
     extern std::string MovementFlags_ToString(uint32 flags);
     extern std::string MovementFlagsExtra_ToString(uint32 flags);
 }
 
-#endif // TRINITYSERVER_TYPEDEFS_H
+#endif // FIRELANDSSERVER_TYPEDEFS_H

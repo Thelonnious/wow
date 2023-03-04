@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_GUILD_H
-#define TRINITYCORE_GUILD_H
+#ifndef _FIRELANDS_GUILD_H
+#define _FIRELANDS_GUILD_H
 
 #include "DatabaseEnvFwd.h"
 #include "ObjectGuid.h"
@@ -32,7 +32,6 @@ class Item;
 class Player;
 class Unit;
 class GameObject;
-class WorldObject;
 class WorldPacket;
 class WorldSession;
 struct ItemPosCount;
@@ -275,7 +274,7 @@ enum GuildChallengeTypes
 };
 
 // Emblem info
-class TC_GAME_API EmblemInfo
+class FC_GAME_API EmblemInfo
 {
 public:
     EmblemInfo() : m_style(0), m_color(0), m_borderStyle(0), m_borderColor(0), m_backgroundColor(0) { }
@@ -343,7 +342,7 @@ struct GuildMemberProfessionData
     std::array<uint8, GUILD_RECIPES_COUNT> RecipeUniqueBits;
 };
 
-class TC_GAME_API Guild
+class FC_GAME_API Guild
 {
 private:
     // Class representing guild member
@@ -892,7 +891,7 @@ public:
     void ResetTimes(bool weekly);
 
     bool HasAchieved(uint32 achievementId) const;
-    void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint64 miscValue1, uint64 miscValue2, uint64 miscValue3, WorldObject* ref, Player* player, GameObject* go = nullptr);
+    void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint64 miscValue1, uint64 miscValue2, uint64 miscValue3, Unit* unit, Player* player, GameObject* go = nullptr);
 
     inline void SetAchievementPointsFor(ObjectGuid guid, uint32 achievementPoint)
     {

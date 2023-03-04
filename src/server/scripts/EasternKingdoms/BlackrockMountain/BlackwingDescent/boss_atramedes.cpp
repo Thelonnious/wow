@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -205,7 +205,7 @@ struct boss_atramedes : public BossAI
     {
         BossAI::JustEngagedWith(who);
         instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-        instance->DoUpdateWorldState(WORLD_STATE_ID_SILENCE_IS_GOLDEN, 0);
+        instance->instance->SetWorldState(WORLD_STATE_ID_SILENCE_IS_GOLDEN, 0);
         Talk(SAY_AGGRO);
         DoCastSelf(SPELL_DEVASTATION_TRIGGER);
         DoCastSelf(SPELL_SOUND_BAR);
@@ -915,7 +915,7 @@ class spell_atramedes_sound_bar : public AuraScript
         }
         else if (target->GetPower(POWER_ALTERNATE_POWER) >= 50)
             if (!instance->instance->GetWorldStateValue(WORLD_STATE_ID_SILENCE_IS_GOLDEN))
-                instance->DoUpdateWorldState(WORLD_STATE_ID_SILENCE_IS_GOLDEN, 1);
+                instance->instance->SetWorldState(WORLD_STATE_ID_SILENCE_IS_GOLDEN, 1);
     }
 
     void Register() override
@@ -1039,10 +1039,10 @@ class spell_atramedes_sonic_breath : public SpellScript
         if (targets.empty())
             return;
 
-        targets.remove_if(Trinity::Predicates::IsVictimOf(GetCaster()));
+        targets.remove_if(Firelands::Predicates::IsVictimOf(GetCaster()));
 
         if (targets.size() > 1)
-            Trinity::Containers::RandomResize(targets, 1);
+            Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override
@@ -1064,7 +1064,7 @@ class spell_atramedes_destroy_shield : public SpellScript
         });
 
         if (targets.size() > 1)
-            Trinity::Containers::RandomResize(targets, 1);
+            Firelands::Containers::RandomResize(targets, 1);
     }
 
     void Register() override

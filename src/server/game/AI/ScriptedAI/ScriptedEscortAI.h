@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -33,7 +33,7 @@ enum EscortState : uint32
     STATE_ESCORT_PAUSED     = 0x04  // escort is paused, wont continue with next waypoint
 };
 
-struct TC_GAME_API EscortAI : public ScriptedAI
+struct FC_GAME_API EscortAI : public ScriptedAI
 {
     public:
         explicit EscortAI(Creature* creature);

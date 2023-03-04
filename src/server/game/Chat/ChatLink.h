@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_CHATLINK_H
-#define TRINITYCORE_CHATLINK_H
+#ifndef _FIRELANDS_CHATLINK_H
+#define _FIRELANDS_CHATLINK_H
 
 #include "Common.h"
 #include "SharedDefines.h"
@@ -36,7 +36,7 @@ class Quest;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // ChatLink - abstract base class for various links
-class TC_GAME_API ChatLink
+class FC_GAME_API ChatLink
 {
 public:
     ChatLink() : _color(0), _startPos(0), _endPos(0) { }
@@ -56,7 +56,7 @@ protected:
 };
 
 // ItemChatLink - link to item
-class TC_GAME_API ItemChatLink : public ChatLink
+class FC_GAME_API ItemChatLink : public ChatLink
 {
 public:
     ItemChatLink() : ChatLink(), _item(nullptr), _suffix(nullptr), _property(nullptr)
@@ -76,7 +76,7 @@ protected:
 };
 
 // QuestChatLink - link to quest
-class TC_GAME_API QuestChatLink : public ChatLink
+class FC_GAME_API QuestChatLink : public ChatLink
 {
 public:
     QuestChatLink() : ChatLink(), _quest(nullptr), _questLevel(0) { }
@@ -89,7 +89,7 @@ protected:
 };
 
 // SpellChatLink - link to quest
-class TC_GAME_API SpellChatLink : public ChatLink
+class FC_GAME_API SpellChatLink : public ChatLink
 {
 public:
     SpellChatLink() : ChatLink(), _spell(nullptr) { }
@@ -101,7 +101,7 @@ protected:
 };
 
 // AchievementChatLink - link to quest
-class TC_GAME_API AchievementChatLink : public ChatLink
+class FC_GAME_API AchievementChatLink : public ChatLink
 {
 public:
     AchievementChatLink() : ChatLink(), _guid(0), _achievement(nullptr)
@@ -118,7 +118,7 @@ protected:
 };
 
 // TradeChatLink - link to trade info
-class TC_GAME_API TradeChatLink : public SpellChatLink
+class FC_GAME_API TradeChatLink : public SpellChatLink
 {
 public:
     TradeChatLink() : SpellChatLink(), _minSkillLevel(0), _maxSkillLevel(0), _guid(0) { }
@@ -131,7 +131,7 @@ private:
 };
 
 // TalentChatLink - link to talent
-class TC_GAME_API TalentChatLink : public SpellChatLink
+class FC_GAME_API TalentChatLink : public SpellChatLink
 {
 public:
     TalentChatLink() : SpellChatLink(), _talentId(0), _rankId(0) { }
@@ -143,7 +143,7 @@ private:
 };
 
 // EnchantmentChatLink - link to enchantment
-class TC_GAME_API EnchantmentChatLink : public SpellChatLink
+class FC_GAME_API EnchantmentChatLink : public SpellChatLink
 {
 public:
     EnchantmentChatLink() : SpellChatLink() { }
@@ -151,7 +151,7 @@ public:
 };
 
 // GlyphChatLink - link to glyph
-class TC_GAME_API GlyphChatLink : public SpellChatLink
+class FC_GAME_API GlyphChatLink : public SpellChatLink
 {
 public:
     GlyphChatLink() : SpellChatLink(), _slotId(0), _glyph(nullptr) { }
@@ -161,7 +161,7 @@ private:
     GlyphPropertiesEntry const* _glyph;
 };
 
-class TC_GAME_API LinkExtractor
+class FC_GAME_API LinkExtractor
 {
 public:
     explicit LinkExtractor(char const* msg);
@@ -176,4 +176,4 @@ private:
 };
 
 
-#endif // TRINITYCORE_CHATLINK_H
+#endif // _FIRELANDS_CHATLINK_H

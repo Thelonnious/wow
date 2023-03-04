@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,7 +20,6 @@
 
 #include "Common.h"
 #include "Duration.h"
-#include "EventProcessor.h"
 #include "GridReference.h"
 #include "GridRefManager.h"
 #include "ModelIgnoreFlags.h"
@@ -31,7 +30,6 @@
 #include "PhaseShift.h"
 #include "Position.h"
 #include "SharedDefines.h"
-#include "SpellDefines.h"
 #include "UpdateFields.h"
 #include "UpdateMask.h"
 #include <list>
@@ -47,9 +45,6 @@ class GameObject;
 class InstanceScript;
 class Map;
 class Player;
-class Spell;
-class SpellCastTargets;
-class SpellInfo;
 class TempSummon;
 class TransportBase;
 class Unit;
@@ -57,7 +52,6 @@ class UpdateData;
 class WorldObject;
 class WorldPacket;
 class ZoneScript;
-struct FactionTemplateEntry;
 struct PositionFullTerrainStatus;
 struct QuaternionData;
 enum ZLiquidStatus : uint32;
@@ -66,7 +60,7 @@ typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 
 float const DEFAULT_COLLISION_HEIGHT = 2.03128f; // Most common value in dbc
 
-class TC_GAME_API Object
+class FC_GAME_API Object
 {
     public:
         virtual ~Object();
@@ -284,7 +278,7 @@ enum GOSummonType
    GO_SUMMON_TIMED_DESPAWN = 1     // despawns after a specified time
 };
 
-class TC_GAME_API WorldObject : public Object, public WorldLocation
+class FC_GAME_API WorldObject : public Object, public WorldLocation
 {
     protected:
         explicit WorldObject(bool isWorldObject); //note: here it means if it is in grid object list or world object list
@@ -306,6 +300,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         Position GetFirstCollisionPosition(float dist, float angle);
         Position GetRandomNearPosition(float radius);
         void GetContactPoint(WorldObject const* obj, float &x, float &y, float &z, float distance2d = CONTACT_DISTANCE) const;
+
+        float GetObjectSize() const;
 
         virtual float GetCombatReach() const { return 0.0f; } // overridden (only) in Unit
         void UpdateGroundPositionZ(float x, float y, float &z) const;
@@ -330,7 +326,6 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         uint32 GetZoneId() const { return m_zoneId; }
         uint32 GetAreaId() const { return m_areaId; }
         void GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const { zoneid = m_zoneId, areaid = m_areaId; }
-        bool IsInWorldPvpZone() const;
         bool IsOutdoors() const { return m_outdoors; }
         ZLiquidStatus GetLiquidStatus() const { return m_liquidStatus; }
         uint32 GetWMOGroupId() const { return m_wmoGroupID; }
@@ -420,61 +415,25 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         Creature*   SummonTrigger(float x, float y, float z, float ang, uint32 dur, CreatureAI* (*GetAI)(Creature*) = nullptr);
         void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
 
-        Creature*   FindNearestCreature(uint32 entry, float range, bool alive = true) const;
-        GameObject* FindNearestGameObject(uint32 entry, float range) const;
-        GameObject* FindNearestGameObjectOfType(GameobjectTypes type, float range) const;
-        Player* SelectNearestPlayer(float distance) const;
+        Creature*               FindNearestCreature(uint32 entry, float range, bool alive = true) const;
+        Creature*               FindNearestCreature(std::list<uint32> entrys, float range, bool alive = true) const;
+        std::list<Creature*>    FindNearestCreatures(uint32 entry, float range) const;
+        std::list<Creature*>    FindAllCreaturesInRange(float range);
+        std::list<Creature*>    FindAllUnfriendlyCreaturesInRange(float range);
+        Creature*               FindNearestAttackableCreatureOnTransportInFloor(float rangeXY, float rangeZ);
+        Creature*               FindNearestCreatureOnTransportInFloor(uint32 entry, float rangeXY, float rangeZ);
 
-        virtual ObjectGuid GetOwnerGUID() const = 0;
-        virtual ObjectGuid GetCharmerOrOwnerGUID() const { return GetOwnerGUID(); }
-        ObjectGuid GetCharmerOrOwnerOrOwnGUID() const;
+        GameObject*             FindNearestGameObject(uint32 entry, float range) const;
+        std::list<GameObject*>  FindNearestGameObjects(uint32 entry, float range) const;
+        GameObject*             FindNearestGameObjectOfType(GameobjectTypes type, float range) const;
 
-        Unit* GetOwner() const;
-        Unit* GetCharmerOrOwner() const;
-        Unit* GetCharmerOrOwnerOrSelf() const;
-        Unit* GetCharmerOrOwnerOrCreatorOrSelf() const;
-        Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
-        Player* GetAffectingPlayer() const;
+        std::list<Player*>      SelectNearestPlayers(float range, bool alive = true);
+        Player*                 SelectRandomPlayerInRange(float range, bool alive);
+        Player*                 SelectNearestPlayer(float distance) const;
 
-        Player* GetSpellModOwner() const;
-        int32 CalculateSpellDamage(Unit const* target, SpellInfo const* spellProto, uint8 effIndex, int32 const* basePoints = nullptr) const;
-
-        // target dependent range checks
-        float GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
-        float GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
-
-        float ApplyEffectModifiers(SpellInfo const* spellProto, uint8 effect_index, float value) const;
-        int32 CalcSpellDuration(SpellInfo const* spellInfo) const;
-        int32 ModSpellDuration(SpellInfo const* spellProto, WorldObject const* target, int32 duration, bool positive, uint32 effectMask);
-        void  ModSpellCastTime(SpellInfo const* spellProto, int32& castTime, Spell* spell = nullptr);
-
-        virtual float MeleeSpellMissChance(Unit const* victim, WeaponAttackType attType, SpellInfo const* spellInfo = nullptr) const;
-        virtual SpellMissInfo MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo) const;
-        SpellMissInfo MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo) const;
-        SpellMissInfo SpellHitResult(Unit* victim, SpellInfo const* spellInfo, bool canReflect = false) const;
-        void SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo missInfo);
-
-        virtual uint32 GetFaction() const = 0;
-        virtual void SetFaction(uint32 /*faction*/) { }
-        FactionTemplateEntry const* GetFactionTemplateEntry() const;
-
-        ReputationRank GetReactionTo(WorldObject const* target) const;
-        static ReputationRank GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
-
-        bool IsHostileTo(WorldObject const* target) const;
-        bool IsHostileToPlayers() const;
-        bool IsFriendlyTo(WorldObject const* target) const;
-        bool IsNeutralToAll() const;
-
-        // CastSpell's third arg can be a variety of things - check out CastSpellExtraArgs' constructors!
-        SpellCastResult CastSpell(SpellCastTargets const& targets, uint32 spellId, CastSpellExtraArgs const& args = { });
-        SpellCastResult CastSpell(WorldObject* target, uint32 spellId, CastSpellExtraArgs const& args = { });
-        SpellCastResult CastSpell(Position const& dest, uint32 spellId, CastSpellExtraArgs const& args = { });
-
-        bool IsValidAttackTarget(WorldObject const* target, SpellInfo const* bySpell = nullptr) const;
-        bool IsValidAssistTarget(WorldObject const* target, SpellInfo const* bySpell = nullptr) const;
-
-        Unit* GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
+        AreaTrigger*            SelectNearestAreaTrigger(uint32 spellId, float distance = 0.0f) const;
+        std::list<AreaTrigger*> SelectNearestAreaTriggers(uint32 spellId, float range);
+        AreaTrigger*            SelectRandomAreaTriggerInRange(uint32 spellId, float range);
 
         template <typename Container>
         void GetGameObjectListWithEntryInGrid(Container& gameObjectContainer, uint32 entry, float maxSearchRange = 250.0f) const;
@@ -539,9 +498,6 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
         float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
 
-        // Event handler
-        EventProcessor m_Events;
-
         uint16 GetAIAnimKitId() const { return m_aiAnimKitId; }
         void SetAIAnimKitId(uint16 animKitId);
         uint16 GetMovementAnimKitId() const { return m_movementAnimKitId; }
@@ -560,7 +516,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         bool m_isActive;
         bool m_isFarVisible;
         Optional<float> m_visibilityDistanceOverride;
-        bool const m_isWorldObject;
+        const bool m_isWorldObject;
         ZoneScript* m_zoneScript;
 
         // transports (gameobjects only)
@@ -588,6 +544,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
     private:
         Map* m_currMap;                                   // current object's Map location
 
+        //uint32 m_mapId;                                 // object at map with map_id
         uint32 m_InstanceId;                              // in map copy with instance id
         PhaseShift _phaseShift;
         PhaseShift _suppressedPhaseShift;                 // contains phases for current area but not applied due to conditions
@@ -610,7 +567,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         uint16 m_meleeAnimKitId;
 };
 
-namespace Trinity
+namespace Firelands
 {
     // Binary predicate to sort WorldObjects based on the distance to a reference WorldObject
     class ObjectDistanceOrderPred

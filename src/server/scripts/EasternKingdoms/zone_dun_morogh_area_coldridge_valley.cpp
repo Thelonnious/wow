@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -56,7 +56,7 @@ public:
             _tapped = false;
         }
 
-        void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (_tapped)
                 return;
@@ -150,7 +150,7 @@ public:
             me->SetHealth(me->CountPctFromMaxHealth(_percentHP));
         }
 
-        void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (!_hitBySpell)
             {

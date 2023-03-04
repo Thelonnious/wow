@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_SMARTAI_H
-#define TRINITY_SMARTAI_H
+#ifndef FIRELANDS_SMARTAI_H
+#define FIRELANDS_SMARTAI_H
 
 #include "Define.h"
 #include "CreatureAI.h"
@@ -39,7 +39,7 @@ enum SmartEscortVars
     SMART_MAX_AID_DIST    = SMART_ESCORT_MAX_PLAYER_DIST / 2
 };
 
-class TC_GAME_API SmartAI : public CreatureAI
+class FC_GAME_API SmartAI : public CreatureAI
 {
     public:
         ~SmartAI() { }
@@ -66,6 +66,7 @@ class TC_GAME_API SmartAI : public CreatureAI
         bool CanCombatMove() { return _canCombatMove; }
         void SetFollow(Unit* target, float dist = 0.0f, float angle = 0.0f, uint32 credit = 0, uint32 end = 0, uint32 creditType = 0);
         void StopFollow(bool complete);
+        void SetUnfollow();
         bool IsEscortInvokerInRange();
 
         void WaypointPathStarted(uint32 pathId) override;
@@ -104,10 +105,10 @@ class TC_GAME_API SmartAI : public CreatureAI
         void MoveInLineOfSight(Unit* who) override;
 
         // Called when hit by a spell
-        void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override;
+        void SpellHit(Unit* unit, SpellInfo const* spellInfo) override;
 
         // Called when spell hits a target
-        void SpellHitTarget(WorldObject* target, SpellInfo const* spellInfo) override;
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override;
 
         // Called at any Damage from any attacker (before damage apply)
         void DamageTaken(Unit* doneBy, uint32& damage) override;
@@ -196,6 +197,8 @@ class TC_GAME_API SmartAI : public CreatureAI
 
         void SetGossipReturn(bool val) { _gossipReturn = val; }
 
+        uint32 GetPhase() { return GetScript()->GetPhase(); }
+
     private:
         bool AssistPlayerInCombatAgainst(Unit* who);
         void ReturnToLastOOCPos();
@@ -243,7 +246,7 @@ class TC_GAME_API SmartAI : public CreatureAI
         bool _gossipReturn;
 };
 
-class TC_GAME_API SmartGameObjectAI : public GameObjectAI
+class FC_GAME_API SmartGameObjectAI : public GameObjectAI
 {
     public:
         SmartGameObjectAI(GameObject* g) : GameObjectAI(g), _gossipReturn(false) { }
@@ -261,17 +264,14 @@ class TC_GAME_API SmartGameObjectAI : public GameObjectAI
         bool GossipSelectCode(Player* player, uint32 menuId, uint32 gossipListId, char const* code) override;
         void QuestAccept(Player* player, Quest const* quest) override;
         void QuestReward(Player* player, Quest const* quest, uint32 opt) override;
-        void Destroyed(WorldObject* attacker, uint32 eventId) override;
+        void Destroyed(Player* player, uint32 eventId) override;
         void SetData(uint32 id, uint32 value, Unit* invoker);
         void SetData(uint32 id, uint32 value) override { SetData(id, value, nullptr); }
         void SetScript9(SmartScriptHolder& e, uint32 entry, Unit* invoker);
         void OnGameEvent(bool start, uint16 eventId) override;
         void OnLootStateChanged(uint32 state, Unit* unit) override;
         void EventInform(uint32 eventId) override;
-
-        // Called when hit by a spell
-        void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override;
-
+        void SpellHit(Unit* unit, SpellInfo const* spellInfo) override;
 
         void SetGossipReturn(bool val) { _gossipReturn = val; }
 

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the FirelandsCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_GAMEEVENT_MGR_H
-#define TRINITY_GAMEEVENT_MGR_H
+#ifndef FIRELANDS_GAMEEVENT_MGR_H
+#define FIRELANDS_GAMEEVENT_MGR_H
 
 #include "Common.h"
 #include "ObjectGuid.h"
@@ -90,7 +90,7 @@ class Creature;
 class Quest;
 struct VendorItem;
 
-class TC_GAME_API GameEventMgr
+class FC_GAME_API GameEventMgr
 {
     private:
         GameEventMgr();
@@ -140,7 +140,6 @@ class TC_GAME_API GameEventMgr
         bool hasCreatureActiveEventExcept(ObjectGuid::LowType creature_guid, uint16 event_id);
         bool hasGameObjectActiveEventExcept(ObjectGuid::LowType go_guid, uint16 event_id);
         void SetHolidayEventTime(GameEventData& event);
-        time_t GetLastStartTime(uint16 event_id) const;
 
         typedef std::list<ObjectGuid::LowType> GuidList;
         typedef std::list<uint32> IdList;
@@ -181,7 +180,7 @@ class TC_GAME_API GameEventMgr
 
 #define sGameEventMgr GameEventMgr::instance()
 
-TC_GAME_API bool IsHolidayActive(HolidayIds id);
-TC_GAME_API bool IsEventActive(uint32 eventId);
+FC_GAME_API bool IsHolidayActive(HolidayIds id);
+FC_GAME_API bool IsEventActive(uint32 eventId);
 
 #endif
